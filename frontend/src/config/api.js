@@ -1,7 +1,8 @@
 // API Configuration
-const API_CONFIG = {
+export const API_CONFIG = {
   // Base API URL - production'da environment variable'dan gelecek
   BASE_URL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000',
+  baseURL: import.meta.env.VITE_API_BASE_URL,
 
   // API Endpoints
   ENDPOINTS: {
