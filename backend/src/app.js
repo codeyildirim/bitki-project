@@ -24,12 +24,15 @@ import orderRoutes from './routes/orders.js';
 import adminRoutes from './routes/admin.js';
 import blogRoutes from './routes/blog.js';
 import captchaRoutes from './routes/captcha.js';
+import cartRoutes from './routes/cart.js';
+import addressRoutes from './routes/addresses.js';
 
 // Middleware
 import { checkIPBan } from './middleware/ipban.js';
 
 // Database initialization
 import './models/database.js';
+import { runMigrations } from './utils/migrations.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -107,6 +110,8 @@ const corsOptions = {
       'http://localhost:5173',
       'http://localhost:5174',
       'http://localhost:3000',
+      'https://bitki.vercel.app',
+      'https://bitki-admin.vercel.app',
       process.env.PUBLIC_DOMAIN,
       process.env.ADMIN_DOMAIN
     ].filter(Boolean);
@@ -133,11 +138,23 @@ app.use(express.urlencoded({ extended: true, limit: '1mb' }));
 app.use(checkIPBan);
 
 // Static files (uploads)
-const uploadsDir = join(__dirname, '../uploads');
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir, { recursive: true });
+// Use environment variable for upload directory
+const UPLOAD_DIR = process.env.UPLOAD_DIR || join(__dirname, '../uploads');
+
+if (!fs.existsSync(UPLOAD_DIR)) {
+  fs.mkdirSync(UPLOAD_DIR, { recursive: true });
 }
-app.use('/uploads', express.static(uploadsDir));
+
+// Create subdirectories
+const subDirs = ['products', 'videos', 'categories', 'temp', 'backgrounds'];
+subDirs.forEach(subDir => {
+  const fullPath = join(UPLOAD_DIR, subDir);
+  if (!fs.existsSync(fullPath)) {
+    fs.mkdirSync(fullPath, { recursive: true });
+  }
+});
+
+app.use('/uploads', express.static(UPLOAD_DIR));
 
 // Routes
 app.use('/api/auth', authRoutes);
@@ -146,6 +163,8 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/blog', blogRoutes);
 app.use('/api/captcha', captchaRoutes);
+app.use('/api/cart', cartRoutes);
+app.use('/api/addresses', addressRoutes);
 
 // Yeni route'lar
 import categoriesRoutes from './routes/categories.js';
@@ -217,10 +236,17 @@ app.use('*', (req, res) => {
   res.status(404).json({ success: false, message: 'Endpoint bulunamadı' });
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`🌿 Şifalı Bitkiler E-Ticaret API çalışıyor: http://localhost:${PORT}`);
   console.log(`📋 Health Check: http://localhost:${PORT}/api/health`);
   console.log(`🗃️  Database: SQLite (${join(__dirname, '../database.sqlite')})`);
+
+  // Run database migrations
+  try {
+    await runMigrations();
+  } catch (error) {
+    console.error('❌ Migration failed, but server will continue running:', error);
+  }
 });
 
 export default app;

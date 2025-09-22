@@ -1,0 +1,47 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background with gradient -->
+  <rect width="512" height="512" rx="85" fill="url(#bgGradient)"/>
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#10b981;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#059669;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Main plant stem -->
+  <path d="M256 380 L256 180" stroke="#ffffff" stroke-width="16" stroke-linecap="round"/>
+
+  <!-- Large leaves -->
+  <ellipse cx="180" cy="240" rx="40" ry="70" fill="#ffffff" transform="rotate(-35 180 240)"/>
+  <ellipse cx="332" cy="240" rx="40" ry="70" fill="#ffffff" transform="rotate(35 332 240)"/>
+
+  <!-- Medium leaves -->
+  <ellipse cx="205" cy="190" rx="30" ry="55" fill="#ffffff" transform="rotate(-25 205 190)"/>
+  <ellipse cx="307" cy="190" rx="30" ry="55" fill="#ffffff" transform="rotate(25 307 190)"/>
+
+  <!-- Small upper leaves -->
+  <ellipse cx="220" cy="155" rx="22" ry="40" fill="#ffffff" transform="rotate(-15 220 155)"/>
+  <ellipse cx="292" cy="155" rx="22" ry="40" fill="#ffffff" transform="rotate(15 292 155)"/>
+
+  <!-- Center flower -->
+  <circle cx="256" cy="130" r="25" fill="#ffffff"/>
+  <circle cx="256" cy="130" r="15" fill="#10b981"/>
+
+  <!-- Flower petals -->
+  <ellipse cx="256" cy="105" rx="8" ry="18" fill="#ffffff"/>
+  <ellipse cx="281" cy="130" rx="8" ry="18" fill="#ffffff" transform="rotate(90 281 130)"/>
+  <ellipse cx="256" cy="155" rx="8" ry="18" fill="#ffffff"/>
+  <ellipse cx="231" cy="130" rx="8" ry="18" fill="#ffffff" transform="rotate(90 231 130)"/>
+
+  <!-- Decorative elements -->
+  <circle cx="150" cy="320" r="8" fill="#ffffff" opacity="0.7"/>
+  <circle cx="362" cy="320" r="8" fill="#ffffff" opacity="0.7"/>
+  <circle cx="120" cy="280" r="5" fill="#ffffff" opacity="0.5"/>
+  <circle cx="392" cy="280" r="5" fill="#ffffff" opacity="0.5"/>
+  <circle cx="190" cy="350" r="6" fill="#ffffff" opacity="0.6"/>
+  <circle cx="322" cy="350" r="6" fill="#ffffff" opacity="0.6"/>
+
+  <!-- Additional small decorative leaves -->
+  <ellipse cx="140" cy="300" rx="12" ry="20" fill="#ffffff" opacity="0.4" transform="rotate(-45 140 300)"/>
+  <ellipse cx="372" cy="300" rx="12" ry="20" fill="#ffffff" opacity="0.4" transform="rotate(45 372 300)"/>
+</svg>
