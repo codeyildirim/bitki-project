@@ -26,6 +26,7 @@ import blogRoutes from './routes/blog.js';
 import captchaRoutes from './routes/captcha.js';
 import cartRoutes from './routes/cart.js';
 import addressRoutes from './routes/addresses.js';
+import healthRoutes from './routes/health.js';
 
 // Middleware
 import { checkIPBan } from './middleware/ipban.js';
@@ -165,6 +166,7 @@ app.use('/api/blog', blogRoutes);
 app.use('/api/captcha', captchaRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/addresses', addressRoutes);
+app.use('/api/health', healthRoutes);
 
 // Yeni route'lar
 import categoriesRoutes from './routes/categories.js';
