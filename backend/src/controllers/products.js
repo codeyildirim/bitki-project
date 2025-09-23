@@ -45,17 +45,19 @@ export const getProducts = async (req, res) => {
 
     const { total } = await db.get(countQuery, countParams);
 
-    const baseURL = process.env.BASE_URL || `http://localhost:${process.env.PORT || 3000}`;
+    // Mutlak URL üretme fonksiyonu
+    const publicUrl = (filename) => {
+      if (!filename) return null;
+      if (filename.startsWith('http')) return filename;
+      const host = req.get('host');
+      const proto = (req.headers['x-forwarded-proto'] || req.protocol || 'http');
+      return `${proto}://${host}/uploads/${filename}`;
+    };
+
     const formattedProducts = products.map(product => ({
       ...product,
-      images: product.images ? JSON.parse(product.images).map(img => {
-        // Eğer URL zaten tam ise olduğu gibi dön, değilse baseURL ekle
-        return img.startsWith('http') ? img : `${baseURL}${img}`;
-      }) : [],
-      videos: product.videos ? JSON.parse(product.videos).map(video => {
-        // Eğer URL zaten tam ise olduğu gibi dön, değilse baseURL ekle
-        return video.startsWith('http') ? video : `${baseURL}${video}`;
-      }) : [],
+      images: product.images ? JSON.parse(product.images).map(img => publicUrl(img)) : [],
+      videos: product.videos ? JSON.parse(product.videos).map(video => publicUrl(video)) : [],
       avg_rating: product.avg_rating ? parseFloat(product.avg_rating).toFixed(1) : 0,
       review_count: product.review_count || 0
     }));

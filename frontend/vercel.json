@@ -1,4 +1,6 @@
 {
+  "cleanUrls": true,
+  "trailingSlash": false,
   "rewrites": [
     {
       "source": "/admin",
@@ -6,6 +8,11 @@
     },
     {
       "source": "/admin/(.*)",
+      "destination": "/admin.html"
+    },
+    {
+      "source": "/",
+      "has": [{ "type": "host", "value": "bitki-admin.vercel.app" }],
       "destination": "/admin.html"
     },
     {

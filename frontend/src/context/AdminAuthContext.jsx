@@ -7,7 +7,8 @@ const AdminAuthContext = createContext();
 
 // Admin-specific axios instance
 const adminApi = axios.create({
-  baseURL: API_CONFIG.BASE_URL
+  baseURL: API_CONFIG.BASE_URL,
+  withCredentials: true
 });
 
 // Add auth interceptor for admin token

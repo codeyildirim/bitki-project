@@ -42,7 +42,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Trust proxy ayarı (IP adresini doğru almak için)
-// Rate limiting için güvenli proxy ayarı
+// Rate limiting için güvenli proxy ayarı - Render/Proxy arkasında güvenli işlem için
 app.set('trust proxy', 1);
 
 // Security middleware
@@ -111,9 +111,12 @@ app.use(cors({
     'http://localhost:5173',
     'http://localhost:5174'
   ],
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
 }));
+
+app.options('*', cors());
 
 // Global rate limiter - tüm isteklere uygulanır
 app.use(globalLimiter);
@@ -125,9 +128,8 @@ app.use(express.urlencoded({ extended: true, limit: '1mb' }));
 // IP ban kontrolü
 app.use(checkIPBan);
 
-// Static files (uploads)
-// Use environment variable for upload directory
-const UPLOAD_DIR = process.env.UPLOAD_DIR || join(__dirname, '../uploads');
+// Static files (uploads) - Render kalıcı disk için
+const UPLOAD_DIR = process.env.UPLOAD_DIR || '/opt/render/project/uploads';
 
 if (!fs.existsSync(UPLOAD_DIR)) {
   fs.mkdirSync(UPLOAD_DIR, { recursive: true });
@@ -142,7 +144,7 @@ subDirs.forEach(subDir => {
   }
 });
 
-app.use('/uploads', express.static(UPLOAD_DIR));
+app.use('/uploads', express.static(UPLOAD_DIR, { fallthrough: true }));
 
 // Routes
 app.use('/api/auth', authRoutes);
