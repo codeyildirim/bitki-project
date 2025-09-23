@@ -3,7 +3,7 @@ import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
 import db from '../models/database.js';
-import { authenticateToken, requireAdmin } from '../middleware/auth.js';
+import { requireAdminRole } from '../middleware/auth.js';
 import { getUploadPath } from '../utils/uploadPaths.js';
 
 const router = express.Router();
@@ -98,7 +98,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // Admin: Yeni kategori ekle
-router.post('/', authenticateToken, requireAdmin, upload.single('image'), async (req, res) => {
+router.post('/', requireAdminRole, upload.single('image'), async (req, res) => {
   const { name, slug, description, image_url, parent_id } = req.body;
 
   if (!name || !slug) {
@@ -152,7 +152,7 @@ router.post('/', authenticateToken, requireAdmin, upload.single('image'), async 
 });
 
 // Admin: Kategori güncelle
-router.put('/:id', authenticateToken, requireAdmin, upload.single('image'), async (req, res) => {
+router.put('/:id', requireAdminRole, upload.single('image'), async (req, res) => {
   const { name, slug, description, image_url, parent_id, is_active } = req.body;
 
   try {
@@ -227,7 +227,7 @@ router.put('/:id', authenticateToken, requireAdmin, upload.single('image'), asyn
 });
 
 // Admin: Kategori sil
-router.delete('/:id', authenticateToken, requireAdmin, async (req, res) => {
+router.delete('/:id', requireAdminRole, async (req, res) => {
   try {
     // Alt kategorileri kontrol et
     const subcategories = await db.all(
