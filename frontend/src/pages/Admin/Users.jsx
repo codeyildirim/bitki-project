@@ -167,11 +167,26 @@ const AdminUsers = () => {
             onClick={() => {
               console.log('Current localStorage users:', localStorage.getItem('users'));
               console.log('Current localStorage userLogs:', localStorage.getItem('userLogs'));
+              console.log('All localStorage keys:', Object.keys(localStorage));
               alert('Console\'a localStorage durumu yazdırıldı');
             }}
             className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-xs"
           >
             🔍 Debug LocalStorage
+          </button>
+          <button
+            onClick={() => {
+              if (confirm('localStorage\'ı tamamen temizlemek istediğinizden emin misiniz?')) {
+                localStorage.clear();
+                fetchUsers();
+                fetchUserLogs();
+                fetchSystemLogs();
+                alert('localStorage temizlendi!');
+              }
+            }}
+            className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs"
+          >
+            🗑️ LocalStorage Temizle
           </button>
         </div>
       </div>
