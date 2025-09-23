@@ -19,7 +19,8 @@ const AdminDashboard = () => {
   const fetchDashboardData = async () => {
     try {
       // Dashboard istatistiklerini yükle
-      const response = await fetch('/api/admin/dashboard', {
+      const API_URL = 'http://localhost:3000';
+      const response = await fetch(`${API_URL}/api/admin/dashboard`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
@@ -30,30 +31,24 @@ const AdminDashboard = () => {
       } else {
         // Eğer API'den veri gelmezse demo veriler kullan
         setStats({
-          totalUsers: 42,
-          totalOrders: 18,
-          totalProducts: 25,
-          totalRevenue: 15750,
-          pendingOrders: 3,
-          recentOrders: [
-            { id: 1, order_number: 'SB-2024-001', customer_name: 'Ali Yılmaz', total_amount: 150, created_at: new Date().toISOString() },
-            { id: 2, order_number: 'SB-2024-002', customer_name: 'Ayşe Kaya', total_amount: 280, created_at: new Date().toISOString() }
-          ]
+          totalUsers: 0,
+          totalOrders: 0,
+          totalProducts: 0,
+          totalRevenue: 0,
+          pendingOrders: 0,
+          recentOrders: []
         });
       }
     } catch (error) {
       console.error('Dashboard verileri yüklenemedi:', error);
-      // Hata durumunda demo veriler
+      // Hata durumunda gerçek durumu yansıt
       setStats({
-        totalUsers: 42,
-        totalOrders: 18,
-        totalProducts: 25,
-        totalRevenue: 15750,
-        pendingOrders: 3,
-        recentOrders: [
-          { id: 1, order_number: 'SB-2024-001', customer_name: 'Ali Yılmaz', total_amount: 150, created_at: new Date().toISOString() },
-          { id: 2, order_number: 'SB-2024-002', customer_name: 'Ayşe Kaya', total_amount: 280, created_at: new Date().toISOString() }
-        ]
+        totalUsers: 0,
+        totalOrders: 0,
+        totalProducts: 0,
+        totalRevenue: 0,
+        pendingOrders: 0,
+        recentOrders: []
       });
     } finally {
       setLoading(false);
