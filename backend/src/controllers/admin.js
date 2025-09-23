@@ -79,22 +79,28 @@ export const deleteUser = async (req, res) => {
   try {
     const { id } = req.params;
 
+    console.log('🗑️  DELETE USER REQUEST:', { userId: id, adminId: req.user.id });
+
     if (parseInt(id) === req.user.id) {
       return res.status(400).json(responseError('Kendi hesabınızı silemezsiniz'));
     }
 
     const user = await db.get('SELECT * FROM users WHERE id = ?', [id]);
     if (!user) {
+      console.log('❌ User not found:', id);
       return res.status(404).json(responseError('Kullanıcı bulunamadı'));
     }
 
-    await db.run('DELETE FROM users WHERE id = ?', [id]);
+    console.log('👤 Found user to delete:', { id: user.id, nickname: user.nickname });
+
+    const result = await db.run('DELETE FROM users WHERE id = ?', [id]);
+    console.log('🗑️  DELETE RESULT:', { changes: result.changes, deletedUserId: id });
 
     await logAdminAction(db, req.user.id, 'DELETE_USER', `Kullanıcı silindi: ${user.nickname}`, req);
 
     res.json(responseSuccess(null, 'Kullanıcı silindi'));
   } catch (error) {
-    console.error('Kullanıcı silme hatası:', error);
+    console.error('❌ Kullanıcı silme hatası:', error);
     res.status(500).json(responseError('Sunucu hatası'));
   }
 };
