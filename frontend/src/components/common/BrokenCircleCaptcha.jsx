@@ -63,54 +63,32 @@ const BrokenCircleCaptcha = ({ onVerified, onError }) => {
     setFocusedCircleIndex(-1);
 
     try {
-      // Mock CAPTCHA generation - localStorage tabanlı
-      console.log('🎯 CAPTCHA: Mock CAPTCHA oluşturuluyor...');
+      // Backend API CAPTCHA generation
+      console.log('🎯 CAPTCHA: Backend API CAPTCHA oluşturuluyor...');
 
-      const numCircles = 5; // 5 daire
-      const circles = [];
-      const brokenCircleIndex = Math.floor(Math.random() * numCircles);
+      const API_URL = 'http://localhost:3000';
+      const response = await fetch(`${API_URL}/api/captcha/create`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
 
-      // Grid pozisyonları oluştur
-      const positions = [];
-      const cols = 3;
-      const rows = 2;
-      const cellWidth = 80;
-      const cellHeight = 80;
-      const startX = 50;
-      const startY = 50;
-
-      // Pozisyon havuzu oluştur
-      for (let row = 0; row < rows; row++) {
-        for (let col = 0; col < cols; col++) {
-          if (positions.length < numCircles) {
-            positions.push({
-              x: startX + col * cellWidth + Math.random() * 30 - 15,
-              y: startY + row * cellHeight + Math.random() * 20 - 10
-            });
-          }
-        }
+      if (!response.ok) {
+        throw new Error(`API hatası: ${response.status}`);
       }
 
-      for (let i = 0; i < numCircles; i++) {
-        circles.push({
-          id: i,
-          x: positions[i].x,
-          y: positions[i].y,
-          isBroken: i === brokenCircleIndex,
-          gapRotation: Math.random() * 360,
-          radius: 25 + Math.random() * 10
-        });
+      const data = await response.json();
+      console.log('📡 CAPTCHA API yanıtı:', data);
+
+      if (data.success) {
+        const { captchaId, circles } = data.data;
+        setCaptchaData(circles);
+        setCaptchaId(captchaId);
+        console.log('✅ CAPTCHA: Backend CAPTCHA hazır, ID:', captchaId);
+      } else {
+        throw new Error(data.message || 'CAPTCHA oluşturulamadı');
       }
-
-      const mockCaptchaId = 'mock-' + Date.now();
-
-      setCaptchaData(circles);
-      setCaptchaId(mockCaptchaId);
-
-      // localStorage'a doğru cevabı sakla
-      localStorage.setItem(`captcha_${mockCaptchaId}`, brokenCircleIndex.toString());
-
-      console.log('✅ CAPTCHA: Mock CAPTCHA hazır, kırık daire index:', brokenCircleIndex);
 
     } catch (error) {
       console.error('CAPTCHA load error:', error);
@@ -129,33 +107,41 @@ const BrokenCircleCaptcha = ({ onVerified, onError }) => {
     setLoading(true);
 
     try {
-      // Mock CAPTCHA verification - localStorage tabanlı
-      console.log('🔍 CAPTCHA: Doğrulama yapılıyor, seçilen:', circleId, 'captchaId:', captchaId);
+      // Backend API CAPTCHA verification
+      console.log('🔍 CAPTCHA: Backend doğrulaması yapılıyor, seçilen:', circleId, 'captchaId:', captchaId);
 
-      // localStorage'dan doğru cevabı al
-      const correctAnswer = localStorage.getItem(`captcha_${captchaId}`);
-      console.log('✅ CAPTCHA: Doğru cevap:', correctAnswer, 'Seçilen:', circleId);
+      const API_URL = 'http://localhost:3000';
+      const response = await fetch(`${API_URL}/api/captcha/verify`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          captchaId: captchaId,
+          selectedIndex: circleId
+        }),
+      });
 
-      if (correctAnswer && parseInt(correctAnswer) === circleId) {
+      const data = await response.json();
+      console.log('📡 CAPTCHA Verify API yanıtı:', data);
+
+      if (response.ok && data.success) {
         setIsVerified(true);
         playAudioFeedback('success');
         toast.success('CAPTCHA doğrulandı!');
 
-        // Mock token oluştur
-        const mockToken = 'captcha-verified-' + Date.now();
+        // Get verification token from backend
+        const verificationToken = data.data.token;
 
         // Pass the verification token to parent
         if (onVerified) {
-          onVerified(mockToken);
+          onVerified(verificationToken);
         }
 
-        console.log('🎉 CAPTCHA: Doğrulama başarılı! Token:', mockToken);
-
-        // CAPTCHA verisini temizle
-        localStorage.removeItem(`captcha_${captchaId}`);
+        console.log('🎉 CAPTCHA: Doğrulama başarılı! Token:', verificationToken);
 
       } else {
-        throw new Error('Yanlış seçim');
+        throw new Error(data.message || 'Yanlış seçim');
       }
     } catch (error) {
       console.error('CAPTCHA verification error:', error);
