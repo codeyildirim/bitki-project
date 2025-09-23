@@ -23,14 +23,14 @@ const Categories = () => {
 
   const fetchCategories = async () => {
     try {
-      // Use the base API endpoint for categories since there's no admin-specific endpoint
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000'}/api/categories`);
-      const data = await response.json();
-      if (data.success) {
-        setCategories(data.data);
+      // Use adminApi for proper token authentication
+      const response = await adminApi.get('/api/categories');
+      if (response.data.success) {
+        setCategories(response.data.data || []);
       }
     } catch (error) {
       console.error('Kategoriler yüklenemedi:', error);
+      setCategories([]);
     } finally {
       setLoading(false);
     }
@@ -39,12 +39,6 @@ const Categories = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const url = editingCategory
-        ? `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000'}/api/categories/${editingCategory.id}`
-        : `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000'}/api/categories`;
-
-      const method = editingCategory ? 'PUT' : 'POST';
-
       // FormData kullanarak hem metin hem dosya gönder
       const submitData = new FormData();
       submitData.append('name', formData.name);
@@ -61,20 +55,22 @@ const Categories = () => {
         submitData.append('image_url', formData.image_url);
       }
 
-      const response = await fetch(url, {
-        method,
+      // Use adminApi with proper token
+      const config = {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: submitData
-      });
+          'Content-Type': 'multipart/form-data'
+        }
+      };
 
-      const data = await response.json();
-      if (data.success) {
+      const response = editingCategory
+        ? await adminApi.put(`/api/categories/${editingCategory.id}`, submitData, config)
+        : await adminApi.post('/api/categories', submitData, config);
+
+      if (response.data.success) {
         fetchCategories();
         resetForm();
       } else {
-        alert(data.message || 'Hata oluştu');
+        alert(response.data.message || 'Hata oluştu');
       }
     } catch (error) {
       console.error('Kategori kaydedilemedi:', error);
@@ -100,18 +96,13 @@ const Categories = () => {
     if (!confirm('Bu kategoriyi silmek istediğinizden emin misiniz?')) return;
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000'}/api/categories/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
+      // Use adminApi for proper admin token authentication
+      const response = await adminApi.delete(`/api/categories/${id}`);
 
-      const data = await response.json();
-      if (data.success) {
+      if (response.data.success) {
         fetchCategories();
       } else {
-        alert(data.message || 'Kategori silinemedi');
+        alert(response.data.message || 'Kategori silinemedi');
       }
     } catch (error) {
       console.error('Kategori silinemedi:', error);
