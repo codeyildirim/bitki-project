@@ -69,6 +69,68 @@ const AdminUsers = () => {
     setActiveTab('user-logs');
   };
 
+  const exportData = () => {
+    try {
+      const data = {
+        users: JSON.parse(localStorage.getItem('users') || '[]'),
+        userLogs: JSON.parse(localStorage.getItem('userLogs') || '[]'),
+        systemLogs: JSON.parse(localStorage.getItem('systemLogs') || '[]'),
+        exportDate: new Date().toISOString(),
+        exportFrom: 'bitki-project.vercel.app'
+      };
+
+      const dataStr = JSON.stringify(data, null, 2);
+      const dataBlob = new Blob([dataStr], { type: 'application/json' });
+      const url = URL.createObjectURL(dataBlob);
+
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `bitki-admin-data-${new Date().toISOString().split('T')[0]}.json`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      console.log('📦 Veri export edildi:', data);
+    } catch (error) {
+      console.error('Export hatası:', error);
+    }
+  };
+
+  const importData = (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const data = JSON.parse(e.target.result);
+
+        if (data.users) {
+          localStorage.setItem('users', JSON.stringify(data.users));
+        }
+        if (data.userLogs) {
+          localStorage.setItem('userLogs', JSON.stringify(data.userLogs));
+        }
+        if (data.systemLogs) {
+          localStorage.setItem('systemLogs', JSON.stringify(data.systemLogs));
+        }
+
+        // Verileri yeniden yükle
+        fetchUsers();
+        fetchUserLogs();
+        fetchSystemLogs();
+
+        console.log('📥 Veri import edildi:', data);
+        alert('Veriler başarıyla içe aktarıldı!');
+      } catch (error) {
+        console.error('Import hatası:', error);
+        alert('Dosya formatı hatalı!');
+      }
+    };
+    reader.readAsText(file);
+  };
+
   const getLogLevelColor = (level) => {
     switch (level) {
       case 'ERROR': return 'text-red-400';
@@ -98,9 +160,28 @@ const AdminUsers = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold text-white font-mono">Kullanıcı Yönetimi</h1>
-        <p className="text-gray-400 font-mono">Kullanıcıları yönet ve aktivitelerini izle</p>
+      <div className="flex justify-between items-start">
+        <div>
+          <h1 className="text-3xl font-bold text-white font-mono">Kullanıcı Yönetimi</h1>
+          <p className="text-gray-400 font-mono">Kullanıcıları yönet ve aktivitelerini izle</p>
+        </div>
+        <div className="flex gap-3">
+          <button
+            onClick={exportData}
+            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded font-mono text-sm"
+          >
+            📦 Verileri Export Et
+          </button>
+          <label className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded font-mono text-sm cursor-pointer">
+            📥 Verileri Import Et
+            <input
+              type="file"
+              accept=".json"
+              onChange={importData}
+              className="hidden"
+            />
+          </label>
+        </div>
       </div>
 
       {/* Tabs */}
