@@ -62,7 +62,8 @@ export const adminLogin = async (req, res) => {
 export const getUsers = async (req, res) => {
   try {
     const users = await db.all(`
-      SELECT id, nickname, city, is_admin, created_at
+      SELECT id, nickname, city, is_admin, created_at,
+             registration_ip, last_ip, last_login_at
       FROM users
       ORDER BY created_at DESC
     `);

@@ -1,5 +1,5 @@
 import { hashPassword, comparePassword, generateJWT, generateRecoveryCode, validateNickname, validatePassword } from '../utils/crypto.js';
-import { responseSuccess, responseError } from '../utils/helpers.js';
+import { responseSuccess, responseError, getClientIP } from '../utils/helpers.js';
 import db from '../models/database.js';
 
 export const register = async (req, res) => {
@@ -41,9 +41,12 @@ export const register = async (req, res) => {
     const passwordHash = hashPassword(pwd);
     const recoveryCodeHash = hashPassword(recoveryCode);
 
+    // Get client IP address
+    const clientIP = getClientIP(req);
+
     const result = await db.run(
-      'INSERT INTO users (nickname, password_hash, recovery_code_hash, city) VALUES (?, ?, ?, ?)',
-      [cleanNickname, passwordHash, recoveryCodeHash, cleanCity]
+      'INSERT INTO users (nickname, password_hash, recovery_code_hash, city, registration_ip, last_ip) VALUES (?, ?, ?, ?, ?, ?)',
+      [cleanNickname, passwordHash, recoveryCodeHash, cleanCity, clientIP, clientIP]
     );
 
     const token = generateJWT({ userId: result.id, nickname: cleanNickname });
@@ -81,6 +84,13 @@ export const login = async (req, res) => {
     }
 
     const token = generateJWT({ userId: user.id, nickname: user.nickname });
+
+    // Update last IP and login time
+    const clientIP = getClientIP(req);
+    await db.run(
+      'UPDATE users SET last_ip = ?, last_login_at = CURRENT_TIMESTAMP WHERE id = ?',
+      [clientIP, user.id]
+    );
 
     res.json(responseSuccess({
       token,

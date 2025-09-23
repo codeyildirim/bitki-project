@@ -227,7 +227,7 @@ const Security = () => {
                       {user.city}
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-300 font-mono">
-                      {user.last_ip || 'N/A'}
+                      {user.last_ip || user.registration_ip || 'N/A'}
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-300 font-mono">
                       {new Date(user.created_at).toLocaleDateString('tr-TR')}
@@ -240,7 +240,7 @@ const Security = () => {
                         SIFRE SIFIRLA
                       </button>
                       <button
-                        onClick={() => handleBanUserIP(user.last_ip)}
+                        onClick={() => handleBanUserIP(user.last_ip || user.registration_ip)}
                         className="text-purple-400 hover:text-purple-300 font-mono"
                       >
                         IP YASAKLA
