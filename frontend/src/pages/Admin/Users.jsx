@@ -115,9 +115,42 @@ const AdminUsers = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold text-white font-mono">Kullanıcı Yönetimi</h1>
-        <p className="text-gray-400 font-mono">Kullanıcıları yönet ve aktivitelerini izle</p>
+      <div className="flex justify-between items-start">
+        <div>
+          <h1 className="text-3xl font-bold text-white font-mono">Kullanıcı Yönetimi</h1>
+          <p className="text-gray-400 font-mono">Kullanıcıları yönet ve aktivitelerini izle</p>
+        </div>
+        <div className="flex gap-2">
+          <button
+            onClick={() => {
+              const testUser = {
+                id: Date.now(),
+                nickname: 'manuel_test',
+                city: 'Test Şehri',
+                createdAt: new Date().toISOString(),
+                isAdmin: false
+              };
+              const existing = JSON.parse(localStorage.getItem('users') || '[]');
+              existing.push(testUser);
+              localStorage.setItem('users', JSON.stringify(existing));
+              fetchUsers();
+              alert('Manuel test kullanıcısı eklendi!');
+            }}
+            className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-xs"
+          >
+            🔧 Test Kullanıcı Ekle
+          </button>
+          <button
+            onClick={() => {
+              console.log('Current localStorage users:', localStorage.getItem('users'));
+              console.log('Current localStorage userLogs:', localStorage.getItem('userLogs'));
+              alert('Console\'a localStorage durumu yazdırıldı');
+            }}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-xs"
+          >
+            🔍 Debug LocalStorage
+          </button>
+        </div>
       </div>
 
       {/* Tabs */}
