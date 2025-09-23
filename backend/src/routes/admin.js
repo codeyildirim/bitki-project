@@ -19,13 +19,13 @@ import rateLimit from 'express-rate-limit';
 
 const router = express.Router();
 
-// Rate limiter specifically for admin login
+// Rate limiter specifically for admin login - Reduced for testing
 const adminLoginLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 10, // limit each IP to 10 requests per windowMs
+  windowMs: 1 * 60 * 1000, // 1 minute (reduced for testing)
+  max: 100, // limit each IP to 100 requests per windowMs (increased for testing)
   message: {
     success: false,
-    message: 'Çok fazla admin giriş denemesi. 15 dakika sonra tekrar deneyin.'
+    message: 'Çok fazla admin giriş denemesi. 1 dakika sonra tekrar deneyin.'
   },
   standardHeaders: true,
   legacyHeaders: false,
