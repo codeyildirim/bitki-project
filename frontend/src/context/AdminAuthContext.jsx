@@ -13,7 +13,7 @@ const adminApi = axios.create({
 
 // Add auth interceptor for admin token
 adminApi.interceptors.request.use((config) => {
-  const token = localStorage.getItem('admin_token');
+  const token = localStorage.getItem('adminToken');
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
@@ -25,9 +25,9 @@ adminApi.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401 || error.response?.status === 403) {
-      localStorage.removeItem('admin_token');
+      localStorage.removeItem('adminToken');
       localStorage.removeItem('admin_user');
-      window.location.href = '/login';
+      window.location.href = '/admin/login';
     }
     return Promise.reject(error);
   }
@@ -48,7 +48,7 @@ export const AdminAuthProvider = ({ children }) => {
 
   // Check existing admin token on mount
   useEffect(() => {
-    const token = localStorage.getItem('admin_token');
+    const token = localStorage.getItem('adminToken');
     const savedUser = localStorage.getItem('admin_user');
 
     if (token && savedUser) {
@@ -57,7 +57,7 @@ export const AdminAuthProvider = ({ children }) => {
         setIsAuthenticated(true);
       } catch (error) {
         console.error('Error parsing saved admin user:', error);
-        localStorage.removeItem('admin_token');
+        localStorage.removeItem('adminToken');
         localStorage.removeItem('admin_user');
       }
     }
@@ -71,7 +71,7 @@ export const AdminAuthProvider = ({ children }) => {
       if (response.data.success) {
         const { token, user } = response.data.data;
 
-        localStorage.setItem('admin_token', token);
+        localStorage.setItem('adminToken', token);
         localStorage.setItem('admin_user', JSON.stringify(user));
 
         setUser(user);
@@ -90,7 +90,7 @@ export const AdminAuthProvider = ({ children }) => {
   };
 
   const logout = () => {
-    localStorage.removeItem('admin_token');
+    localStorage.removeItem('adminToken');
     localStorage.removeItem('admin_user');
     setUser(null);
     setIsAuthenticated(false);
