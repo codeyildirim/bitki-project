@@ -7,7 +7,7 @@ const AdminAuthContext = createContext();
 
 // Admin-specific axios instance
 const adminApi = axios.create({
-  baseURL: `${API_CONFIG.BASE_URL}/api/admin`
+  baseURL: API_CONFIG.BASE_URL
 });
 
 // Add auth interceptor for admin token
@@ -65,7 +65,7 @@ export const AdminAuthProvider = ({ children }) => {
 
   const login = async (credentials) => {
     try {
-      const response = await adminApi.post('/admin/login', credentials);
+      const response = await adminApi.post('/api/admin/login', credentials);
 
       if (response.data.success) {
         const { token, user } = response.data.data;
