@@ -179,13 +179,21 @@ export const removeIPBan = async (req, res) => {
 // Ürün Yönetimi
 export const createProduct = async (req, res) => {
   try {
+    console.log('📦 CREATE PRODUCT REQUEST:', {
+      body: req.body,
+      files: req.files ? Object.keys(req.files) : 'No files',
+      filesCount: req.files ? Object.values(req.files).flat().length : 0
+    });
+
     const { name, description, price, stock, category_id } = req.body;
 
     if (!name || !price || stock < 0) {
+      console.log('❌ Validation failed:', { name, price, stock });
       return res.status(400).json(responseError('Ürün adı, fiyat ve stok gereklidir'));
     }
 
     const baseURL = process.env.BASE_URL || `http://localhost:${process.env.PORT || 3000}`;
+    console.log('🌐 Base URL:', baseURL);
 
     // Handle images
     const images = req.files?.images
@@ -197,14 +205,22 @@ export const createProduct = async (req, res) => {
       ? req.files.videos.map(file => `${baseURL}/uploads/videos/${file.filename}`)
       : [];
 
+    console.log('📁 File processing:', {
+      imagesCount: images.length,
+      videosCount: videos.length,
+      images: images.slice(0, 2), // Show first 2 for brevity
+      videos: videos.slice(0, 2)
+    });
+
     const result = await db.run(`
       INSERT INTO products (name, description, price, stock, category_id, images, videos)
       VALUES (?, ?, ?, ?, ?, ?, ?)
     `, [name, description, price, stock, category_id || null, JSON.stringify(images), JSON.stringify(videos)]);
 
+    console.log('✅ Product created successfully:', { id: result.id, name });
     res.json(responseSuccess({ id: result.id }, 'Ürün oluşturuldu'));
   } catch (error) {
-    console.error('Ürün oluşturma hatası:', error);
+    console.error('❌ Ürün oluşturma hatası:', error);
     res.status(500).json(responseError('Sunucu hatası'));
   }
 };
