@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useAdminAuth } from '../../context/AdminAuthContext.jsx';
 
 const AdminUsers = () => {
-  const { adminApi } = useAdminAuth();
   const [users, setUsers] = useState([]);
   const [userLogs, setUserLogs] = useState([]);
   const [systemLogs, setSystemLogs] = useState([]);
@@ -18,10 +16,22 @@ const AdminUsers = () => {
 
   const fetchUsers = async () => {
     try {
-      const response = await adminApi.get('/api/admin/users');
-      if (response.data.success) {
-        setUsers(response.data.data || []);
-      }
+      // localStorage'dan kullanıcıları al
+      const localUsers = JSON.parse(localStorage.getItem('users') || '[]');
+
+      // Kullanıcıları admin paneli formatına çevir
+      const formattedUsers = localUsers.map(user => ({
+        id: user.id,
+        nickname: user.nickname,
+        city: user.city,
+        created_at: user.createdAt || new Date().toISOString(),
+        last_login: user.lastLogin || user.createdAt || new Date().toISOString(),
+        status: 'active',
+        user_type: 'normal'
+      }));
+
+      setUsers(formattedUsers);
+      console.log('📊 LocalStorage\'dan kullanıcılar yüklendi:', formattedUsers.length);
     } catch (error) {
       console.error('Users loading failed:', error);
       setUsers([]);
@@ -32,10 +42,10 @@ const AdminUsers = () => {
 
   const fetchUserLogs = async () => {
     try {
-      const response = await adminApi.get('/api/admin/logs');
-      if (response.data.success) {
-        setUserLogs(response.data.data || []);
-      }
+      // localStorage tabanlı log sistemi - şimdilik boş array
+      const userLogs = JSON.parse(localStorage.getItem('userLogs') || '[]');
+      setUserLogs(userLogs);
+      console.log('📊 LocalStorage\'dan kullanıcı logları yüklendi:', userLogs.length);
     } catch (error) {
       console.error('User logs loading failed:', error);
       setUserLogs([]);
@@ -44,10 +54,10 @@ const AdminUsers = () => {
 
   const fetchSystemLogs = async () => {
     try {
-      const response = await adminApi.get('/api/admin/logs');
-      if (response.data.success) {
-        setSystemLogs(response.data.data || []);
-      }
+      // localStorage tabanlı log sistemi - şimdilik boş array
+      const systemLogs = JSON.parse(localStorage.getItem('systemLogs') || '[]');
+      setSystemLogs(systemLogs);
+      console.log('📊 LocalStorage\'dan sistem logları yüklendi:', systemLogs.length);
     } catch (error) {
       console.error('System logs loading failed:', error);
       setSystemLogs([]);

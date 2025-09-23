@@ -78,6 +78,18 @@ export const AuthProvider = ({ children }) => {
         isAdmin: false
       }));
 
+      // Kullanıcı giriş logunu ekle
+      const userLogs = JSON.parse(localStorage.getItem('userLogs') || '[]');
+      userLogs.unshift({
+        id: Date.now(),
+        action: 'LOGIN',
+        status: 'SUCCESS',
+        admin_nickname: user.nickname,
+        description: `${user.nickname} kullanıcısı giriş yaptı`,
+        created_at: new Date().toISOString()
+      });
+      localStorage.setItem('userLogs', JSON.stringify(userLogs.slice(0, 100))); // Son 100 log
+
       setToken(token);
       setUser({
         id: user.id,
@@ -137,6 +149,18 @@ export const AuthProvider = ({ children }) => {
       existingUsers.push(newUser);
       localStorage.setItem('users', JSON.stringify(existingUsers));
 
+      // Kullanıcı kayıt logunu ekle
+      const userLogs = JSON.parse(localStorage.getItem('userLogs') || '[]');
+      userLogs.unshift({
+        id: Date.now(),
+        action: 'REGISTER',
+        status: 'SUCCESS',
+        admin_nickname: newUser.nickname,
+        description: `${newUser.nickname} kullanıcısı kayıt oldu (${city})`,
+        created_at: new Date().toISOString()
+      });
+      localStorage.setItem('userLogs', JSON.stringify(userLogs.slice(0, 100)));
+
       // Mock token ve recovery code
       const token = 'local-token-' + Date.now();
       const recoveryCode = 'REC-' + Math.random().toString(36).substr(2, 6).toUpperCase();
@@ -177,6 +201,20 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
+    // Mevcut kullanıcı bilgisi varsa logout logunu ekle
+    if (user) {
+      const userLogs = JSON.parse(localStorage.getItem('userLogs') || '[]');
+      userLogs.unshift({
+        id: Date.now(),
+        action: 'LOGOUT',
+        status: 'SUCCESS',
+        admin_nickname: user.nickname,
+        description: `${user.nickname} kullanıcısı çıkış yaptı`,
+        created_at: new Date().toISOString()
+      });
+      localStorage.setItem('userLogs', JSON.stringify(userLogs.slice(0, 100)));
+    }
+
     localStorage.removeItem('token');
     localStorage.removeItem('currentUser');
     setToken(null);
