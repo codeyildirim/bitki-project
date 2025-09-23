@@ -16,8 +16,14 @@ const AdminUsers = () => {
 
   const fetchUsers = async () => {
     try {
+      console.log('🔍 Admin Users: fetchUsers başlatıldı');
+
       // localStorage'dan kullanıcıları al
-      const localUsers = JSON.parse(localStorage.getItem('users') || '[]');
+      const usersRaw = localStorage.getItem('users');
+      console.log('📦 Raw localStorage users:', usersRaw);
+
+      const localUsers = JSON.parse(usersRaw || '[]');
+      console.log('🏠 localStorage\'dan alınan kullanıcılar:', localUsers);
 
       // Kullanıcıları admin paneli formatına çevir
       const formattedUsers = localUsers.map(user => ({
@@ -30,10 +36,11 @@ const AdminUsers = () => {
         user_type: 'normal'
       }));
 
+      console.log('✨ Formatlanmış kullanıcılar:', formattedUsers);
       setUsers(formattedUsers);
-      console.log('📊 LocalStorage\'dan kullanıcılar yüklendi:', formattedUsers.length);
+      console.log(`📊 Admin panele ${formattedUsers.length} kullanıcı yüklendi`);
     } catch (error) {
-      console.error('Users loading failed:', error);
+      console.error('❌ Users loading failed:', error);
       setUsers([]);
     } finally {
       setLoading(false);
@@ -42,24 +49,32 @@ const AdminUsers = () => {
 
   const fetchUserLogs = async () => {
     try {
-      // localStorage tabanlı log sistemi - şimdilik boş array
-      const userLogs = JSON.parse(localStorage.getItem('userLogs') || '[]');
+      console.log('🔍 Admin: fetchUserLogs başlatıldı');
+      const userLogsRaw = localStorage.getItem('userLogs');
+      console.log('📦 Raw userLogs:', userLogsRaw);
+
+      const userLogs = JSON.parse(userLogsRaw || '[]');
+      console.log('📜 Yüklenen kullanıcı logları:', userLogs);
       setUserLogs(userLogs);
-      console.log('📊 LocalStorage\'dan kullanıcı logları yüklendi:', userLogs.length);
+      console.log(`📊 ${userLogs.length} kullanıcı logu yüklendi`);
     } catch (error) {
-      console.error('User logs loading failed:', error);
+      console.error('❌ User logs loading failed:', error);
       setUserLogs([]);
     }
   };
 
   const fetchSystemLogs = async () => {
     try {
-      // localStorage tabanlı log sistemi - şimdilik boş array
-      const systemLogs = JSON.parse(localStorage.getItem('systemLogs') || '[]');
+      console.log('🔍 Admin: fetchSystemLogs başlatıldı');
+      const systemLogsRaw = localStorage.getItem('systemLogs');
+      console.log('📦 Raw systemLogs:', systemLogsRaw);
+
+      const systemLogs = JSON.parse(systemLogsRaw || '[]');
+      console.log('🔧 Yüklenen sistem logları:', systemLogs);
       setSystemLogs(systemLogs);
-      console.log('📊 LocalStorage\'dan sistem logları yüklendi:', systemLogs.length);
+      console.log(`📊 ${systemLogs.length} sistem logu yüklendi`);
     } catch (error) {
-      console.error('System logs loading failed:', error);
+      console.error('❌ System logs loading failed:', error);
       setSystemLogs([]);
     }
   };
