@@ -84,66 +84,6 @@ const AdminUsers = () => {
     setActiveTab('user-logs');
   };
 
-  const createTestUsers = () => {
-    const testUsers = [
-      {
-        id: Date.now(),
-        nickname: 'demo_user',
-        password: '123456',
-        city: 'İstanbul',
-        createdAt: new Date().toISOString(),
-        isAdmin: false
-      },
-      {
-        id: Date.now() + 1,
-        nickname: 'test_kullanıcı',
-        password: '123456',
-        city: 'Ankara',
-        createdAt: new Date().toISOString(),
-        isAdmin: false
-      },
-      {
-        id: Date.now() + 2,
-        nickname: 'örnek_user',
-        password: '123456',
-        city: 'İzmir',
-        createdAt: new Date().toISOString(),
-        isAdmin: false
-      }
-    ];
-
-    const testUserLogs = [
-      {
-        id: Date.now(),
-        action: 'REGISTER',
-        status: 'SUCCESS',
-        admin_nickname: 'demo_user',
-        description: 'demo_user kullanıcısı kayıt oldu (İstanbul)',
-        created_at: new Date().toISOString()
-      },
-      {
-        id: Date.now() + 1,
-        action: 'LOGIN',
-        status: 'SUCCESS',
-        admin_nickname: 'test_kullanıcı',
-        description: 'test_kullanıcı kullanıcısı giriş yaptı',
-        created_at: new Date().toISOString()
-      }
-    ];
-
-    // localStorage'a kaydet
-    localStorage.setItem('users', JSON.stringify(testUsers));
-    localStorage.setItem('userLogs', JSON.stringify(testUserLogs));
-    localStorage.setItem('systemLogs', JSON.stringify([]));
-
-    // Verileri yeniden yükle
-    fetchUsers();
-    fetchUserLogs();
-    fetchSystemLogs();
-
-    console.log('✅ Test kullanıcıları oluşturuldu:', testUsers);
-    alert('Test kullanıcıları başarıyla oluşturuldu!');
-  };
 
 
   const getLogLevelColor = (level) => {
@@ -175,19 +115,9 @@ const AdminUsers = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex justify-between items-start">
-        <div>
-          <h1 className="text-3xl font-bold text-white font-mono">Kullanıcı Yönetimi</h1>
-          <p className="text-gray-400 font-mono">Kullanıcıları yönet ve aktivitelerini izle</p>
-        </div>
-        {users.length === 0 && (
-          <button
-            onClick={createTestUsers}
-            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded font-mono text-sm"
-          >
-            🚀 Test Kullanıcıları Oluştur
-          </button>
-        )}
+      <div>
+        <h1 className="text-3xl font-bold text-white font-mono">Kullanıcı Yönetimi</h1>
+        <p className="text-gray-400 font-mono">Kullanıcıları yönet ve aktivitelerini izle</p>
       </div>
 
       {/* Tabs */}

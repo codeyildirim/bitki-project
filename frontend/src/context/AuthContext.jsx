@@ -148,6 +148,8 @@ export const AuthProvider = ({ children }) => {
       // Kullanıcıyı kaydet
       existingUsers.push(newUser);
       localStorage.setItem('users', JSON.stringify(existingUsers));
+      console.log('💾 localStorage\'a kullanıcı kaydedildi:', newUser);
+      console.log('📋 Güncel kullanıcı listesi:', existingUsers);
 
       // Kullanıcı kayıt logunu ekle
       const userLogs = JSON.parse(localStorage.getItem('userLogs') || '[]');
