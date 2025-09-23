@@ -129,7 +129,7 @@ app.use(express.urlencoded({ extended: true, limit: '1mb' }));
 app.use(checkIPBan);
 
 // Static files (uploads) - Render kalıcı disk için
-const UPLOAD_DIR = process.env.UPLOAD_DIR || '/opt/render/project/uploads';
+const UPLOAD_DIR = process.env.UPLOAD_DIR || (process.env.NODE_ENV === 'production' ? '/opt/render/project/uploads' : './uploads');
 
 if (!fs.existsSync(UPLOAD_DIR)) {
   fs.mkdirSync(UPLOAD_DIR, { recursive: true });
