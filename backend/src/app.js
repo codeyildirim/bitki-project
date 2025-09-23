@@ -104,18 +104,15 @@ app.use('/api/captcha', captchaLimiter);
 app.use('/api', generalLimiter);
 
 // CORS configuration
+const allowedOrigins = [
+  'https://bitki-project.vercel.app',
+  'https://bitki-admin.vercel.app',
+  'http://localhost:5173',
+  'http://localhost:5174'
+];
+
 const corsOptions = {
   origin: function (origin, callback) {
-    // Allowed origins
-    const allowedOrigins = [
-      'http://localhost:5173',
-      'http://localhost:5174',
-      'http://localhost:3000',
-      'https://bitki-project.vercel.app',
-      process.env.PUBLIC_DOMAIN,
-      process.env.ADMIN_DOMAIN
-    ].filter(Boolean);
-
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
