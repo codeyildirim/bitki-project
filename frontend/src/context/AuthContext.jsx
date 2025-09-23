@@ -16,6 +16,8 @@ export const useAuth = () => {
 };
 
 export const AuthProvider = ({ children }) => {
+  console.log('🚀 AuthContext: AuthProvider oluşturuldu');
+
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [token, setToken] = useState(localStorage.getItem('token'));

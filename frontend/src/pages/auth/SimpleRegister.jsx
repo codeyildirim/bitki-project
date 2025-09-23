@@ -90,7 +90,9 @@ const SimpleRegister = () => {
         captchaToken // Include CAPTCHA token
       };
 
+      console.log('📝 SimpleRegister: register fonksiyonu çağrılıyor', payload);
       const result = await register(payload);
+      console.log('📨 SimpleRegister: register sonucu', result);
 
       if (result.success) {
         navigate('/');
