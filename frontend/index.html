@@ -26,6 +26,12 @@
   </head>
   <body>
     <div id="root"></div>
+    <script>
+      // Admin domain check - redirect to admin panel
+      if (window.location.hostname === 'bitki-admin.vercel.app') {
+        window.location.replace('/admin.html');
+      }
+    </script>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
