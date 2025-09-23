@@ -104,25 +104,16 @@ app.use('/api/captcha', captchaLimiter);
 app.use('/api', generalLimiter);
 
 // CORS configuration
-const allowedOrigins = [
-  'https://bitki-project.vercel.app',
-  'https://bitki-admin.vercel.app',
-  'http://localhost:5173',
-  'http://localhost:5174'
-];
-
-const corsOptions = {
-  origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('CORS tarafından engellenmiştir'));
-    }
-  },
+app.use(cors({
+  origin: [
+    'https://bitki-project.vercel.app',
+    'https://bitki-admin.vercel.app',
+    'http://localhost:5173',
+    'http://localhost:5174'
+  ],
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true
-};
-
-app.use(cors(corsOptions));
+}));
 
 // Global rate limiter - tüm isteklere uygulanır
 app.use(globalLimiter);
