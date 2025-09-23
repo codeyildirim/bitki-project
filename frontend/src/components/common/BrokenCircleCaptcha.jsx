@@ -70,9 +70,32 @@ const BrokenCircleCaptcha = ({ onVerified, onError }) => {
       const circles = [];
       const brokenCircleIndex = Math.floor(Math.random() * numCircles);
 
+      // Grid pozisyonları oluştur
+      const positions = [];
+      const cols = 3;
+      const rows = 2;
+      const cellWidth = 80;
+      const cellHeight = 80;
+      const startX = 50;
+      const startY = 50;
+
+      // Pozisyon havuzu oluştur
+      for (let row = 0; row < rows; row++) {
+        for (let col = 0; col < cols; col++) {
+          if (positions.length < numCircles) {
+            positions.push({
+              x: startX + col * cellWidth + Math.random() * 30 - 15,
+              y: startY + row * cellHeight + Math.random() * 20 - 10
+            });
+          }
+        }
+      }
+
       for (let i = 0; i < numCircles; i++) {
         circles.push({
           id: i,
+          x: positions[i].x,
+          y: positions[i].y,
           isBroken: i === brokenCircleIndex,
           gapRotation: Math.random() * 360,
           radius: 25 + Math.random() * 10
