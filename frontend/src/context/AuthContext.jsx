@@ -109,8 +109,8 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (userData) => {
     try {
-      // Geçici çözüm: Local storage tabanlı kayıt
-      console.log('📝 Local storage tabanlı kayıt işlemi');
+      // FORCED localStorage kayıt - API devre dışı
+      console.log('🔧 FORCED localStorage tabanlı kayıt işlemi başlatıldı');
 
       const { nickname, password, confirmPassword, city } = userData;
 
@@ -178,6 +178,11 @@ export const AuthProvider = ({ children }) => {
 
       setToken(token);
       setUser(newUser);
+
+      // Final kontrol - localStorage gerçekten güncellendi mi?
+      const finalCheck = JSON.parse(localStorage.getItem('users') || '[]');
+      console.log('✅ KAYIT TAMAMLANDI! Final localStorage kontrolü:', finalCheck.length, 'kullanıcı');
+      console.log('✅ Yeni eklenen kullanıcı:', finalCheck.find(u => u.nickname === nickname));
 
       toast.success('Kayıt başarılı!');
       return { success: true, recoveryCode };
