@@ -111,8 +111,7 @@ const corsOptions = {
       'http://localhost:5173',
       'http://localhost:5174',
       'http://localhost:3000',
-      'https://bitki.vercel.app',
-      'https://bitki-admin.vercel.app',
+      'https://bitki-project.vercel.app',
       process.env.PUBLIC_DOMAIN,
       process.env.ADMIN_DOMAIN
     ].filter(Boolean);
