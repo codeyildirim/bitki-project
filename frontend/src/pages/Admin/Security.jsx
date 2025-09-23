@@ -16,7 +16,7 @@ const Security = () => {
 
   const fetchUsers = async () => {
     try {
-      const response = await adminApi.get('/users');
+      const response = await adminApi.get('/api/admin/users');
       if (response.data.success) {
         setUsers(response.data.data || []);
       }
@@ -30,7 +30,7 @@ const Security = () => {
 
   const fetchIPBans = async () => {
     try {
-      const response = await adminApi.get('/ip-bans');
+      const response = await adminApi.get('/api/admin/ip-bans');
       if (response.data.success) {
         setIpBans(response.data.data || []);
       }
@@ -44,7 +44,7 @@ const Security = () => {
     if (!confirm('[CONFIRM] Delete this user account? This action cannot be undone.')) return;
 
     try {
-      const response = await adminApi.delete(`/users/${userId}`);
+      const response = await adminApi.delete(`/api/admin/users/${userId}`);
       if (response.data.success) {
         alert('[SUCCESS] User account deleted');
         fetchUsers();
@@ -61,7 +61,7 @@ const Security = () => {
     if (!confirm('[CONFIRM] Reset user password? New password will be generated.')) return;
 
     try {
-      const response = await adminApi.put(`/users/${userId}/reset-password`);
+      const response = await adminApi.put(`/api/admin/users/${userId}/reset-password`);
       if (response.data.success) {
         alert(`[SUCCESS] Password reset completed\n\nNew Password: ${response.data.data.newPassword}\n\nProvide this to the user securely.`);
       } else {
@@ -82,7 +82,7 @@ const Security = () => {
     if (!confirm(`[CONFIRM] Ban IP address: ${userIP}?`)) return;
 
     try {
-      const response = await adminApi.post('/ip-bans', {
+      const response = await adminApi.post('/api/admin/ip-bans', {
         ipAddress: userIP,
         reason: 'Banned via user management'
       });
@@ -104,7 +104,7 @@ const Security = () => {
     if (!newBanIP.trim()) return;
 
     try {
-      const response = await adminApi.post('/ip-bans', {
+      const response = await adminApi.post('/api/admin/ip-bans', {
         ipAddress: newBanIP,
         reason: 'Manual admin ban'
       });
@@ -126,7 +126,7 @@ const Security = () => {
     if (!confirm('[CONFIRM] Remove this IP ban?')) return;
 
     try {
-      const response = await adminApi.delete(`/ip-bans/${banId}`);
+      const response = await adminApi.delete(`/api/admin/ip-bans/${banId}`);
       if (response.data.success) {
         alert('[SUCCESS] IP ban removed');
         fetchIPBans();

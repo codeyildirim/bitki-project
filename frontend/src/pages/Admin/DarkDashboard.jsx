@@ -21,15 +21,15 @@ const DarkDashboard = () => {
   const fetchDashboardData = async () => {
     try {
       // Fetch users count
-      const usersResponse = await adminApi.get('/users');
+      const usersResponse = await adminApi.get('/api/admin/users');
       const usersCount = usersResponse.data.success ? (usersResponse.data.data || []).length : 0;
 
       // Fetch orders
-      const ordersResponse = await adminApi.get('/orders');
+      const ordersResponse = await adminApi.get('/api/admin/orders');
       const orders = ordersResponse.data.success ? (ordersResponse.data.data || []) : [];
 
       // Fetch products count
-      const productsResponse = await adminApi.get('/products');
+      const productsResponse = await adminApi.get('/api/products');
       const productsData = productsResponse.data.success ? (productsResponse.data.data || {}) : {};
       const productsCount = productsData.products ? productsData.products.length : (Array.isArray(productsData) ? productsData.length : 0);
 

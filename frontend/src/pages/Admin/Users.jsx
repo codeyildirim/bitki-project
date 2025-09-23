@@ -18,7 +18,7 @@ const AdminUsers = () => {
 
   const fetchUsers = async () => {
     try {
-      const response = await adminApi.get('/users');
+      const response = await adminApi.get('/api/admin/users');
       if (response.data.success) {
         setUsers(response.data.data || []);
       }
@@ -32,7 +32,7 @@ const AdminUsers = () => {
 
   const fetchUserLogs = async () => {
     try {
-      const response = await adminApi.get('/logs');
+      const response = await adminApi.get('/api/admin/logs');
       if (response.data.success) {
         setUserLogs(response.data.data || []);
       }
@@ -44,7 +44,7 @@ const AdminUsers = () => {
 
   const fetchSystemLogs = async () => {
     try {
-      const response = await adminApi.get('/logs');
+      const response = await adminApi.get('/api/admin/logs');
       if (response.data.success) {
         setSystemLogs(response.data.data || []);
       }
