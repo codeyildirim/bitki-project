@@ -3,6 +3,11 @@
   "trailingSlash": false,
   "rewrites": [
     {
+      "source": "/(.*)",
+      "has": [{ "type": "host", "value": "bitki-admin.vercel.app" }],
+      "destination": "/admin.html"
+    },
+    {
       "source": "/admin",
       "destination": "/admin.html"
     },
