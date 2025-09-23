@@ -122,23 +122,46 @@ const AdminUsers = () => {
         </div>
         <div className="flex gap-2">
           <button
-            onClick={() => {
-              const testUser = {
-                id: Date.now(),
-                nickname: 'manuel_test',
-                city: 'Test Şehri',
-                createdAt: new Date().toISOString(),
-                isAdmin: false
-              };
-              const existing = JSON.parse(localStorage.getItem('users') || '[]');
-              existing.push(testUser);
-              localStorage.setItem('users', JSON.stringify(existing));
-              fetchUsers();
-              alert('Manuel test kullanıcısı eklendi!');
+            onClick={async () => {
+              try {
+                console.log('🔄 API\'deki kullanıcıları çekiliyor...');
+                const response = await fetch('/api/auth/register');
+                const data = await response.json();
+
+                console.log('🔍 API response:', data);
+
+                if (data.success && data.data && data.data.length > 0) {
+                  // API'deki kullanıcıları localStorage formatına çevir
+                  const existingLocal = JSON.parse(localStorage.getItem('users') || '[]');
+
+                  data.data.forEach(apiUser => {
+                    // Zaten localStorage'da yoksa ekle
+                    if (!existingLocal.find(u => u.nickname === apiUser.nickname)) {
+                      existingLocal.push({
+                        id: apiUser.id,
+                        nickname: apiUser.nickname,
+                        password: apiUser.password,
+                        city: apiUser.city,
+                        createdAt: apiUser.createdAt,
+                        isAdmin: false
+                      });
+                    }
+                  });
+
+                  localStorage.setItem('users', JSON.stringify(existingLocal));
+                  fetchUsers();
+                  alert(`${data.count} kullanıcı API'den localStorage'a migrate edildi!`);
+                } else {
+                  alert('API\'de kullanıcı bulunamadı: ' + data.message);
+                }
+              } catch (error) {
+                console.error('Migration error:', error);
+                alert('Migration hatası: ' + error.message);
+              }
             }}
-            className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-xs"
+            className="bg-purple-600 hover:bg-purple-700 text-white px-3 py-1 rounded text-xs"
           >
-            🔧 Test Kullanıcı Ekle
+            🔄 API→localStorage Migration
           </button>
           <button
             onClick={() => {

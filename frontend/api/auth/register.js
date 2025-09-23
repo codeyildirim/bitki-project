@@ -17,6 +17,16 @@ export default async function handler(req, res) {
     return res.status(200).end();
   }
 
+  if (req.method === 'GET') {
+    // Debug: API'deki kullanıcıları göster
+    return res.status(200).json({
+      success: true,
+      data: users,
+      count: users.length,
+      message: 'API kullanıcıları'
+    });
+  }
+
   if (req.method !== 'POST') {
     return res.status(405).json({ success: false, message: 'Method not allowed' });
   }
