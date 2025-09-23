@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import axios from 'axios';
 import toast from 'react-hot-toast';
 import { RefreshCw, Volume2, VolumeX } from 'lucide-react';
 
@@ -64,14 +63,32 @@ const BrokenCircleCaptcha = ({ onVerified, onError }) => {
     setFocusedCircleIndex(-1);
 
     try {
-      const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000'}/api/captcha/new`);
+      // Mock CAPTCHA generation - localStorage tabanlı
+      console.log('🎯 CAPTCHA: Mock CAPTCHA oluşturuluyor...');
 
-      if (response.data.success) {
-        setCaptchaData(response.data.data.circles);
-        setCaptchaId(response.data.data.captchaId);
-      } else {
-        throw new Error('CAPTCHA yüklenemedi');
+      const numCircles = 5; // 5 daire
+      const circles = [];
+      const brokenCircleIndex = Math.floor(Math.random() * numCircles);
+
+      for (let i = 0; i < numCircles; i++) {
+        circles.push({
+          id: i,
+          isBroken: i === brokenCircleIndex,
+          gapRotation: Math.random() * 360,
+          radius: 25 + Math.random() * 10
+        });
       }
+
+      const mockCaptchaId = 'mock-' + Date.now();
+
+      setCaptchaData(circles);
+      setCaptchaId(mockCaptchaId);
+
+      // localStorage'a doğru cevabı sakla
+      localStorage.setItem(`captcha_${mockCaptchaId}`, brokenCircleIndex.toString());
+
+      console.log('✅ CAPTCHA: Mock CAPTCHA hazır, kırık daire index:', brokenCircleIndex);
+
     } catch (error) {
       console.error('CAPTCHA load error:', error);
       toast.error('CAPTCHA yüklenemedi. Sayfayı yenileyin.');
@@ -89,20 +106,33 @@ const BrokenCircleCaptcha = ({ onVerified, onError }) => {
     setLoading(true);
 
     try {
-      const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000'}/api/captcha/verify`, {
-        captchaId,
-        selectedIndex: circleId
-      });
+      // Mock CAPTCHA verification - localStorage tabanlı
+      console.log('🔍 CAPTCHA: Doğrulama yapılıyor, seçilen:', circleId, 'captchaId:', captchaId);
 
-      if (response.data.success) {
+      // localStorage'dan doğru cevabı al
+      const correctAnswer = localStorage.getItem(`captcha_${captchaId}`);
+      console.log('✅ CAPTCHA: Doğru cevap:', correctAnswer, 'Seçilen:', circleId);
+
+      if (correctAnswer && parseInt(correctAnswer) === circleId) {
         setIsVerified(true);
         playAudioFeedback('success');
         toast.success('CAPTCHA doğrulandı!');
 
+        // Mock token oluştur
+        const mockToken = 'captcha-verified-' + Date.now();
+
         // Pass the verification token to parent
         if (onVerified) {
-          onVerified(response.data.data.token);
+          onVerified(mockToken);
         }
+
+        console.log('🎉 CAPTCHA: Doğrulama başarılı! Token:', mockToken);
+
+        // CAPTCHA verisini temizle
+        localStorage.removeItem(`captcha_${captchaId}`);
+
+      } else {
+        throw new Error('Yanlış seçim');
       }
     } catch (error) {
       console.error('CAPTCHA verification error:', error);
@@ -115,7 +145,7 @@ const BrokenCircleCaptcha = ({ onVerified, onError }) => {
         toast.error('Çok fazla yanlış deneme. Yeni CAPTCHA yükleniyor...');
         setTimeout(() => loadCaptcha(), 1500);
       } else {
-        toast.error(error.response?.data?.message || `Yanlış seçim! ${3 - newAttempts} deneme hakkınız kaldı.`);
+        toast.error(`Yanlış seçim! ${3 - newAttempts} deneme hakkınız kaldı.`);
       }
 
       // Visual feedback for wrong selection
