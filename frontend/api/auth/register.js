@@ -1,11 +1,9 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import { addUser, findUserByNickname, getAllUsers } from '../_lib/storage.js';
 
 // JWT Secret
 const JWT_SECRET = process.env.JWT_SECRET || 'sifalı-bitkiler-super-secret-key-2024';
-
-// Geçici olarak memory-based user storage (production'da external DB kullanılacak)
-let users = [];
 
 export default async function handler(req, res) {
   // CORS headers
@@ -17,16 +15,6 @@ export default async function handler(req, res) {
     return res.status(200).end();
   }
 
-  if (req.method === 'GET') {
-    // Debug: API'deki kullanıcıları göster
-    return res.status(200).json({
-      success: true,
-      data: users,
-      count: users.length,
-      message: 'API kullanıcıları'
-    });
-  }
-
   if (req.method !== 'POST') {
     return res.status(405).json({ success: false, message: 'Method not allowed' });
   }
@@ -34,8 +22,10 @@ export default async function handler(req, res) {
   try {
     const { nickname, password, confirmPassword, city, captchaToken } = req.body;
 
+    console.log('📝 Register attempt:', { nickname, city, captchaToken: !!captchaToken });
+
     // Basit validasyon
-    if (!nickname || !password || !confirmPassword || !city) {
+    if (!nickname || !password || !confirmPassword) {
       return res.status(400).json({
         success: false,
         message: 'Tüm alanları doldurun'
@@ -56,7 +46,7 @@ export default async function handler(req, res) {
       });
     }
 
-    // CAPTCHA kontrolü (geçici olarak bypass)
+    // CAPTCHA kontrolü
     if (!captchaToken) {
       return res.status(400).json({
         success: false,
@@ -65,7 +55,7 @@ export default async function handler(req, res) {
     }
 
     // Kullanıcı zaten var mı kontrol et
-    const existingUser = users.find(u => u.nickname === nickname);
+    const existingUser = await findUserByNickname(nickname);
     if (existingUser) {
       return res.status(400).json({
         success: false,
@@ -77,8 +67,7 @@ export default async function handler(req, res) {
     const hashedPassword = bcrypt.hashSync(password, 10);
 
     // Recovery code oluştur
-    const recoveryCode = 'REC-' + Date.now().toString().slice(-6) + Math.random().toString(36).substr(2, 4).toUpperCase();
-    const hashedRecoveryCode = bcrypt.hashSync(recoveryCode, 10);
+    const recoveryCode = 'REC-' + Date.now().toString().slice(-6) + Math.random().toString(36).substring(2, 6).toUpperCase();
 
     // Kullanıcıyı kaydet
     const userId = Date.now();
@@ -86,17 +75,21 @@ export default async function handler(req, res) {
       id: userId,
       nickname,
       password: hashedPassword,
-      city,
-      recoveryCode: hashedRecoveryCode,
-      createdAt: new Date().toISOString(),
-      isAdmin: false
+      city: city || 'İstanbul',
+      recoveryCode,
+      created_at: new Date().toISOString(),
+      last_login: null,
+      is_admin: 0
     };
 
-    users.push(newUser);
+    await addUser(newUser);
+
+    const allUsers = await getAllUsers();
+    console.log('✅ User registered:', { id: userId, nickname, totalUsers: allUsers.length });
 
     // JWT token oluştur
     const token = jwt.sign(
-      { id: userId, nickname, isAdmin: false },
+      { id: userId, nickname, is_admin: 0 },
       JWT_SECRET,
       { expiresIn: '7d' }
     );
@@ -105,8 +98,8 @@ export default async function handler(req, res) {
     const user = {
       id: userId,
       nickname,
-      city,
-      isAdmin: false
+      city: city || 'İstanbul',
+      is_admin: 0
     };
 
     res.status(201).json({
@@ -120,10 +113,10 @@ export default async function handler(req, res) {
     });
 
   } catch (error) {
-    console.error('Register error:', error);
+    console.error('❌ Register error:', error);
     res.status(500).json({
       success: false,
-      message: 'Sunucu hatası'
+      message: 'Kayıt sırasında hata oluştu'
     });
   }
 }

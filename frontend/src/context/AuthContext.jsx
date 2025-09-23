@@ -18,32 +18,117 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }) => {
   console.log('🚀 AuthContext: AuthProvider oluşturuldu');
 
-  const [user, setUser] = useState(null);
+  // Clear old localStorage data that might conflict with API
+  useEffect(() => {
+    const clearOldData = () => {
+      try {
+        // Remove old user data that might be from localStorage-only system
+        const oldUsers = localStorage.getItem('users');
+        if (oldUsers) {
+          console.log('🧹 AuthContext: Eski users verisi temizleniyor');
+          localStorage.removeItem('users');
+        }
+
+        // Clean up system logs that might be outdated
+        const systemLogs = localStorage.getItem('systemLogs');
+        if (systemLogs) {
+          console.log('🧹 AuthContext: Eski system logs temizleniyor');
+          localStorage.removeItem('systemLogs');
+        }
+
+        // Clean up user logs that might be outdated
+        const userLogs = localStorage.getItem('userLogs');
+        if (userLogs) {
+          console.log('🧹 AuthContext: Eski user logs temizleniyor');
+          localStorage.removeItem('userLogs');
+        }
+
+        // Force clear any remaining conflicting data
+        const keysToRemove = [];
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key && (key.includes('user') || key.includes('admin') || key.includes('log')) &&
+              key !== 'currentUser' && key !== 'token') {
+            keysToRemove.push(key);
+          }
+        }
+
+        keysToRemove.forEach(key => {
+          console.log('🧹 AuthContext: Ek veri temizleniyor:', key);
+          localStorage.removeItem(key);
+        });
+
+        console.log('✅ AuthContext: localStorage kapsamlı temizlik tamamlandı');
+      } catch (error) {
+        console.error('❌ AuthContext: localStorage temizlik hatası:', error);
+      }
+    };
+
+    clearOldData();
+  }, []);
+
+  // Initial state'i localStorage'dan güvenli şekilde al
+  const [user, setUser] = useState(() => {
+    try {
+      const storedUser = localStorage.getItem('currentUser');
+      return storedUser ? JSON.parse(storedUser) : null;
+    } catch {
+      return null;
+    }
+  });
+
   const [loading, setLoading] = useState(true);
-  const [token, setToken] = useState(localStorage.getItem('token'));
+  const [token, setToken] = useState(() => {
+    try {
+      return localStorage.getItem('token');
+    } catch {
+      return null;
+    }
+  });
 
   useEffect(() => {
+    console.log('🔄 AuthContext useEffect: token değişti:', token, 'user var mı:', !!user);
     if (token) {
+      console.log('🔑 AuthContext: Authorization header ayarlanıyor');
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-      fetchProfile();
+
+      // Eğer user yoksa ve localStorage'dan da alamadıysak fetchProfile çağır
+      if (!user) {
+        console.log('📋 AuthContext: User yok - fetchProfile çağrılıyor');
+        fetchProfile();
+      } else {
+        console.log('✅ AuthContext: User mevcut, loading false yapılıyor');
+        setLoading(false);
+      }
     } else {
+      console.log('⚠️ AuthContext: Token yok, loading false yapılıyor');
       setLoading(false);
     }
   }, [token]);
 
   const fetchProfile = async () => {
     try {
+      console.log('🔄 AuthContext: fetchProfile başlatıldı');
       const storedToken = localStorage.getItem('token');
       const storedUser = localStorage.getItem('currentUser');
+
+      console.log('📦 AuthContext: storedToken:', storedToken);
+      console.log('👤 AuthContext: storedUser:', storedUser);
 
       if (storedToken && storedUser) {
         setToken(storedToken);
         setUser(JSON.parse(storedUser));
+        console.log('✅ AuthContext: Kullanıcı session\' restore edildi');
+      } else {
+        console.log('⚠️ AuthContext: Token veya user bulunamadı');
       }
     } catch (error) {
-      console.error('Profil getirme hatası:', error);
+      console.error('❌ Profil getirme hatası:', error);
+      console.log('🗑️ localStorage temizleniyor...');
       localStorage.removeItem('token');
       localStorage.removeItem('currentUser');
+      setToken(null);
+      setUser(null);
     } finally {
       setLoading(false);
     }
@@ -51,147 +136,85 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (nickname, password, captchaToken) => {
     try {
-      // Geçici çözüm: Local storage tabanlı giriş
-      console.log('🔐 Local storage tabanlı giriş işlemi');
+      console.log('🔐 Login işlemi başlatıldı');
 
-      // Validasyon
-      if (!nickname || !password) {
-        throw new Error('Kullanıcı adı ve şifre gerekli');
-      }
+      // Backend API endpoint - Local backend with SQLite
+      const API_URL = 'http://localhost:3000';
 
-      // Local storage'dan kullanıcıları al
-      const existingUsers = JSON.parse(localStorage.getItem('users') || '[]');
-
-      // Kullanıcıyı bul
-      const user = existingUsers.find(u => u.nickname === nickname && u.password === password);
-      if (!user) {
-        throw new Error('Kullanıcı adı veya şifre hatalı');
-      }
-
-      // Mock token oluştur
-      const token = 'local-token-' + Date.now();
-
-      // Giriş bilgilerini kaydet
-      localStorage.setItem('token', token);
-      localStorage.setItem('currentUser', JSON.stringify({
-        id: user.id,
-        nickname: user.nickname,
-        city: user.city,
-        isAdmin: false
-      }));
-
-      // Kullanıcı giriş logunu ekle
-      const userLogs = JSON.parse(localStorage.getItem('userLogs') || '[]');
-      userLogs.unshift({
-        id: Date.now(),
-        action: 'LOGIN',
-        status: 'SUCCESS',
-        admin_nickname: user.nickname,
-        description: `${user.nickname} kullanıcısı giriş yaptı`,
-        created_at: new Date().toISOString()
-      });
-      localStorage.setItem('userLogs', JSON.stringify(userLogs.slice(0, 100))); // Son 100 log
-
-      setToken(token);
-      setUser({
-        id: user.id,
-        nickname: user.nickname,
-        city: user.city,
-        isAdmin: false
+      const response = await axios.post(`${API_URL}/api/auth/login`, {
+        nickname,
+        password,
+        captchaToken
       });
 
-      toast.success('Giriş başarılı!');
-      return { success: true };
+      if (response.data.success) {
+        const { token, user } = response.data.data;
+
+        // Token ve user bilgilerini kaydet
+        localStorage.setItem('token', token);
+        localStorage.setItem('currentUser', JSON.stringify(user));
+
+        // Axios header'ına token ekle
+        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+
+        // State güncelle
+        setToken(token);
+        setUser(user);
+
+        toast.success('Giriş başarılı!');
+        return { success: true };
+      } else {
+        throw new Error(response.data.message);
+      }
 
     } catch (error) {
-      toast.error(error.message);
-      return { success: false, message: error.message };
+      const message = error.response?.data?.message || error.message || 'Giriş başarısız';
+      toast.error(message);
+      return { success: false, message };
     }
   };
 
   const register = async (userData) => {
     try {
-      // FORCED localStorage kayıt - API devre dışı
-      console.log('🔧 FORCED localStorage tabanlı kayıt işlemi başlatıldı');
+      console.log('🔧 Register işlemi başlatıldı');
 
-      const { nickname, password, confirmPassword, city } = userData;
+      const { nickname, password, confirmPassword, city, captchaToken } = userData;
 
-      // Validasyon
-      if (!nickname || !password || !confirmPassword || !city) {
-        throw new Error('Tüm alanları doldurun');
-      }
+      // Backend API endpoint - Local backend with SQLite
+      const API_URL = 'http://localhost:3000';
 
-      if (password !== confirmPassword) {
-        throw new Error('Şifreler eşleşmiyor');
-      }
-
-      if (password.length < 6) {
-        throw new Error('Şifre en az 6 karakter olmalı');
-      }
-
-      // Local storage'dan mevcut kullanıcıları al
-      const existingUsers = JSON.parse(localStorage.getItem('users') || '[]');
-
-      // Kullanıcı adı kontrolü
-      if (existingUsers.find(u => u.nickname === nickname)) {
-        throw new Error('Bu kullanıcı adı zaten kullanılıyor');
-      }
-
-      // Yeni kullanıcı oluştur
-      const newUser = {
-        id: Date.now(),
+      const response = await axios.post(`${API_URL}/api/auth/register`, {
         nickname,
-        password: password, // Basitçe düz text (demo için)
+        password,
+        confirmPassword,
         city,
-        createdAt: new Date().toISOString(),
-        isAdmin: false
-      };
-
-      // Kullanıcıyı kaydet
-      existingUsers.push(newUser);
-      localStorage.setItem('users', JSON.stringify(existingUsers));
-      console.log('💾 localStorage\'a kullanıcı kaydedildi:', newUser);
-      console.log('📋 Güncel kullanıcı listesi:', existingUsers);
-
-      // Kullanıcı kayıt logunu ekle
-      const userLogs = JSON.parse(localStorage.getItem('userLogs') || '[]');
-      userLogs.unshift({
-        id: Date.now(),
-        action: 'REGISTER',
-        status: 'SUCCESS',
-        admin_nickname: newUser.nickname,
-        description: `${newUser.nickname} kullanıcısı kayıt oldu (${city})`,
-        created_at: new Date().toISOString()
+        captchaToken
       });
-      localStorage.setItem('userLogs', JSON.stringify(userLogs.slice(0, 100)));
 
-      // Mock token ve recovery code
-      const token = 'local-token-' + Date.now();
-      const recoveryCode = 'REC-' + Math.random().toString(36).substr(2, 6).toUpperCase();
+      if (response.data.success) {
+        const { token, user, recoveryCode } = response.data.data;
 
-      // Giriş yap
-      localStorage.setItem('token', token);
-      localStorage.setItem('currentUser', JSON.stringify({
-        id: newUser.id,
-        nickname: newUser.nickname,
-        city: newUser.city,
-        isAdmin: false
-      }));
+        // Token ve user bilgilerini kaydet
+        localStorage.setItem('token', token);
+        localStorage.setItem('currentUser', JSON.stringify(user));
 
-      setToken(token);
-      setUser(newUser);
+        // Axios header'ına token ekle
+        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
-      // Final kontrol - localStorage gerçekten güncellendi mi?
-      const finalCheck = JSON.parse(localStorage.getItem('users') || '[]');
-      console.log('✅ KAYIT TAMAMLANDI! Final localStorage kontrolü:', finalCheck.length, 'kullanıcı');
-      console.log('✅ Yeni eklenen kullanıcı:', finalCheck.find(u => u.nickname === nickname));
+        // State güncelle
+        setToken(token);
+        setUser(user);
 
-      toast.success('Kayıt başarılı!');
-      return { success: true, recoveryCode };
+        toast.success('Kayıt başarılı! Kurtarma kodunuz: ' + recoveryCode);
+        return { success: true, recoveryCode };
+      } else {
+        throw new Error(response.data.message);
+      }
 
     } catch (error) {
-      toast.error(error.message);
-      return { success: false, message: error.message };
+      const message = error.response?.data?.message || error.message || 'Kayıt başarısız';
+      toast.error(message);
+      return { success: false, message };
     }
   };
 

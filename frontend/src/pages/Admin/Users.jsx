@@ -16,31 +16,39 @@ const AdminUsers = () => {
 
   const fetchUsers = async () => {
     try {
-      console.log('🔍 Admin Users: fetchUsers başlatıldı');
+      console.log('🔍 Admin Users: fetchUsers başlatıldı - API çağrısı yapılıyor');
 
-      // localStorage'dan kullanıcıları al
-      const usersRaw = localStorage.getItem('users');
-      console.log('📦 Raw localStorage users:', usersRaw);
+      // Local backend API URL
+      const API_URL = 'http://localhost:3000';
 
-      const localUsers = JSON.parse(usersRaw || '[]');
-      console.log('🏠 localStorage\'dan alınan kullanıcılar:', localUsers);
+      const response = await fetch(`${API_URL}/api/admin/users`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
 
-      // Kullanıcıları admin paneli formatına çevir
-      const formattedUsers = localUsers.map(user => ({
-        id: user.id,
-        nickname: user.nickname,
-        city: user.city,
-        created_at: user.createdAt || new Date().toISOString(),
-        last_login: user.lastLogin || user.createdAt || new Date().toISOString(),
-        status: 'active',
-        user_type: 'normal'
-      }));
+      if (!response.ok) {
+        throw new Error(`API hatası: ${response.status}`);
+      }
 
-      console.log('✨ Formatlanmış kullanıcılar:', formattedUsers);
-      setUsers(formattedUsers);
-      console.log(`📊 Admin panele ${formattedUsers.length} kullanıcı yüklendi`);
+      const data = await response.json();
+      console.log('📡 API yanıtı:', data);
+
+      if (data.success) {
+        const apiUsers = data.data || [];
+        console.log('✅ API\'den alınan kullanıcılar:', apiUsers);
+        setUsers(apiUsers);
+        console.log(`📊 Admin panele ${apiUsers.length} kullanıcı yüklendi`);
+      } else {
+        console.error('❌ API başarısız:', data.message);
+        setUsers([]);
+      }
     } catch (error) {
       console.error('❌ Users loading failed:', error);
+
+      // API başarısız oldu, kullanıcı listesi boş bırakılıyor
+      console.log('❌ Users: API çağrısı başarısız, kullanıcı listesi boş');
       setUsers([]);
     } finally {
       setLoading(false);
@@ -122,53 +130,51 @@ const AdminUsers = () => {
         </div>
         <div className="flex gap-2">
           <button
-            onClick={async () => {
-              try {
-                console.log('🔄 API\'deki kullanıcıları çekiliyor...');
-                const response = await fetch('/api/auth/register');
-                const data = await response.json();
+            onClick={() => {
+              // Test kullanıcıları ekle
+              const testUsers = [
+                { nickname: 'test_user1', password: '123456', city: 'İstanbul' },
+                { nickname: 'test_user2', password: '123456', city: 'Ankara' },
+                { nickname: 'test_user3', password: '123456', city: 'İzmir' }
+              ];
 
-                console.log('🔍 API response:', data);
+              const existingUsers = JSON.parse(localStorage.getItem('users') || '[]');
 
-                if (data.success && data.data && data.data.length > 0) {
-                  // API'deki kullanıcıları localStorage formatına çevir
-                  const existingLocal = JSON.parse(localStorage.getItem('users') || '[]');
-
-                  data.data.forEach(apiUser => {
-                    // Zaten localStorage'da yoksa ekle
-                    if (!existingLocal.find(u => u.nickname === apiUser.nickname)) {
-                      existingLocal.push({
-                        id: apiUser.id,
-                        nickname: apiUser.nickname,
-                        password: apiUser.password,
-                        city: apiUser.city,
-                        createdAt: apiUser.createdAt,
-                        isAdmin: false
-                      });
-                    }
+              testUsers.forEach(testUser => {
+                if (!existingUsers.find(u => u.nickname === testUser.nickname)) {
+                  existingUsers.push({
+                    id: Date.now() + Math.random(),
+                    ...testUser,
+                    createdAt: new Date().toISOString(),
+                    isAdmin: false
                   });
-
-                  localStorage.setItem('users', JSON.stringify(existingLocal));
-                  fetchUsers();
-                  alert(`${data.count} kullanıcı API'den localStorage'a migrate edildi!`);
-                } else {
-                  alert('API\'de kullanıcı bulunamadı: ' + data.message);
                 }
-              } catch (error) {
-                console.error('Migration error:', error);
-                alert('Migration hatası: ' + error.message);
-              }
+              });
+
+              localStorage.setItem('users', JSON.stringify(existingUsers));
+              fetchUsers();
+              alert('3 test kullanıcısı eklendi!');
             }}
-            className="bg-purple-600 hover:bg-purple-700 text-white px-3 py-1 rounded text-xs"
+            className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-xs"
           >
-            🔄 API→localStorage Migration
+            ➕ Test Kullanıcıları Ekle
           </button>
           <button
             onClick={() => {
-              console.log('Current localStorage users:', localStorage.getItem('users'));
-              console.log('Current localStorage userLogs:', localStorage.getItem('userLogs'));
-              console.log('All localStorage keys:', Object.keys(localStorage));
-              alert('Console\'a localStorage durumu yazdırıldı');
+              const users = JSON.parse(localStorage.getItem('users') || '[]');
+              const userLogs = JSON.parse(localStorage.getItem('userLogs') || '[]');
+
+              console.log('📊 Toplam Kullanıcı:', users.length);
+              console.log('👥 Kullanıcılar:', users);
+              console.log('📜 Son 10 Log:', userLogs.slice(0, 10));
+              console.log('🔑 Current User:', localStorage.getItem('currentUser'));
+              console.log('🎫 Token:', localStorage.getItem('token'));
+
+              alert(`localStorage Durumu:\n\n` +
+                    `Kullanıcı Sayısı: ${users.length}\n` +
+                    `Log Sayısı: ${userLogs.length}\n` +
+                    `Giriş Yapılmış: ${localStorage.getItem('token') ? 'Evet' : 'Hayır'}\n\n` +
+                    `Detaylar console'da!`);
             }}
             className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-xs"
           >
