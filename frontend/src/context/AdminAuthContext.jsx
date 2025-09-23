@@ -14,8 +14,12 @@ const adminApi = axios.create({
 // Add auth interceptor for admin token
 adminApi.interceptors.request.use((config) => {
   const token = localStorage.getItem('adminToken');
+  console.log('🔍 Admin Token Debug:', { token: token ? `${token.slice(0, 20)}...` : 'null' });
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
+    console.log('✅ Authorization header added to request');
+  } else {
+    console.log('❌ No token found, request will fail');
   }
   return config;
 });
@@ -48,13 +52,27 @@ export const AdminAuthProvider = ({ children }) => {
 
   // Check existing admin token on mount
   useEffect(() => {
+    // Migration: Clear old token format
+    const oldToken = localStorage.getItem('admin_token');
+    if (oldToken) {
+      console.log('🔄 Migrating old token format...');
+      localStorage.removeItem('admin_token');
+      localStorage.removeItem('admin_user');
+      // Force re-login
+      setLoading(false);
+      return;
+    }
+
     const token = localStorage.getItem('adminToken');
     const savedUser = localStorage.getItem('admin_user');
+
+    console.log('🔍 Token check on mount:', { hasToken: !!token, hasUser: !!savedUser });
 
     if (token && savedUser) {
       try {
         setUser(JSON.parse(savedUser));
         setIsAuthenticated(true);
+        console.log('✅ Admin authenticated from localStorage');
       } catch (error) {
         console.error('Error parsing saved admin user:', error);
         localStorage.removeItem('adminToken');
