@@ -47,13 +47,8 @@ export const usePWAInstall = () => {
 
   const installPWA = async () => {
     if (!deferredPrompt) {
-      // iOS manual install instructions
-      alert(
-        'iPhone/iPad\'de yüklemek için:\n\n' +
-        '1. Safari\'nin alt kısmındaki "Paylaş" (⬆️) butonuna basın\n' +
-        '2. "Ana Ekrana Ekle" seçeneğini seçin\n' +
-        '3. "Ekle" butonuna basın'
-      );
+      // iOS için özel işlem - hook'u çağıran komponente bırakıyoruz
+      console.log('📱 iOS detected - showing install guide');
       return;
     }
 
