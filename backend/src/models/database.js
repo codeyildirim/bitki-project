@@ -422,17 +422,78 @@ class Database {
         console.log('parent_id column already exists or error:', err.message);
       }
     });
+
+    // Users tablosuna IP tracking alanları ekle
+    this.db.run(`ALTER TABLE users ADD COLUMN registration_ip TEXT`, (err) => {
+      if (err && !err.message.includes('duplicate column name')) {
+        console.log('registration_ip column already exists or error:', err.message);
+      }
+    });
+
+    this.db.run(`ALTER TABLE users ADD COLUMN last_ip TEXT`, (err) => {
+      if (err && !err.message.includes('duplicate column name')) {
+        console.log('last_ip column already exists or error:', err.message);
+      }
+    });
+
+    this.db.run(`ALTER TABLE users ADD COLUMN last_login_at DATETIME`, (err) => {
+      if (err && !err.message.includes('duplicate column name')) {
+        console.log('last_login_at column already exists or error:', err.message);
+      }
+    });
+
+    // Products tablosuna eksik sütunları ekle
+    this.db.run(`ALTER TABLE products ADD COLUMN videos TEXT`, (err) => {
+      if (err && !err.message.includes('duplicate column name')) {
+        console.log('videos column already exists or error:', err.message);
+      }
+    });
+
+    this.db.run(`ALTER TABLE products ADD COLUMN is_featured BOOLEAN DEFAULT 0`, (err) => {
+      if (err && !err.message.includes('duplicate column name')) {
+        console.log('is_featured column already exists or error:', err.message);
+      }
+    });
+
+    // IP bans tablosuna reason alanı ekle
+    this.db.run(`ALTER TABLE ip_bans ADD COLUMN reason TEXT DEFAULT 'Manual ban'`, (err) => {
+      if (err && !err.message.includes('duplicate column name')) {
+        console.log('reason column already exists or error:', err.message);
+      }
+    });
   }
 
   async createDefaultAdmin() {
     const bcrypt = await import('bcryptjs');
     const adminPassword = bcrypt.default.hashSync('admin123', 10);
-    const recoveryCode = bcrypt.default.hashSync('RECOVERY_ADMIN_2024', 10);
+    const recoveryCode = bcrypt.default.hashSync('ADMIN-RECOVERY-2024', 10);
 
-    this.db.run(`
-      INSERT OR IGNORE INTO users (nickname, password_hash, recovery_code_hash, city, is_admin)
-      VALUES ('admin', ?, ?, 'İstanbul', 1)
-    `, [adminPassword, recoveryCode]);
+    // Check if admin already exists
+    this.db.get('SELECT id FROM users WHERE is_admin = 1', (err, row) => {
+      if (err) {
+        console.error('❌ Admin check error:', err);
+        return;
+      }
+
+      if (row) {
+        console.log('✅ Admin account already exists');
+        return;
+      }
+
+      // Create admin account
+      this.db.run(`
+        INSERT INTO users (nickname, password_hash, recovery_code_hash, city, is_admin, registration_ip, last_ip)
+        VALUES ('admin', ?, ?, 'istanbul', 1, '127.0.0.1', '127.0.0.1')
+      `, [adminPassword, recoveryCode], function(err) {
+        if (err) {
+          console.error('❌ Failed to create admin:', err);
+        } else {
+          console.log('✅ Production admin account created!');
+          console.log('🔑 Username: admin | Password: admin123');
+          console.log('🌐 Admin Panel: https://bitki-admin.vercel.app');
+        }
+      });
+    });
   }
 
   run(query, params = []) {
