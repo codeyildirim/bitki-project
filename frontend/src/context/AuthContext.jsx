@@ -31,13 +31,17 @@ export const AuthProvider = ({ children }) => {
 
   const fetchProfile = async () => {
     try {
-      const response = await axios.get('/api/auth/profile');
-      if (response.data.success) {
-        setUser(response.data.data);
+      const storedToken = localStorage.getItem('token');
+      const storedUser = localStorage.getItem('currentUser');
+
+      if (storedToken && storedUser) {
+        setToken(storedToken);
+        setUser(JSON.parse(storedUser));
       }
     } catch (error) {
       console.error('Profil getirme hatası:', error);
-      logout();
+      localStorage.removeItem('token');
+      localStorage.removeItem('currentUser');
     } finally {
       setLoading(false);
     }
@@ -45,41 +49,116 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (nickname, password, captchaToken) => {
     try {
-      const response = await axios.post('/api/auth/login', { nickname, password, captchaToken });
-      if (response.data.success) {
-        const { token, user } = response.data.data;
-        localStorage.setItem('token', token);
-        setToken(token);
-        setUser(user);
-        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-        toast.success('Giriş başarılı!');
-        return { success: true };
+      // Geçici çözüm: Local storage tabanlı giriş
+      console.log('🔐 Local storage tabanlı giriş işlemi');
+
+      // Validasyon
+      if (!nickname || !password) {
+        throw new Error('Kullanıcı adı ve şifre gerekli');
       }
+
+      // Local storage'dan kullanıcıları al
+      const existingUsers = JSON.parse(localStorage.getItem('users') || '[]');
+
+      // Kullanıcıyı bul
+      const user = existingUsers.find(u => u.nickname === nickname && u.password === password);
+      if (!user) {
+        throw new Error('Kullanıcı adı veya şifre hatalı');
+      }
+
+      // Mock token oluştur
+      const token = 'local-token-' + Date.now();
+
+      // Giriş bilgilerini kaydet
+      localStorage.setItem('token', token);
+      localStorage.setItem('currentUser', JSON.stringify({
+        id: user.id,
+        nickname: user.nickname,
+        city: user.city,
+        isAdmin: false
+      }));
+
+      setToken(token);
+      setUser({
+        id: user.id,
+        nickname: user.nickname,
+        city: user.city,
+        isAdmin: false
+      });
+
+      toast.success('Giriş başarılı!');
+      return { success: true };
+
     } catch (error) {
-      const message = error.response?.data?.message || 'Giriş hatası';
-      toast.error(message);
-      return { success: false, message };
+      toast.error(error.message);
+      return { success: false, message: error.message };
     }
   };
 
   const register = async (userData) => {
     try {
-      const response = await axios.post('/api/auth/register', userData);
-      if (response.data.success) {
-        const { token, user, recoveryCode } = response.data.data;
-        localStorage.setItem('token', token);
-        setToken(token);
-        setUser(user);
-        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      // Geçici çözüm: Local storage tabanlı kayıt
+      console.log('📝 Local storage tabanlı kayıt işlemi');
 
-        // Recovery code'u göster
-        toast.success('Kayıt başarılı!');
-        return { success: true, recoveryCode };
+      const { nickname, password, confirmPassword, city } = userData;
+
+      // Validasyon
+      if (!nickname || !password || !confirmPassword || !city) {
+        throw new Error('Tüm alanları doldurun');
       }
+
+      if (password !== confirmPassword) {
+        throw new Error('Şifreler eşleşmiyor');
+      }
+
+      if (password.length < 6) {
+        throw new Error('Şifre en az 6 karakter olmalı');
+      }
+
+      // Local storage'dan mevcut kullanıcıları al
+      const existingUsers = JSON.parse(localStorage.getItem('users') || '[]');
+
+      // Kullanıcı adı kontrolü
+      if (existingUsers.find(u => u.nickname === nickname)) {
+        throw new Error('Bu kullanıcı adı zaten kullanılıyor');
+      }
+
+      // Yeni kullanıcı oluştur
+      const newUser = {
+        id: Date.now(),
+        nickname,
+        password: password, // Basitçe düz text (demo için)
+        city,
+        createdAt: new Date().toISOString(),
+        isAdmin: false
+      };
+
+      // Kullanıcıyı kaydet
+      existingUsers.push(newUser);
+      localStorage.setItem('users', JSON.stringify(existingUsers));
+
+      // Mock token ve recovery code
+      const token = 'local-token-' + Date.now();
+      const recoveryCode = 'REC-' + Math.random().toString(36).substr(2, 6).toUpperCase();
+
+      // Giriş yap
+      localStorage.setItem('token', token);
+      localStorage.setItem('currentUser', JSON.stringify({
+        id: newUser.id,
+        nickname: newUser.nickname,
+        city: newUser.city,
+        isAdmin: false
+      }));
+
+      setToken(token);
+      setUser(newUser);
+
+      toast.success('Kayıt başarılı!');
+      return { success: true, recoveryCode };
+
     } catch (error) {
-      const message = error.response?.data?.message || 'Kayıt hatası';
-      toast.error(message);
-      return { success: false, message };
+      toast.error(error.message);
+      return { success: false, message: error.message };
     }
   };
 
@@ -99,6 +178,7 @@ export const AuthProvider = ({ children }) => {
 
   const logout = () => {
     localStorage.removeItem('token');
+    localStorage.removeItem('currentUser');
     setToken(null);
     setUser(null);
     delete axios.defaults.headers.common['Authorization'];
