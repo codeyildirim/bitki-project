@@ -1,13 +1,11 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import Database from 'better-sqlite3';
-import { join } from 'path';
 
 // JWT Secret
 const JWT_SECRET = process.env.JWT_SECRET || 'sifalı-bitkiler-super-secret-key-2024';
 
-// Database path for Vercel
-const dbPath = join(process.cwd(), 'data', 'database.sqlite');
+// Geçici olarak memory-based user storage (production'da external DB kullanılacak)
+let users = [];
 
 export default async function handler(req, res) {
   // CORS headers
@@ -56,83 +54,60 @@ export default async function handler(req, res) {
       });
     }
 
-    // Database connection
-    let db;
-    try {
-      db = new Database(dbPath);
-
-      // Users tablosunu oluştur
-      db.exec(`
-        CREATE TABLE IF NOT EXISTS users (
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
-          nickname TEXT UNIQUE NOT NULL,
-          password TEXT NOT NULL,
-          city TEXT,
-          recovery_code TEXT,
-          created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-          updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-        )
-      `);
-
-      // Kullanıcı zaten var mı kontrol et
-      const existingUser = db.prepare('SELECT * FROM users WHERE nickname = ?').get(nickname);
-      if (existingUser) {
-        return res.status(400).json({
-          success: false,
-          message: 'Bu kullanıcı adı zaten kullanılıyor'
-        });
-      }
-
-      // Şifreyi hashle
-      const hashedPassword = bcrypt.hashSync(password, 10);
-
-      // Recovery code oluştur
-      const recoveryCode = 'REC-' + Date.now().toString().slice(-6) + Math.random().toString(36).substr(2, 4).toUpperCase();
-      const hashedRecoveryCode = bcrypt.hashSync(recoveryCode, 10);
-
-      // Kullanıcıyı kaydet
-      const insertUser = db.prepare(`
-        INSERT INTO users (nickname, password, city, recovery_code)
-        VALUES (?, ?, ?, ?)
-      `);
-
-      const result = insertUser.run(nickname, hashedPassword, city, hashedRecoveryCode);
-
-      // JWT token oluştur
-      const token = jwt.sign(
-        { id: result.lastInsertRowid, nickname, isAdmin: false },
-        JWT_SECRET,
-        { expiresIn: '7d' }
-      );
-
-      // Kullanıcı bilgilerini getir
-      const user = {
-        id: result.lastInsertRowid,
-        nickname,
-        city,
-        isAdmin: false
-      };
-
-      db.close();
-
-      res.status(201).json({
-        success: true,
-        message: 'Kayıt başarılı',
-        data: {
-          token,
-          user,
-          recoveryCode
-        }
-      });
-
-    } catch (dbError) {
-      if (db) db.close();
-      console.error('Database error:', dbError);
-      return res.status(500).json({
+    // Kullanıcı zaten var mı kontrol et
+    const existingUser = users.find(u => u.nickname === nickname);
+    if (existingUser) {
+      return res.status(400).json({
         success: false,
-        message: 'Veritabanı hatası'
+        message: 'Bu kullanıcı adı zaten kullanılıyor'
       });
     }
+
+    // Şifreyi hashle
+    const hashedPassword = bcrypt.hashSync(password, 10);
+
+    // Recovery code oluştur
+    const recoveryCode = 'REC-' + Date.now().toString().slice(-6) + Math.random().toString(36).substr(2, 4).toUpperCase();
+    const hashedRecoveryCode = bcrypt.hashSync(recoveryCode, 10);
+
+    // Kullanıcıyı kaydet
+    const userId = Date.now();
+    const newUser = {
+      id: userId,
+      nickname,
+      password: hashedPassword,
+      city,
+      recoveryCode: hashedRecoveryCode,
+      createdAt: new Date().toISOString(),
+      isAdmin: false
+    };
+
+    users.push(newUser);
+
+    // JWT token oluştur
+    const token = jwt.sign(
+      { id: userId, nickname, isAdmin: false },
+      JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    // Kullanıcı bilgilerini hazırla
+    const user = {
+      id: userId,
+      nickname,
+      city,
+      isAdmin: false
+    };
+
+    res.status(201).json({
+      success: true,
+      message: 'Kayıt başarılı',
+      data: {
+        token,
+        user,
+        recoveryCode
+      }
+    });
 
   } catch (error) {
     console.error('Register error:', error);

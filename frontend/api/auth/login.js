@@ -1,13 +1,12 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import Database from 'better-sqlite3';
-import { join } from 'path';
 
 // JWT Secret
 const JWT_SECRET = process.env.JWT_SECRET || 'sifalı-bitkiler-super-secret-key-2024';
 
-// Database path for Vercel
-const dbPath = join(process.cwd(), 'data', 'database.sqlite');
+// Shared users array (gerçek production'da external DB kullanılacak)
+// Bu geçici çözüm - users array'i register.js ile paylaşımı için
+let users = [];
 
 export default async function handler(req, res) {
   // CORS headers
@@ -42,63 +41,47 @@ export default async function handler(req, res) {
       });
     }
 
-    // Database connection
-    let db;
-    try {
-      db = new Database(dbPath);
-
-      // Kullanıcıyı bul
-      const user = db.prepare('SELECT * FROM users WHERE nickname = ?').get(nickname);
-      if (!user) {
-        return res.status(400).json({
-          success: false,
-          message: 'Kullanıcı adı veya şifre hatalı'
-        });
-      }
-
-      // Şifreyi kontrol et
-      const isPasswordValid = bcrypt.compareSync(password, user.password);
-      if (!isPasswordValid) {
-        return res.status(400).json({
-          success: false,
-          message: 'Kullanıcı adı veya şifre hatalı'
-        });
-      }
-
-      // JWT token oluştur
-      const token = jwt.sign(
-        { id: user.id, nickname: user.nickname, isAdmin: false },
-        JWT_SECRET,
-        { expiresIn: '7d' }
-      );
-
-      // Kullanıcı bilgilerini hazırla
-      const userInfo = {
-        id: user.id,
-        nickname: user.nickname,
-        city: user.city,
-        isAdmin: false
-      };
-
-      db.close();
-
-      res.status(200).json({
-        success: true,
-        message: 'Giriş başarılı',
-        data: {
-          token,
-          user: userInfo
-        }
-      });
-
-    } catch (dbError) {
-      if (db) db.close();
-      console.error('Database error:', dbError);
-      return res.status(500).json({
+    // Kullanıcıyı bul
+    const user = users.find(u => u.nickname === nickname);
+    if (!user) {
+      return res.status(400).json({
         success: false,
-        message: 'Veritabanı hatası'
+        message: 'Kullanıcı adı veya şifre hatalı'
       });
     }
+
+    // Şifreyi kontrol et
+    const isPasswordValid = bcrypt.compareSync(password, user.password);
+    if (!isPasswordValid) {
+      return res.status(400).json({
+        success: false,
+        message: 'Kullanıcı adı veya şifre hatalı'
+      });
+    }
+
+    // JWT token oluştur
+    const token = jwt.sign(
+      { id: user.id, nickname: user.nickname, isAdmin: false },
+      JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    // Kullanıcı bilgilerini hazırla
+    const userInfo = {
+      id: user.id,
+      nickname: user.nickname,
+      city: user.city,
+      isAdmin: false
+    };
+
+    res.status(200).json({
+      success: true,
+      message: 'Giriş başarılı',
+      data: {
+        token,
+        user: userInfo
+      }
+    });
 
   } catch (error) {
     console.error('Login error:', error);
