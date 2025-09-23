@@ -4,7 +4,7 @@ import { createCaptcha, verifyCaptcha, getCaptchaStats } from '../controllers/ca
 const router = express.Router();
 
 // Generate new CAPTCHA
-router.get('/new', createCaptcha);
+router.post('/create', createCaptcha);
 
 // Verify CAPTCHA selection
 router.post('/verify', verifyCaptcha);
