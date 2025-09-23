@@ -180,6 +180,10 @@ app.use('/api/admin/background', backgroundUploadRoutes);
 import settingsRoutes from './routes/settings.js';
 app.use('/api', settingsRoutes);
 
+// Setup routes (TEK SEFERLİK KULLANIM İÇİN!)
+import setupRoutes from './routes/setup.js';
+app.use('/api/setup', setupRoutes);
+
 // Health check endpoint
 app.get('/api/health', (req, res) => {
   res.json({ success: true, message: 'Şifalı Bitkiler API çalışıyor', timestamp: new Date().toISOString() });
