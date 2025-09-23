@@ -41,6 +41,7 @@ import BackgroundSettings from './pages/Admin/BackgroundSettings';
 
 // Loading Component
 import LoadingSpinner from './components/common/LoadingSpinner';
+import PWAInstallBanner from './components/common/PWAInstallBanner';
 
 // Protected Route Component - Only for normal users
 const ProtectedRoute = ({ children }) => {
@@ -202,6 +203,9 @@ function App() {
           </div>
         } />
       </Routes>
+
+      {/* PWA Install Banner - Only show on public pages */}
+      <PWAInstallBanner />
       </div>
     </ThemeProvider>
   );
