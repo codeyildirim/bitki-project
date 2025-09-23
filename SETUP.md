@@ -180,4 +180,109 @@ Sorunlar için GitHub Issues kullanın veya info@sifalibitkiler.com adresinden i
 
 ---
 
+# 🔧 Production Admin Hesabı Oluşturma
+
+## Önce Bu Adımları Tamamlayın
+
+### 1. Backend'i GitHub'a Push Edin
+Setup endpoint'ini production'a göndermek için:
+
+```bash
+cd backend/
+git add .
+git commit -m "feat: add setup endpoint for admin account creation"
+git push origin main
+```
+
+### 2. Render.com'da Redeploy Yapın
+- Render.com dashboard'unuza gidin
+- Backend servisinizi seçin
+- "Manual Deploy" -> "Deploy latest commit" tıklayın
+- Deploy'un tamamlanmasını bekleyin (2-3 dakika)
+
+## Admin Hesabı Oluşturma
+
+### Yöntem 1: Script ile (Önerilen)
+
+1. `create-admin.js` dosyasını kullanın:
+```bash
+node create-admin.js
+```
+
+2. Script başarılı olursa şu bilgileri alacaksınız:
+   - **Kullanıcı Adı:** admin
+   - **Şifre:** admin123
+   - **Kurtarma Kodu:** ADMIN-RECOVERY-2024
+
+### Yöntem 2: Manuel API Çağrısı
+
+Eğer script çalışmazsa, doğrudan API'yi çağırabilirsiniz:
+
+```bash
+# Önce mevcut admin kontrolü
+curl https://bitki-backend.onrender.com/api/setup/check
+
+# Admin hesabı oluştur
+curl -X POST https://bitki-backend.onrender.com/api/setup/create-admin \
+  -H "Content-Type: application/json"
+```
+
+### Yöntem 3: Tarayıcı ile
+
+Tarayıcınızda şu URL'leri açın:
+
+1. Kontrol için: `https://bitki-backend.onrender.com/api/setup/check`
+2. Admin oluştur için: `https://bitki-backend.onrender.com/api/setup/create-admin` (POST request)
+
+## Admin Panel Giriş
+
+Admin hesabınız oluşturulduktan sonra:
+
+1. **Admin Panel URL:** https://bitki-admin.vercel.app
+2. **Giriş Bilgileri:**
+   - Kullanıcı Adı: `admin`
+   - Şifre: `admin123`
+
+## Güvenlik Önerileri
+
+⚠️ **UYARI:** Production'da admin hesabı oluşturduktan sonra:
+
+1. **Setup endpoint'ini devre dışı bırakın:**
+   - `src/app.js` dosyasında `app.use('/api/setup', setupRoutes);` satırını comment out edin
+   - Yeniden deploy edin
+
+2. **Admin şifresini değiştirin:**
+   - Admin panelinde giriş yapın
+   - Profil ayarlarından şifrenizi güvenli bir şifreyle değiştirin
+
+3. **Environment variables ekleyin:**
+   - Render.com'da `ADMIN_ACCESS_CODE` environment variable'ı ekleyin
+   - Bu kod olmadan admin girişi yapılamayacak
+
+## Sorun Giderme
+
+### "Admin hesabı zaten mevcut" Hatası
+- Bu normal bir durumdur, admin hesabınız hazır
+- Giriş bilgileri: admin / admin123
+
+### "Bağlantı hatası"
+- Render.com servisinizin çalıştığından emin olun
+- Backend URL'sinin doğru olduğunu kontrol edin
+- Deploy'un tamamlandığından emin olun
+
+### "Not Found" Hatası
+- Setup endpoint'i henüz deploy edilmemiş
+- Önce GitHub'a push edin, sonra Render'da redeploy yapın
+
+## Admin Hesabı Bilgileri
+
+✅ **Standart Admin Hesabı:**
+- **Kullanıcı Adı:** admin
+- **Şifre:** admin123
+- **Kurtarma Kodu:** ADMIN-RECOVERY-2024
+- **Konum:** istanbul
+- **Yetki:** Tam admin yetkisi
+
+---
+
 🌿 **Doğal yaşamın kapıları sizinle!** 🌿

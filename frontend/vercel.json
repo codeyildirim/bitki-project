@@ -11,7 +11,7 @@
       "destination": "/admin.html"
     },
     {
-      "source": "/",
+      "source": "/(.*)",
       "has": [{ "type": "host", "value": "bitki-admin.vercel.app" }],
       "destination": "/admin.html"
     },
