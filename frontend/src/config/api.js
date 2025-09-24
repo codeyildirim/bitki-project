@@ -1,3 +1,5 @@
+import storage from '../utils/storage.js';
+
 // API Configuration
 export const API_CONFIG = {
   // Base API URL - ALWAYS use production URL, no localhost!
@@ -62,7 +64,7 @@ export const createAuthHeaders = (includeAuth = true) => {
   };
 
   if (includeAuth) {
-    const token = localStorage.getItem('token');
+    const token = storage.getToken();
     if (token) {
       headers['Authorization'] = `Bearer ${token}`;
     }
@@ -75,7 +77,7 @@ export const createFormDataHeaders = (includeAuth = true) => {
   const headers = {};
 
   if (includeAuth) {
-    const token = localStorage.getItem('token');
+    const token = storage.getToken();
     if (token) {
       headers['Authorization'] = `Bearer ${token}`;
     }

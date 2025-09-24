@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { API_CONFIG } from '../config/api.js';
+import storage from '../utils/storage.js';
 
 // Production'da Vercel Functions kullan
 console.log('✅ Production: Vercel Functions API kullanılıyor');
@@ -21,70 +22,18 @@ export const AuthProvider = ({ children }) => {
 
   // Clear old localStorage data that might conflict with API
   useEffect(() => {
-    const clearOldData = () => {
-      try {
-        // Remove old user data that might be from localStorage-only system
-        const oldUsers = localStorage.getItem('users');
-        if (oldUsers) {
-          console.log('🧹 AuthContext: Eski users verisi temizleniyor');
-          localStorage.removeItem('users');
-        }
-
-        // Clean up system logs that might be outdated
-        const systemLogs = localStorage.getItem('systemLogs');
-        if (systemLogs) {
-          console.log('🧹 AuthContext: Eski system logs temizleniyor');
-          localStorage.removeItem('systemLogs');
-        }
-
-        // Clean up user logs that might be outdated
-        const userLogs = localStorage.getItem('userLogs');
-        if (userLogs) {
-          console.log('🧹 AuthContext: Eski user logs temizleniyor');
-          localStorage.removeItem('userLogs');
-        }
-
-        // Force clear any remaining conflicting data
-        const keysToRemove = [];
-        for (let i = 0; i < localStorage.length; i++) {
-          const key = localStorage.key(i);
-          if (key && (key.includes('user') || key.includes('admin') || key.includes('log')) &&
-              key !== 'currentUser' && key !== 'token') {
-            keysToRemove.push(key);
-          }
-        }
-
-        keysToRemove.forEach(key => {
-          console.log('🧹 AuthContext: Ek veri temizleniyor:', key);
-          localStorage.removeItem(key);
-        });
-
-        console.log('✅ AuthContext: localStorage kapsamlı temizlik tamamlandı');
-      } catch (error) {
-        console.error('❌ AuthContext: localStorage temizlik hatası:', error);
-      }
-    };
-
-    clearOldData();
+    console.log('🧹 AuthContext: Eski localStorage verileri temizleniyor');
+    storage.cleanupOldKeys();
   }, []);
 
-  // Initial state'i localStorage'dan güvenli şekilde al
+  // Initial state'i storage servisinden güvenli şekilde al
   const [user, setUser] = useState(() => {
-    try {
-      const storedUser = localStorage.getItem('currentUser');
-      return storedUser ? JSON.parse(storedUser) : null;
-    } catch {
-      return null;
-    }
+    return storage.getUser();
   });
 
   const [loading, setLoading] = useState(true);
   const [token, setToken] = useState(() => {
-    try {
-      return localStorage.getItem('token');
-    } catch {
-      return null;
-    }
+    return storage.getToken();
   });
 
   useEffect(() => {
@@ -110,24 +59,23 @@ export const AuthProvider = ({ children }) => {
   const fetchProfile = async () => {
     try {
       console.log('🔄 AuthContext: fetchProfile başlatıldı');
-      const storedToken = localStorage.getItem('token');
-      const storedUser = localStorage.getItem('currentUser');
+      const storedToken = storage.getToken();
+      const storedUser = storage.getUser();
 
       console.log('📦 AuthContext: storedToken:', storedToken);
       console.log('👤 AuthContext: storedUser:', storedUser);
 
       if (storedToken && storedUser) {
         setToken(storedToken);
-        setUser(JSON.parse(storedUser));
-        console.log('✅ AuthContext: Kullanıcı session\' restore edildi');
+        setUser(storedUser);
+        console.log('✅ AuthContext: Kullanıcı session restore edildi');
       } else {
         console.log('⚠️ AuthContext: Token veya user bulunamadı');
       }
     } catch (error) {
       console.error('❌ Profil getirme hatası:', error);
-      console.log('🗑️ localStorage temizleniyor...');
-      localStorage.removeItem('token');
-      localStorage.removeItem('currentUser');
+      console.log('🗑️ storage temizleniyor...');
+      storage.clearAuth();
       setToken(null);
       setUser(null);
     } finally {
@@ -149,9 +97,8 @@ export const AuthProvider = ({ children }) => {
       if (response.data.success) {
         const { token, user } = response.data.data;
 
-        // Token ve user bilgilerini kaydet
-        localStorage.setItem('token', token);
-        localStorage.setItem('currentUser', JSON.stringify(user));
+        // Token ve user bilgilerini storage servisi ile kaydet
+        storage.setAuth(token, user);
 
         // Axios header'ına token ekle
         axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
@@ -191,9 +138,8 @@ export const AuthProvider = ({ children }) => {
       if (response.data.success) {
         const { token, user, recoveryCode } = response.data.data;
 
-        // Token ve user bilgilerini kaydet
-        localStorage.setItem('token', token);
-        localStorage.setItem('currentUser', JSON.stringify(user));
+        // Token ve user bilgilerini storage servisi ile kaydet
+        storage.setAuth(token, user);
 
         // Axios header'ına token ekle
         axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
@@ -230,26 +176,20 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
-    // Mevcut kullanıcı bilgisi varsa logout logunu ekle
-    if (user) {
-      const userLogs = JSON.parse(localStorage.getItem('userLogs') || '[]');
-      userLogs.unshift({
-        id: Date.now(),
-        action: 'LOGOUT',
-        status: 'SUCCESS',
-        admin_nickname: user.nickname,
-        description: `${user.nickname} kullanıcısı çıkış yaptı`,
-        created_at: new Date().toISOString()
-      });
-      localStorage.setItem('userLogs', JSON.stringify(userLogs.slice(0, 100)));
-    }
+    console.log('🚪 AuthContext: Logout işlemi başlatıldı');
 
-    localStorage.removeItem('token');
-    localStorage.removeItem('currentUser');
+    // Storage'ı temizle
+    storage.clearAuth();
+
+    // State'leri temizle
     setToken(null);
     setUser(null);
+
+    // Axios header'ını temizle
     delete axios.defaults.headers.common['Authorization'];
+
     toast.success('Çıkış yapıldı');
+    console.log('✅ AuthContext: Logout tamamlandı');
   };
 
   const updateProfile = async (profileData) => {

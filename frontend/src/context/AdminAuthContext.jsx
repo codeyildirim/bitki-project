@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { API_CONFIG } from '../config/api.js';
+import storage from '../utils/storage.js';
 
 const AdminAuthContext = createContext();
 
@@ -13,7 +14,7 @@ const adminApi = axios.create({
 
 // Add auth interceptor for admin token
 adminApi.interceptors.request.use((config) => {
-  const token = localStorage.getItem('adminToken');
+  const token = storage.getAdminToken();
   console.log('🔍 Admin Token Debug:', { token: token ? `${token.slice(0, 20)}...` : 'null' });
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
@@ -29,8 +30,7 @@ adminApi.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401 || error.response?.status === 403) {
-      localStorage.removeItem('adminToken');
-      localStorage.removeItem('admin_user');
+      storage.clearAdminAuth();
       window.location.href = '/admin/login';
     }
     return Promise.reject(error);
@@ -52,31 +52,19 @@ export const AdminAuthProvider = ({ children }) => {
 
   // Check existing admin token on mount
   useEffect(() => {
-    // Migration: Clear old token format
-    const oldToken = localStorage.getItem('admin_token');
-    if (oldToken) {
-      console.log('🔄 Migrating old token format...');
-      localStorage.removeItem('admin_token');
-      localStorage.removeItem('admin_user');
-      // Force re-login
-      setLoading(false);
-      return;
-    }
-
-    const token = localStorage.getItem('adminToken');
-    const savedUser = localStorage.getItem('admin_user');
+    const token = storage.getAdminToken();
+    const savedUser = storage.getAdminUser();
 
     console.log('🔍 Token check on mount:', { hasToken: !!token, hasUser: !!savedUser });
 
     if (token && savedUser) {
       try {
-        setUser(JSON.parse(savedUser));
+        setUser(savedUser);
         setIsAuthenticated(true);
-        console.log('✅ Admin authenticated from localStorage');
+        console.log('✅ Admin authenticated from storage');
       } catch (error) {
-        console.error('Error parsing saved admin user:', error);
-        localStorage.removeItem('adminToken');
-        localStorage.removeItem('admin_user');
+        console.error('Error using saved admin user:', error);
+        storage.clearAdminAuth();
       }
     }
     setLoading(false);
@@ -89,8 +77,7 @@ export const AdminAuthProvider = ({ children }) => {
       if (response.data.success) {
         const { token, user } = response.data.data;
 
-        localStorage.setItem('adminToken', token);
-        localStorage.setItem('admin_user', JSON.stringify(user));
+        storage.setAdminAuth(token, user);
 
         setUser(user);
         setIsAuthenticated(true);
@@ -108,8 +95,7 @@ export const AdminAuthProvider = ({ children }) => {
   };
 
   const logout = () => {
-    localStorage.removeItem('adminToken');
-    localStorage.removeItem('admin_user');
+    storage.clearAdminAuth();
     setUser(null);
     setIsAuthenticated(false);
     toast.success('Çıkış yapıldı');

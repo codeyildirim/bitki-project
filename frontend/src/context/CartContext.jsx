@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
+import storage from '../utils/storage.js';
 
 const CartContext = createContext();
 
@@ -15,19 +16,12 @@ export const CartProvider = ({ children }) => {
   const [items, setItems] = useState([]);
 
   useEffect(() => {
-    const savedCart = localStorage.getItem('cart');
-    if (savedCart) {
-      try {
-        setItems(JSON.parse(savedCart));
-      } catch (error) {
-        console.error('Sepet verisi okuma hatası:', error);
-        localStorage.removeItem('cart');
-      }
-    }
+    const savedCart = storage.getCart();
+    setItems(savedCart);
   }, []);
 
   useEffect(() => {
-    localStorage.setItem('cart', JSON.stringify(items));
+    storage.setCart(items);
   }, [items]);
 
   const addToCart = (product, quantity = 1) => {
@@ -86,7 +80,7 @@ export const CartProvider = ({ children }) => {
 
   const clearCart = () => {
     setItems([]);
-    localStorage.removeItem('cart');
+    storage.clearCart();
   };
 
   const getTotalPrice = () => {

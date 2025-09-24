@@ -1,4 +1,5 @@
 import axios from 'axios';
+import storage from './storage.js';
 
 // PRODUCTION API URL - NO LOCALHOST!
 const API_BASE_URL = 'https://bitki-backend.onrender.com/api';
@@ -12,7 +13,7 @@ const api = axios.create({
 // Request interceptor - Token ekleme
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token');
+    const token = storage.getToken();
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -28,7 +29,7 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      localStorage.removeItem('token');
+      storage.clearAuth();
       window.location.href = '/auth/login';
     }
     return Promise.reject(error);

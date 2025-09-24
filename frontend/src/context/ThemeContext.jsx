@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import storage from '../utils/storage.js';
 
 const ThemeContext = createContext();
 
@@ -12,24 +13,21 @@ export const useTheme = () => {
 
 export const ThemeProvider = ({ children }) => {
   const [theme, setTheme] = useState(() => {
-    // Güvenli localStorage kontrolü
-    try {
-      const savedTheme = localStorage.getItem('theme');
-      if (savedTheme) return savedTheme;
-    } catch (error) {
-      console.log('localStorage error:', error);
-    }
+    // Storage'dan tema al
+    const savedTheme = storage.getTheme();
 
-    // Sistem tercihini kontrol et
-    try {
-      if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        return 'dark';
+    // Eğer storage'da tema yoksa sistem tercihini kontrol et
+    if (savedTheme === 'light') {
+      try {
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+          return 'dark';
+        }
+      } catch (error) {
+        console.log('matchMedia error:', error);
       }
-    } catch (error) {
-      console.log('matchMedia error:', error);
     }
 
-    return 'light';
+    return savedTheme;
   });
 
   useEffect(() => {
@@ -42,8 +40,8 @@ export const ThemeProvider = ({ children }) => {
         root.classList.remove('dark');
       }
 
-      // LocalStorage'a kaydet
-      localStorage.setItem('theme', theme);
+      // Storage'a kaydet
+      storage.setTheme(theme);
     } catch (error) {
       console.log('Theme effect error:', error);
     }
