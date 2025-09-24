@@ -42,15 +42,33 @@ const PWAManagement = () => {
 
   const fetchPWAStats = async () => {
     try {
-      const response = await axios.get(getApiUrl('/api/pwa/stats'), {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+      const apiUrl = getApiUrl('/api/pwa/stats');
+      console.log('🔍 PWA Stats API URL:', apiUrl);
+
+      const token = localStorage.getItem('token');
+      console.log('🔑 Token exists:', !!token);
+
+      const response = await axios.get(apiUrl, {
+        headers: { Authorization: `Bearer ${token}` }
       });
+
+      console.log('✅ PWA Stats Response:', response.data);
+
       if (response.data.success) {
         setStats(response.data.data);
+        toast.success('İstatistikler yüklendi');
+      } else {
+        console.error('❌ API Response not successful:', response.data);
+        toast.error(response.data.message || 'İstatistikler yüklenemedi');
       }
     } catch (error) {
-      console.error('PWA istatistikleri yüklenemedi:', error);
-      toast.error('İstatistikler yüklenemedi');
+      console.error('❌ PWA istatistikleri yüklenemedi:', {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status,
+        url: getApiUrl('/api/pwa/stats')
+      });
+      toast.error(`İstatistikler yüklenemedi: ${error.response?.data?.message || error.message}`);
     } finally {
       setLoading(false);
     }
@@ -58,14 +76,30 @@ const PWAManagement = () => {
 
   const fetchNotifications = async () => {
     try {
-      const response = await axios.get(getApiUrl('/api/pwa/notifications'), {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+      const apiUrl = getApiUrl('/api/pwa/notifications');
+      console.log('🔍 PWA Notifications API URL:', apiUrl);
+
+      const token = localStorage.getItem('token');
+      const response = await axios.get(apiUrl, {
+        headers: { Authorization: `Bearer ${token}` }
       });
+
+      console.log('✅ PWA Notifications Response:', response.data);
+
       if (response.data.success) {
         setNotifications(response.data.data);
+      } else {
+        console.error('❌ Notifications API Response not successful:', response.data);
+        toast.error(response.data.message || 'Bildirimler yüklenemedi');
       }
     } catch (error) {
-      console.error('Bildirimler yüklenemedi:', error);
+      console.error('❌ Bildirimler yüklenemedi:', {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status,
+        url: getApiUrl('/api/pwa/notifications')
+      });
+      toast.error(`Bildirimler yüklenemedi: ${error.response?.data?.message || error.message}`);
     }
   };
 
@@ -121,6 +155,32 @@ const PWAManagement = () => {
     });
   };
 
+  const clearCacheAndReload = () => {
+    if (window.confirm('Bu işlem tüm local storage ve cache\'i temizleyecektir. Devam etmek istiyor musunuz?')) {
+      // LocalStorage temizle
+      localStorage.clear();
+
+      // SessionStorage temizle
+      sessionStorage.clear();
+
+      // Service Worker cache temizle
+      if ('caches' in window) {
+        caches.keys().then(cacheNames => {
+          cacheNames.forEach(cacheName => {
+            caches.delete(cacheName);
+          });
+        });
+      }
+
+      toast.success('Cache temizlendi, sayfa yenileniyor...');
+
+      // Sayfa yenileme
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
+    }
+  };
+
   // Chart verilerini hazırla
   const prepareChartData = () => {
     const grouped = stats.last30Days.reduce((acc, item) => {
@@ -161,13 +221,22 @@ const PWAManagement = () => {
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
           PWA Yönetimi
         </h1>
-        <button
-          onClick={() => setShowNotificationModal(true)}
-          className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
-        >
-          <Send size={20} />
-          Bildirim Gönder
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={clearCacheAndReload}
+            className="flex items-center gap-2 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700"
+            title="Cache ve LocalStorage'ı temizle"
+          >
+            🗑️ Cache Temizle
+          </button>
+          <button
+            onClick={() => setShowNotificationModal(true)}
+            className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
+          >
+            <Send size={20} />
+            Bildirim Gönder
+          </button>
+        </div>
       </div>
 
       {/* Tabs */}
