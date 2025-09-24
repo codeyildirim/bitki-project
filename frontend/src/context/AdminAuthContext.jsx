@@ -15,8 +15,8 @@ const adminApi = axios.create({
 // Add auth interceptor for admin token
 adminApi.interceptors.request.use((config) => {
   const token = storage.getAdminToken();
-  console.log('🔍 Admin Token Debug:', { token: token ? `${token.slice(0, 20)}...` : 'null' });
-  if (token) {
+  console.log('🔍 Admin Token Debug:', { token: token ? `${token.slice(0, 20)}...` : null });
+  if (token && token !== 'null') {
     config.headers.Authorization = `Bearer ${token}`;
     console.log('✅ Authorization header added to request');
   } else {
@@ -72,7 +72,7 @@ export const AdminAuthProvider = ({ children }) => {
 
   const login = async (credentials) => {
     try {
-      const response = await adminApi.post('/api/admin/login', credentials);
+      const response = await adminApi.post('/admin/login', credentials);
 
       if (response.data.success) {
         const { token, user } = response.data.data;
