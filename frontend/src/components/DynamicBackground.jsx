@@ -60,8 +60,18 @@ const DynamicBackground = () => {
       }
 
       try {
-        const response = await fetch(videoSrc, { method: 'HEAD' });
-        setVideoExists(response.ok);
+        // HEAD request yerine video element kullan - CORS problemi için
+        const video = document.createElement('video');
+        video.preload = 'metadata';
+        video.src = videoSrc;
+
+        video.onloadedmetadata = () => {
+          setVideoExists(true);
+        };
+
+        video.onerror = () => {
+          setVideoExists(false);
+        };
       } catch {
         setVideoExists(false);
       }
@@ -70,11 +80,18 @@ const DynamicBackground = () => {
     const checkImages = async () => {
       for (const src of imageSources) {
         try {
-          const response = await fetch(src, { method: 'HEAD' });
-          if (response.ok) {
-            setImageExists(src);
-            return;
-          }
+          // Image element kullan - fetch HEAD yerine
+          const img = new Image();
+          img.src = src;
+
+          await new Promise((resolve, reject) => {
+            img.onload = () => {
+              setImageExists(src);
+              resolve();
+            };
+            img.onerror = reject;
+          });
+          return; // İlk başarılı image'da dur
         } catch {
           // Continue checking next format
         }

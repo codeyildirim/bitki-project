@@ -103,13 +103,11 @@ app.use('/api/admin/login', authLimiter);
 app.use('/api/captcha', captchaLimiter);
 app.use('/api', generalLimiter);
 
-// CORS configuration
+// CORS configuration - PRODUCTION ONLY, NO LOCALHOST!
 app.use(cors({
   origin: [
     'https://bitki-project.vercel.app',
-    'https://bitki-admin.vercel.app',
-    'http://localhost:5173',
-    'http://localhost:5174'
+    'https://bitki-admin.vercel.app'
   ],
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
