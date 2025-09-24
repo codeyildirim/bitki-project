@@ -483,7 +483,7 @@ class Database {
       // Create admin account
       this.db.run(`
         INSERT INTO users (nickname, password_hash, recovery_code_hash, city, is_admin, registration_ip, last_ip)
-        VALUES ('admin', ?, ?, 'istanbul', 1, '127.0.0.1', '127.0.0.1')
+        VALUES ('admin', ?, ?, 'istanbul', 1, 'production', 'production')
       `, [adminPassword, recoveryCode], function(err) {
         if (err) {
           console.error('❌ Failed to create admin:', err);

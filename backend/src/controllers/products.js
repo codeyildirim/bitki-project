@@ -99,7 +99,7 @@ export const getProduct = async (req, res) => {
       ORDER BY created_at DESC
     `, [id]);
 
-    const baseURL = process.env.BASE_URL || `http://localhost:${process.env.PORT || 3000}`;
+    const baseURL = process.env.BASE_URL || 'https://seninrenderlink.onrender.com';
     const formattedProduct = {
       ...product,
       images: product.images ? JSON.parse(product.images).map(img => {
@@ -169,7 +169,7 @@ export const getFeaturedProducts = async (req, res) => {
       LIMIT 8
     `);
 
-    const baseURL = process.env.BASE_URL || `http://localhost:${process.env.PORT || 3000}`;
+    const baseURL = process.env.BASE_URL || 'https://seninrenderlink.onrender.com';
     const formattedProducts = products.map(product => ({
       ...product,
       images: product.images ? JSON.parse(product.images).map(img => {

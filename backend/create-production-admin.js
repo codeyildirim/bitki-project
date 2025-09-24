@@ -44,7 +44,7 @@ async function createProductionAdmin() {
       db.run(`
         INSERT INTO users (nickname, password_hash, recovery_code_hash, city, is_admin, registration_ip, last_ip)
         VALUES (?, ?, ?, ?, 1, ?, ?)
-      `, ['admin', adminPassword, recoveryCode, 'istanbul', '127.0.0.1', '127.0.0.1'], function(err) {
+      `, ['admin', adminPassword, recoveryCode, 'istanbul', 'production', 'production'], function(err) {
 
         if (err) {
           console.error('❌ Failed to create admin:', err);

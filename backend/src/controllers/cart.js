@@ -16,7 +16,7 @@ export const getCart = async (req, res) => {
       ORDER BY c.created_at DESC
     `, [req.user.id]);
 
-    const baseURL = process.env.BASE_URL || `http://localhost:${process.env.PORT || 3000}`;
+    const baseURL = process.env.BASE_URL || 'https://seninrenderlink.onrender.com';
     const formattedItems = cartItems.map(item => ({
       ...item,
       images: item.images ? JSON.parse(item.images).map(img =>

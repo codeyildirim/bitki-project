@@ -192,7 +192,7 @@ export const createProduct = async (req, res) => {
       return res.status(400).json(responseError('Ürün adı, fiyat ve stok gereklidir'));
     }
 
-    const baseURL = process.env.BASE_URL || `http://localhost:${process.env.PORT || 3000}`;
+    const baseURL = process.env.BASE_URL || 'https://seninrenderlink.onrender.com';
     console.log('🌐 Base URL:', baseURL);
 
     // Handle images
@@ -235,7 +235,7 @@ export const updateProduct = async (req, res) => {
       return res.status(404).json(responseError('Ürün bulunamadı'));
     }
 
-    const baseURL = process.env.BASE_URL || `http://localhost:${process.env.PORT || 3000}`;
+    const baseURL = process.env.BASE_URL || 'https://seninrenderlink.onrender.com';
 
     // Handle existing images
     let images = product.images ? JSON.parse(product.images) : [];
