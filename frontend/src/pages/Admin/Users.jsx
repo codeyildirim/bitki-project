@@ -190,53 +190,6 @@ const AdminUsers = () => {
           <h1 className="text-3xl font-bold text-white font-mono">Kullanıcı Yönetimi</h1>
           <p className="text-gray-400 font-mono">Kullanıcıları yönet ve aktivitelerini izle</p>
         </div>
-        <div className="flex gap-2">
-          <button
-            onClick={() => {
-              fetchUsers();
-              fetchUserLogs();
-              fetchSystemLogs();
-            }}
-            className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-xs"
-          >
-            🔄 Verileri Yenile
-          </button>
-          <button
-            onClick={() => {
-              const users = JSON.parse(localStorage.getItem('users') || '[]');
-              const userLogs = JSON.parse(localStorage.getItem('userLogs') || '[]');
-
-              console.log('📊 Toplam Kullanıcı:', users.length);
-              console.log('👥 Kullanıcılar:', users);
-              console.log('📜 Son 10 Log:', userLogs.slice(0, 10));
-              console.log('🔑 Current User:', localStorage.getItem('currentUser'));
-              console.log('🎫 Token:', localStorage.getItem('token'));
-
-              alert(`localStorage Durumu:\n\n` +
-                    `Kullanıcı Sayısı: ${users.length}\n` +
-                    `Log Sayısı: ${userLogs.length}\n` +
-                    `Giriş Yapılmış: ${localStorage.getItem('token') ? 'Evet' : 'Hayır'}\n\n` +
-                    `Detaylar console'da!`);
-            }}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-xs"
-          >
-            🔍 Debug LocalStorage
-          </button>
-          <button
-            onClick={() => {
-              if (confirm('localStorage\'ı tamamen temizlemek istediğinizden emin misiniz?')) {
-                localStorage.clear();
-                fetchUsers();
-                fetchUserLogs();
-                fetchSystemLogs();
-                alert('localStorage temizlendi!');
-              }
-            }}
-            className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs"
-          >
-            🗑️ LocalStorage Temizle
-          </button>
-        </div>
       </div>
 
       {/* Tabs */}
