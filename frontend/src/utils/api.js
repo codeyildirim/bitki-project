@@ -2,7 +2,7 @@ import axios from 'axios';
 import storage from './storage.js';
 
 // PRODUCTION API URL - NO LOCALHOST!
-const API_BASE_URL = 'https://bitki-backend.onrender.com/api';
+const API_BASE_URL = 'https://bitki-project.onrender.com/api';
 
 // Axios instance oluştur
 const api = axios.create({

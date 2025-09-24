@@ -40,7 +40,7 @@ const AdminProducts = () => {
   const loadCategories = async () => {
     try {
       // Use production API endpoint for categories
-      const response = await fetch('https://bitki-backend.onrender.com/api/categories');
+      const response = await fetch('https://bitki-project.onrender.com/api/categories');
       const data = await response.json();
       if (data.success) {
         setCategories(data.data || []);
@@ -362,7 +362,7 @@ const AdminProducts = () => {
                             if (firstImage) {
                               return (
                                 <img
-                                  src={`https://bitki-backend.onrender.com${firstImage}`}
+                                  src={`https://bitki-project.onrender.com${firstImage}`}
                                   alt={product.name}
                                   className="w-12 h-12 object-cover rounded border border-gray-700"
                                 />

@@ -161,5 +161,5 @@ export const debounce = (func, wait) => {
 export const getImageUrl = (imagePath) => {
   if (!imagePath) return '/placeholder-image.jpg';
   if (imagePath.startsWith('http')) return imagePath;
-  return `https://bitki-backend.onrender.com/uploads/${imagePath}`;
+  return `https://bitki-project.onrender.com/uploads/${imagePath}`;
 };
