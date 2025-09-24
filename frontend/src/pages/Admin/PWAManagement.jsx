@@ -5,6 +5,7 @@ import {
 } from 'lucide-react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
+import { API_CONFIG } from '../../config/api.js';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 
 const PWAManagement = () => {
@@ -36,7 +37,7 @@ const PWAManagement = () => {
 
   const fetchPWAStats = async () => {
     try {
-      const response = await axios.get('/api/pwa/stats', {
+      const response = await axios.get(`${API_CONFIG.BASE_URL}/api/pwa/stats`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       });
       if (response.data.success) {
@@ -52,7 +53,7 @@ const PWAManagement = () => {
 
   const fetchNotifications = async () => {
     try {
-      const response = await axios.get('/api/pwa/notifications', {
+      const response = await axios.get(`${API_CONFIG.BASE_URL}/api/pwa/notifications`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       });
       if (response.data.success) {
@@ -68,7 +69,7 @@ const PWAManagement = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post('/api/pwa/notifications/send',
+      const response = await axios.post(`${API_CONFIG.BASE_URL}/api/pwa/notifications/send`,
         notificationForm,
         { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }}
       );
@@ -90,7 +91,7 @@ const PWAManagement = () => {
     if (!window.confirm('Bu bildirimi silmek istediğinizden emin misiniz?')) return;
 
     try {
-      const response = await axios.delete(`/api/pwa/notifications/${id}`, {
+      const response = await axios.delete(`${API_CONFIG.BASE_URL}/api/pwa/notifications/${id}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       });
 

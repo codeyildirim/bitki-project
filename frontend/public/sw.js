@@ -181,7 +181,8 @@ async function trackPWAEvent(eventType) {
       tablet: /iPad/i.test(navigator.userAgent)
     };
 
-    await fetch('/api/pwa/track', {
+    // Use production API URL
+    await fetch('https://bitki-project.onrender.com/api/pwa/track', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

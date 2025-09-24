@@ -8,6 +8,7 @@ import AdminApp from './AdminApp.jsx'
 import { AuthProvider } from './context/AuthContext.jsx'
 import { CartProvider } from './context/CartContext.jsx'
 import { ThemeProvider } from './context/ThemeContext.jsx'
+import { initializePWATracking } from './utils/pwaTracking.js'
 import './index.css'
 
 // Check if we're in admin mode
@@ -24,6 +25,11 @@ if ('serviceWorker' in navigator) {
         console.log('SW registration failed: ', registrationError);
       });
   });
+}
+
+// Initialize PWA tracking for public app
+if (!isAdmin) {
+  initializePWATracking();
 }
 
 const queryClient = new QueryClient({

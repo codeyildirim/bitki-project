@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { trackPWAInstall } from '../utils/pwaTracking.js';
 
 export const usePWAInstall = () => {
   const [deferredPrompt, setDeferredPrompt] = useState(null);
@@ -16,6 +17,7 @@ export const usePWAInstall = () => {
 
     const handleAppInstalled = () => {
       console.log('📱 PWA was installed');
+      trackPWAInstall();
       setShowInstallButton(false);
       setDeferredPrompt(null);
     };
