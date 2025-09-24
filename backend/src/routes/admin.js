@@ -84,8 +84,8 @@ const categoryUpload = multer({
 // Dashboard Endpoint
 router.get('/dashboard', requireAdminRole, async (req, res) => {
   try {
-    // Toplam kullanıcı sayısı
-    const totalUsersResult = await db.get('SELECT COUNT(*) as count FROM users WHERE is_admin != 1');
+    // Toplam kullanıcı sayısı (sadece normal kullanıcılar)
+    const totalUsersResult = await db.get('SELECT COUNT(*) as count FROM users WHERE is_admin = 0 OR is_admin IS NULL');
     const totalUsers = totalUsersResult.count;
 
     // Toplam sipariş sayısı

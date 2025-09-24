@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { useAdminAuth } from '../../context/AdminAuthContext.jsx';
 
 const AdminUsers = () => {
+  const { adminApi } = useAdminAuth();
   const [users, setUsers] = useState([]);
   const [userLogs, setUserLogs] = useState([]);
   const [systemLogs, setSystemLogs] = useState([]);
@@ -18,30 +20,18 @@ const AdminUsers = () => {
     try {
       console.log('🔍 Admin Users: fetchUsers başlatıldı - API çağrısı yapılıyor');
 
-      // Local backend API URL
-      const API_URL = 'http://localhost:3000';
+      const response = await adminApi.get('/api/admin/users');
+      console.log('📡 API yanıtı:', response.data);
 
-      const response = await fetch(`${API_URL}/api/admin/users`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`API hatası: ${response.status}`);
-      }
-
-      const data = await response.json();
-      console.log('📡 API yanıtı:', data);
-
-      if (data.success) {
-        const apiUsers = data.data || [];
+      if (response.data.success) {
+        const apiUsers = response.data.data || [];
         console.log('✅ API\'den alınan kullanıcılar:', apiUsers);
-        setUsers(apiUsers);
-        console.log(`📊 Admin panele ${apiUsers.length} kullanıcı yüklendi`);
+        // Admin kullanıcıları filtrele
+        const normalUsers = apiUsers.filter(user => !user.is_admin);
+        setUsers(normalUsers);
+        console.log(`📊 Admin panele ${normalUsers.length} normal kullanıcı yüklendi`);
       } else {
-        console.error('❌ API başarısız:', data.message);
+        console.error('❌ API başarısız:', response.data.message);
         setUsers([]);
       }
     } catch (error) {

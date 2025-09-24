@@ -18,30 +18,18 @@ const Security = () => {
     try {
       console.log('🔍 Security: fetchUsers başlatıldı - API çağrısı yapılıyor');
 
-      // Local backend API URL
-      const API_URL = 'http://localhost:3000';
+      const response = await adminApi.get('/api/admin/users');
+      console.log('📡 Security API yanıtı:', response.data);
 
-      const response = await fetch(`${API_URL}/api/admin/users`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`API hatası: ${response.status}`);
-      }
-
-      const data = await response.json();
-      console.log('📡 Security API yanıtı:', data);
-
-      if (data.success) {
-        const apiUsers = data.data || [];
+      if (response.data.success) {
+        const apiUsers = response.data.data || [];
         console.log('✅ Security: API\'den alınan kullanıcılar:', apiUsers);
-        setUsers(apiUsers);
-        console.log(`📊 Security panele ${apiUsers.length} kullanıcı yüklendi`);
+        // Admin kullanıcıları filtrele
+        const normalUsers = apiUsers.filter(user => !user.is_admin);
+        setUsers(normalUsers);
+        console.log(`📊 Security panele ${normalUsers.length} normal kullanıcı yüklendi`);
       } else {
-        console.error('❌ Security API başarısız:', data.message);
+        console.error('❌ Security API başarısız:', response.data.message);
         setUsers([]);
       }
     } catch (error) {
@@ -73,28 +61,14 @@ const Security = () => {
     try {
       console.log('🗑️ Security: Kullanıcı siliniyor, ID:', userId);
 
-      // Local backend API URL
-      const API_URL = 'http://localhost:3000';
+      const response = await adminApi.delete(`/api/admin/users/${userId}`);
+      console.log('📡 Security Delete API yanıtı:', response.data);
 
-      const response = await fetch(`${API_URL}/api/admin/users/${userId}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`API hatası: ${response.status}`);
-      }
-
-      const data = await response.json();
-      console.log('📡 Security Delete API yanıtı:', data);
-
-      if (data.success) {
+      if (response.data.success) {
         alert('[SUCCESS] User account deleted');
         fetchUsers(); // Refresh user list
       } else {
-        alert('[ERROR] User deletion failed: ' + data.message);
+        alert('[ERROR] User deletion failed: ' + response.data.message);
       }
 
     } catch (error) {
@@ -112,37 +86,13 @@ const Security = () => {
     try {
       console.log('🔐 Security: Şifre resetleniyor, userId:', userId);
 
-      // localStorage'dan kullanıcıları al
-      const existingUsers = JSON.parse(localStorage.getItem('users') || '[]');
-      const userIndex = existingUsers.findIndex(user => user.id === userId);
+      const response = await adminApi.post(`/api/admin/users/${userId}/reset-password`);
 
-      if (userIndex === -1) {
-        alert('[ERROR] User not found');
-        return;
+      if (response.data.success) {
+        alert(`[SUCCESS] Password reset. New recovery code: ${response.data.data.recoveryCode}`);
+      } else {
+        alert('[ERROR] Password reset failed: ' + response.data.message);
       }
-
-      // Yeni şifre oluştur
-      const newPassword = 'reset-' + Math.random().toString(36).substring(2, 8);
-
-      // Kullanıcının şifresini güncelle
-      existingUsers[userIndex].password = newPassword;
-
-      // localStorage'a kaydet
-      localStorage.setItem('users', JSON.stringify(existingUsers));
-
-      // User logs'a kaydet
-      const userLogs = JSON.parse(localStorage.getItem('userLogs') || '[]');
-      userLogs.unshift({
-        id: Date.now(),
-        action: 'RESET_PASSWORD',
-        status: 'SUCCESS',
-        admin_nickname: 'admin',
-        description: `${existingUsers[userIndex].nickname} kullanıcısının şifresi resetlendi`,
-        created_at: new Date().toISOString()
-      });
-      localStorage.setItem('userLogs', JSON.stringify(userLogs.slice(0, 100)));
-
-      alert(`[SUCCESS] Password reset completed\n\nNew Password: ${newPassword}\n\nProvide this to the user securely.`);
 
     } catch (error) {
       console.error('❌ Security: Password reset error:', error);
