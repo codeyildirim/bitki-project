@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import toast from 'react-hot-toast';
 import { RefreshCw, Volume2, VolumeX } from 'lucide-react';
+import { API_CONFIG } from '../../config/api.js';
 
 const BrokenCircleCaptcha = ({ onVerified, onError }) => {
   const [captchaData, setCaptchaData] = useState(null);
@@ -66,8 +67,7 @@ const BrokenCircleCaptcha = ({ onVerified, onError }) => {
       // Backend API CAPTCHA generation
       console.log('🎯 CAPTCHA: Backend API CAPTCHA oluşturuluyor...');
 
-      const API_URL = 'http://localhost:3000';
-      const response = await fetch(`${API_URL}/api/captcha/create`, {
+      const response = await fetch(`${API_CONFIG.BASE_URL}/api/captcha/create`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -110,8 +110,7 @@ const BrokenCircleCaptcha = ({ onVerified, onError }) => {
       // Backend API CAPTCHA verification
       console.log('🔍 CAPTCHA: Backend doğrulaması yapılıyor, seçilen:', circleId, 'captchaId:', captchaId);
 
-      const API_URL = 'http://localhost:3000';
-      const response = await fetch(`${API_URL}/api/captcha/verify`, {
+      const response = await fetch(`${API_CONFIG.BASE_URL}/api/captcha/verify`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
+import { API_CONFIG } from '../config/api.js';
 
 // Production'da Vercel Functions kullan
 console.log('✅ Production: Vercel Functions API kullanılıyor');
@@ -138,10 +139,8 @@ export const AuthProvider = ({ children }) => {
     try {
       console.log('🔐 Login işlemi başlatıldı');
 
-      // Backend API endpoint - Local backend with SQLite
-      const API_URL = 'http://localhost:3000';
-
-      const response = await axios.post(`${API_URL}/api/auth/login`, {
+      // Backend API endpoint
+      const response = await axios.post(`${API_CONFIG.BASE_URL}/api/auth/login`, {
         nickname,
         password,
         captchaToken
@@ -180,10 +179,8 @@ export const AuthProvider = ({ children }) => {
 
       const { nickname, password, confirmPassword, city, captchaToken } = userData;
 
-      // Backend API endpoint - Local backend with SQLite
-      const API_URL = 'http://localhost:3000';
-
-      const response = await axios.post(`${API_URL}/api/auth/register`, {
+      // Backend API endpoint
+      const response = await axios.post(`${API_CONFIG.BASE_URL}/api/auth/register`, {
         nickname,
         password,
         confirmPassword,
