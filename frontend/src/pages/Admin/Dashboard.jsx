@@ -18,9 +18,8 @@ const AdminDashboard = () => {
 
   const fetchDashboardData = async () => {
     try {
-      // Dashboard istatistiklerini yükle
-      const API_URL = 'http://localhost:3000';
-      const response = await fetch(`${API_URL}/api/admin/dashboard`, {
+      // Dashboard istatistiklerini yükle - PRODUCTION URL
+      const response = await fetch('https://bitki-backend.onrender.com/api/admin/dashboard', {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }

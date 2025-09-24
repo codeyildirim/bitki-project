@@ -39,8 +39,8 @@ const AdminProducts = () => {
 
   const loadCategories = async () => {
     try {
-      // Use base API endpoint for categories since there's no admin-specific endpoint
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000'}/api/categories`);
+      // Use production API endpoint for categories
+      const response = await fetch('https://bitki-backend.onrender.com/api/categories');
       const data = await response.json();
       if (data.success) {
         setCategories(data.data || []);
@@ -362,7 +362,7 @@ const AdminProducts = () => {
                             if (firstImage) {
                               return (
                                 <img
-                                  src={`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000'}${firstImage}`}
+                                  src={`https://bitki-backend.onrender.com${firstImage}`}
                                   alt={product.name}
                                   className="w-12 h-12 object-cover rounded border border-gray-700"
                                 />

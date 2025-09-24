@@ -23,7 +23,7 @@ const Products = () => {
       if (selectedCategory) params.append('category', selectedCategory);
       if (searchTerm) params.append('search', searchTerm);
 
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000'}/api/products?${params}`);
+      const response = await fetch(`https://bitki-backend.onrender.com/api/products?${params}`);
       const data = await response.json();
       if (data.success) {
         setProducts(data.data.products);
@@ -38,7 +38,7 @@ const Products = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000'}/api/products/categories`);
+      const response = await fetch('https://bitki-backend.onrender.com/api/products/categories');
       const data = await response.json();
       if (data.success) {
         setCategories(data.data);

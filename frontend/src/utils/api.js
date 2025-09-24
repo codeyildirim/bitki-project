@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000'}/api`;
+// PRODUCTION API URL - NO LOCALHOST!
+const API_BASE_URL = 'https://bitki-backend.onrender.com/api';
 
 // Axios instance oluştur
 const api = axios.create({

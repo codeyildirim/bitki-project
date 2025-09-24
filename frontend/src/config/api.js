@@ -1,8 +1,8 @@
 // API Configuration
 export const API_CONFIG = {
-  // Base API URL - production'da environment variable'dan gelecek
-  BASE_URL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000',
-  baseURL: import.meta.env.VITE_API_BASE_URL,
+  // Base API URL - ALWAYS use production URL, no localhost!
+  BASE_URL: 'https://bitki-backend.onrender.com',
+  baseURL: 'https://bitki-backend.onrender.com',
 
   // API Endpoints
   ENDPOINTS: {
@@ -108,10 +108,10 @@ export const apiCall = async (endpoint, options = {}) => {
   }
 };
 
-// Domain-specific configuration
+// Domain-specific configuration - PRODUCTION ONLY
 export const DOMAIN_CONFIG = {
-  PUBLIC_DOMAIN: import.meta.env.VITE_PUBLIC_DOMAIN || 'http://localhost:5173',
-  ADMIN_DOMAIN: import.meta.env.VITE_ADMIN_DOMAIN || 'http://localhost:5174'
+  PUBLIC_DOMAIN: 'https://bitki-project.vercel.app',
+  ADMIN_DOMAIN: 'https://bitki-admin.vercel.app'
 };
 
 export default API_CONFIG;

@@ -39,7 +39,7 @@ const AdminSettings = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000'}/api/admin/settings`, {
+      const response = await fetch('https://bitki-backend.onrender.com/api/admin/settings', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -60,7 +60,7 @@ const AdminSettings = () => {
     setMessage('');
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000'}/api/admin/settings`, {
+      const response = await fetch('https://bitki-backend.onrender.com/api/admin/settings', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
