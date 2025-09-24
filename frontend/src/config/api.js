@@ -3,8 +3,8 @@ import storage from '../utils/storage.js';
 // API Configuration
 export const API_CONFIG = {
   // Base API URL - ALWAYS use production URL, no localhost!
-  BASE_URL: 'https://bitki-project.onrender.com',
-  baseURL: 'https://bitki-project.onrender.com',
+  BASE_URL: 'https://bitki-backend.onrender.com',
+  baseURL: 'https://bitki-backend.onrender.com',
 
   // API Endpoints
   ENDPOINTS: {

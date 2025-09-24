@@ -230,8 +230,8 @@ app.use('*', (req, res) => {
 });
 
 app.listen(PORT, async () => {
-  console.log(`🌿 Şifalı Bitkiler E-Ticaret API çalışıyor: https://bitki-project.onrender.com`);
-  console.log(`📋 Health Check: https://bitki-project.onrender.com/api/health`);
+  console.log(`🌿 Şifalı Bitkiler E-Ticaret API çalışıyor: https://bitki-backend.onrender.com`);
+  console.log(`📋 Health Check: https://bitki-backend.onrender.com/api/health`);
   console.log(`🗃️  Database: SQLite (${join(__dirname, '../database.sqlite')})`);
 
   // Run database migrations
