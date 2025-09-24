@@ -91,6 +91,7 @@ export const adminApi = {
 
   // Kategori yönetimi
   createCategory: (data) => api.post('/admin/categories', data),
+  deleteCategory: (id) => api.delete(`/categories/${id}`),
 
   // Sipariş yönetimi
   getAllOrders: () => api.get('/admin/orders'),

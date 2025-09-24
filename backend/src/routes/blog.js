@@ -4,7 +4,7 @@ import {
   createBlogPost, updateBlogPost, deleteBlogPost,
   getBlogComments, approveBlogComment, getAdminBlogPosts
 } from '../controllers/blog.js';
-import { authenticateToken, requireAdmin } from '../middleware/auth.js';
+import { authenticateToken, requireAdminRole } from '../middleware/auth.js';
 
 const router = express.Router();
 
@@ -16,11 +16,11 @@ router.get('/:id', getBlogPost);
 router.post('/:id/comments', authenticateToken, addBlogComment);
 
 // Admin routes
-router.get('/admin/posts', authenticateToken, requireAdmin, getAdminBlogPosts);
-router.post('/admin/posts', authenticateToken, requireAdmin, createBlogPost);
-router.put('/admin/posts/:id', authenticateToken, requireAdmin, updateBlogPost);
-router.delete('/admin/posts/:id', authenticateToken, requireAdmin, deleteBlogPost);
-router.get('/admin/comments', authenticateToken, requireAdmin, getBlogComments);
-router.put('/admin/comments/:id/approve', authenticateToken, requireAdmin, approveBlogComment);
+router.get('/admin/posts', requireAdminRole, getAdminBlogPosts);
+router.post('/admin/posts', requireAdminRole, createBlogPost);
+router.put('/admin/posts/:id', requireAdminRole, updateBlogPost);
+router.delete('/admin/posts/:id', requireAdminRole, deleteBlogPost);
+router.get('/admin/comments', requireAdminRole, getBlogComments);
+router.put('/admin/comments/:id/approve', requireAdminRole, approveBlogComment);
 
 export default router;
