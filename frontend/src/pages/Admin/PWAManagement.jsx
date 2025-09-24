@@ -7,12 +7,9 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 import { API_CONFIG } from '../../config/api.js';
 
-// Development mode'da localhost backend kullan, production'da remote backend
+// Her zaman canlı domain kullan
 const getApiUrl = (endpoint) => {
-  if (import.meta.env.DEV) {
-    return `http://localhost:3000${endpoint}`; // Development'ta localhost backend
-  }
-  return `${API_CONFIG.BASE_URL}${endpoint}`; // Production'da remote backend
+  return `${API_CONFIG.BASE_URL}${endpoint}`;
 };
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 
