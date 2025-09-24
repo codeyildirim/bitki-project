@@ -30,6 +30,15 @@ const AdminUsers = () => {
         const normalUsers = apiUsers.filter(user => !user.is_admin);
         setUsers(normalUsers);
         console.log(`📊 Admin panele ${normalUsers.length} normal kullanıcı yüklendi`);
+
+        // Cache temizliği - Eski localStorage kullanıcı verilerini temizle
+        // Çünkü bunlar artık backend'den geliyor
+        const oldUsers = localStorage.getItem('users');
+        if (oldUsers) {
+          console.log('🧹 Eski localStorage users verisi temizleniyor');
+          localStorage.removeItem('users');
+        }
+
       } else {
         console.error('❌ API başarısız:', response.data.message);
         setUsers([]);
@@ -82,6 +91,69 @@ const AdminUsers = () => {
     setActiveTab('user-logs');
   };
 
+  const handleDeleteUser = async (userId, userNickname) => {
+    if (!confirm(`"${userNickname}" kullanıcısını silmek istediğinizden emin misiniz?\n\nBu işlem geri alınamaz!`)) return;
+
+    try {
+      console.log('🗑️ Kullanıcı silme başlatıldı:', { userId, userNickname });
+
+      const response = await adminApi.delete(`/api/admin/users/${userId}`);
+      console.log('📡 Silme API yanıtı:', response.data);
+
+      if (response.data.success) {
+        console.log('✅ Kullanıcı başarıyla silindi:', userNickname);
+
+        // Kullanıcı listesini güncelle
+        await fetchUsers();
+
+        console.log('🔄 Kullanıcı listesi yenilendi');
+      } else {
+        console.error('❌ Silme API hatası:', response.data.message);
+        alert('Silme hatası: ' + response.data.message);
+      }
+    } catch (error) {
+      console.error('❌ Kullanıcı silme hatası:', error);
+      if (error.response?.data?.message) {
+        alert('Silme hatası: ' + error.response.data.message);
+      } else {
+        alert('Kullanıcı silinirken bir hata oluştu');
+      }
+    }
+  };
+
+  const handleResetPassword = async (userId, userNickname) => {
+    const newPassword = prompt(`"${userNickname}" için yeni şifre girin:`);
+    if (!newPassword) return;
+
+    if (newPassword.length < 6) {
+      alert('Şifre en az 6 karakter olmalıdır');
+      return;
+    }
+
+    try {
+      console.log('🔑 Şifre sıfırlama başlatıldı:', { userId, userNickname });
+
+      const response = await adminApi.put(`/api/admin/users/${userId}/reset-password`, {
+        newPassword
+      });
+
+      if (response.data.success) {
+        console.log('✅ Şifre başarıyla sıfırlandı:', userNickname);
+        alert(`"${userNickname}" kullanıcısının şifresi değiştirildi`);
+      } else {
+        console.error('❌ Şifre sıfırlama hatası:', response.data.message);
+        alert('Şifre değiştirme hatası: ' + response.data.message);
+      }
+    } catch (error) {
+      console.error('❌ Şifre sıfırlama hatası:', error);
+      if (error.response?.data?.message) {
+        alert('Hata: ' + error.response.data.message);
+      } else {
+        alert('Şifre değiştirilirken bir hata oluştu');
+      }
+    }
+  };
+
 
 
   const getLogLevelColor = (level) => {
@@ -121,33 +193,13 @@ const AdminUsers = () => {
         <div className="flex gap-2">
           <button
             onClick={() => {
-              // Test kullanıcıları ekle
-              const testUsers = [
-                { nickname: 'test_user1', password: '123456', city: 'İstanbul' },
-                { nickname: 'test_user2', password: '123456', city: 'Ankara' },
-                { nickname: 'test_user3', password: '123456', city: 'İzmir' }
-              ];
-
-              const existingUsers = JSON.parse(localStorage.getItem('users') || '[]');
-
-              testUsers.forEach(testUser => {
-                if (!existingUsers.find(u => u.nickname === testUser.nickname)) {
-                  existingUsers.push({
-                    id: Date.now() + Math.random(),
-                    ...testUser,
-                    createdAt: new Date().toISOString(),
-                    isAdmin: false
-                  });
-                }
-              });
-
-              localStorage.setItem('users', JSON.stringify(existingUsers));
               fetchUsers();
-              alert('3 test kullanıcısı eklendi!');
+              fetchUserLogs();
+              fetchSystemLogs();
             }}
             className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-xs"
           >
-            ➕ Test Kullanıcıları Ekle
+            🔄 Verileri Yenile
           </button>
           <button
             onClick={() => {
@@ -271,12 +323,26 @@ const AdminUsers = () => {
                         {new Date(user.created_at).toLocaleString('tr-TR')}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm">
-                        <button
-                          onClick={() => handleViewUserLogs(user)}
-                          className="text-red-400 hover:text-red-300 font-mono"
-                        >
-                          Logları Görüntüle
-                        </button>
+                        <div className="flex flex-wrap gap-2">
+                          <button
+                            onClick={() => handleViewUserLogs(user)}
+                            className="text-blue-400 hover:text-blue-300 font-mono text-xs bg-blue-900/20 px-2 py-1 rounded"
+                          >
+                            📋 Loglar
+                          </button>
+                          <button
+                            onClick={() => handleResetPassword(user.id, user.nickname)}
+                            className="text-yellow-400 hover:text-yellow-300 font-mono text-xs bg-yellow-900/20 px-2 py-1 rounded"
+                          >
+                            🔑 Şifre
+                          </button>
+                          <button
+                            onClick={() => handleDeleteUser(user.id, user.nickname)}
+                            className="text-red-400 hover:text-red-300 font-mono text-xs bg-red-900/20 px-2 py-1 rounded"
+                          >
+                            🗑️ Sil
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))
