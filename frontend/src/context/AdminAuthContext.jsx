@@ -72,7 +72,7 @@ export const AdminAuthProvider = ({ children }) => {
 
   const login = async (credentials) => {
     try {
-      const response = await adminApi.post('/admin/login', credentials);
+      const response = await adminApi.post('/api/admin/login', credentials);
 
       if (response.data.success) {
         const { token, user } = response.data.data;

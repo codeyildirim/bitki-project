@@ -45,6 +45,19 @@ const PORT = process.env.PORT || 3000;
 // Rate limiting için güvenli proxy ayarı - Render/Proxy arkasında güvenli işlem için
 app.set('trust proxy', 1);
 
+// CORS configuration MUST come FIRST - PRODUCTION ONLY, NO LOCALHOST!
+app.use(cors({
+  origin: [
+    'https://bitki-project.vercel.app',
+    'https://bitki-admin.vercel.app'
+  ],
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
+}));
+
+app.options('*', cors());
+
 // Security middleware
 app.use(helmet({
   contentSecurityPolicy: {
@@ -102,19 +115,6 @@ app.use('/api/auth/recover-password', authLimiter);
 app.use('/api/admin/login', authLimiter);
 app.use('/api/captcha', captchaLimiter);
 app.use('/api', generalLimiter);
-
-// CORS configuration - PRODUCTION ONLY, NO LOCALHOST!
-app.use(cors({
-  origin: [
-    'https://bitki-project.vercel.app',
-    'https://bitki-admin.vercel.app'
-  ],
-  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true
-}));
-
-app.options('*', cors());
 
 // Global rate limiter - tüm isteklere uygulanır
 app.use(globalLimiter);

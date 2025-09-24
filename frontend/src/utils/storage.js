@@ -37,7 +37,13 @@ class StorageService {
 
   getToken() {
     const auth = this.getAuth();
-    return auth?.token || null;
+    const token = auth?.token || null;
+    // Clean up invalid token values
+    if (token === 'null' || token === 'undefined') {
+      this.clearAuth();
+      return null;
+    }
+    return token;
   }
 
   getUser() {
@@ -66,7 +72,13 @@ class StorageService {
 
   getAdminToken() {
     try {
-      return localStorage.getItem(StorageService.ADMIN_TOKEN_KEY);
+      const token = localStorage.getItem(StorageService.ADMIN_TOKEN_KEY);
+      // Clean up invalid token values
+      if (token === 'null' || token === 'undefined' || !token) {
+        this.clearAdminAuth();
+        return null;
+      }
+      return token;
     } catch (error) {
       console.error('Admin token okuma hatası:', error);
       return null;
