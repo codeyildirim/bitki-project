@@ -79,26 +79,60 @@ export const deleteUser = async (req, res) => {
   try {
     const { id } = req.params;
 
-    console.log('🗑️  DELETE USER REQUEST:', { userId: id, adminId: req.user.id });
+    console.log('🗑️  DELETE USER REQUEST:', {
+      userId: id,
+      adminId: req.user.id,
+      adminNickname: req.user.nickname,
+      timestamp: new Date().toISOString()
+    });
 
     if (parseInt(id) === req.user.id) {
+      console.log('❌ Admin tried to delete themselves');
       return res.status(400).json(responseError('Kendi hesabınızı silemezsiniz'));
     }
 
+    // Kullanıcı var mı kontrol et
     const user = await db.get('SELECT * FROM users WHERE id = ?', [id]);
     if (!user) {
-      console.log('❌ User not found:', id);
+      console.log('❌ User not found in database:', id);
       return res.status(404).json(responseError('Kullanıcı bulunamadı'));
     }
 
-    console.log('👤 Found user to delete:', { id: user.id, nickname: user.nickname });
+    console.log('👤 Found user to delete:', {
+      id: user.id,
+      nickname: user.nickname,
+      city: user.city,
+      created_at: user.created_at,
+      is_admin: user.is_admin
+    });
 
+    // Silme işlemini gerçekleştir
     const result = await db.run('DELETE FROM users WHERE id = ?', [id]);
-    console.log('🗑️  DELETE RESULT:', { changes: result.changes, deletedUserId: id });
+    console.log('🗑️  DELETE SQL RESULT:', {
+      changes: result.changes,
+      deletedUserId: id,
+      success: result.changes > 0
+    });
 
-    await logAdminAction(db, req.user.id, 'DELETE_USER', `Kullanıcı silindi: ${user.nickname}`, req);
+    if (result.changes === 0) {
+      console.error('⚠️  DELETE: No rows affected - user might not exist');
+      return res.status(404).json(responseError('Kullanıcı bulunamadı veya silinemedi'));
+    }
 
-    res.json(responseSuccess(null, 'Kullanıcı silindi'));
+    // Kontrolü - gerçekten silindiğini doğrula
+    const checkDeleted = await db.get('SELECT * FROM users WHERE id = ?', [id]);
+    if (checkDeleted) {
+      console.error('🚨 CRITICAL: User still exists after DELETE:', checkDeleted);
+      return res.status(500).json(responseError('Kullanıcı silinemedi'));
+    } else {
+      console.log('✅ VERIFIED: User successfully deleted from database');
+    }
+
+    // Admin log kaydet
+    await logAdminAction(db, req.user.id, 'DELETE_USER', `Kullanıcı silindi: ${user.nickname} (ID: ${id})`, req);
+
+    console.log('🎉 DELETE USER COMPLETED successfully');
+    res.json(responseSuccess(null, 'Kullanıcı başarıyla silindi'));
   } catch (error) {
     console.error('❌ Kullanıcı silme hatası:', error);
     res.status(500).json(responseError('Sunucu hatası'));
