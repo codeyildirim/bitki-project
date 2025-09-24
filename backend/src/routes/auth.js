@@ -1,9 +1,12 @@
 import express from 'express';
-import { register, login, recoverPassword, getProfile, updateProfile } from '../controllers/auth.js';
+import { register, login, recoverPassword, getProfile, updateProfile, checkNickname } from '../controllers/auth.js';
 import { authenticateToken } from '../middleware/auth.js';
 import { validateCaptchaToken } from '../controllers/captcha.js';
 
 const router = express.Router();
+
+// Nickname availability check (no auth required)
+router.post('/check-nickname', checkNickname);
 
 // Auth routes with CAPTCHA validation
 router.post('/register', validateCaptchaToken, register);

@@ -2,6 +2,40 @@ import { hashPassword, comparePassword, generateJWT, generateRecoveryCode, valid
 import { responseSuccess, responseError, getClientIP } from '../utils/helpers.js';
 import db from '../models/database.js';
 
+// Nickname kontrolü endpoint'i
+export const checkNickname = async (req, res) => {
+  try {
+    const { nickname } = req.body;
+
+    // String alanını temizle ve normalize et
+    const cleanNickname = (nickname ?? '').normalize('NFC').trim();
+
+    if (!validateNickname(cleanNickname)) {
+      return res.json({
+        success: false,
+        available: false,
+        message: 'Nickname 3-24 karakter olmalı ve sadece harf, rakam, altçizgi, nokta içermelidir'
+      });
+    }
+
+    const existingUser = await db.get('SELECT id FROM users WHERE nickname = ?', [cleanNickname]);
+
+    res.json({
+      success: true,
+      available: !existingUser,
+      nickname: cleanNickname
+    });
+
+  } catch (error) {
+    console.error('Nickname kontrol hatası:', error);
+    res.status(500).json({
+      success: false,
+      available: false,
+      message: 'Sunucu hatası'
+    });
+  }
+};
+
 export const register = async (req, res) => {
   try {
     const { nickname, password, confirmPassword, city } = req.body;
