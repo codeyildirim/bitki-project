@@ -36,7 +36,7 @@ const DarkAdminLayout = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
             <div className="flex items-center space-x-4">
-              <Link to="/admin-panel/dashboard" className="text-2xl font-bold text-red-400 font-mono">
+              <Link to="/" className="text-2xl font-bold text-red-400 font-mono">
                 SHADOW ADMIN
               </Link>
               <span className="text-xs bg-red-900 text-red-200 px-2 py-1 rounded border border-red-700">GIZLI</span>
@@ -63,84 +63,84 @@ const DarkAdminLayout = () => {
           <nav className="mt-6">
             <div className="px-4 space-y-1">
               <Link
-                to="/admin-panel/dashboard"
+                to="/"
                 className="flex items-center space-x-3 text-gray-300 p-3 rounded-lg hover:bg-red-900 hover:text-red-200 transition-colors font-mono"
               >
                 <span className="text-red-400">◉</span>
                 <span>Ana Panel</span>
               </Link>
               <Link
-                to="/admin-panel/dashboard/products"
+                to="//products"
                 className="flex items-center space-x-3 text-gray-300 p-3 rounded-lg hover:bg-red-900 hover:text-red-200 transition-colors font-mono"
               >
                 <span className="text-green-400">◈</span>
                 <span>Urun Kontrolu</span>
               </Link>
               <Link
-                to="/admin-panel/dashboard/orders"
+                to="//orders"
                 className="flex items-center space-x-3 text-gray-300 p-3 rounded-lg hover:bg-red-900 hover:text-red-200 transition-colors font-mono"
               >
                 <span className="text-purple-400">◇</span>
                 <span>Siparis Takibi</span>
               </Link>
               <Link
-                to="/admin-panel/dashboard/categories"
+                to="//categories"
                 className="flex items-center space-x-3 text-gray-300 p-3 rounded-lg hover:bg-red-900 hover:text-red-200 transition-colors font-mono"
               >
                 <span className="text-green-400">◆</span>
                 <span>Kategoriler</span>
               </Link>
               <Link
-                to="/admin-panel/dashboard/users"
+                to="//users"
                 className="flex items-center space-x-3 text-gray-300 p-3 rounded-lg hover:bg-red-900 hover:text-red-200 transition-colors font-mono"
               >
                 <span className="text-purple-400">◎</span>
                 <span>Kullanici Loglari</span>
               </Link>
               <Link
-                to="/admin-panel/dashboard/security"
+                to="//security"
                 className="flex items-center space-x-3 text-gray-300 p-3 rounded-lg hover:bg-red-900 hover:text-red-200 transition-colors font-mono"
               >
                 <span className="text-red-400">◈</span>
                 <span>Guvenlik Kontrolu</span>
               </Link>
               <Link
-                to="/admin-panel/dashboard/blog"
+                to="//blog"
                 className="flex items-center space-x-3 text-gray-300 p-3 rounded-lg hover:bg-red-900 hover:text-red-200 transition-colors font-mono"
               >
                 <span className="text-green-400">◇</span>
                 <span>Icerik Yoneticisi</span>
               </Link>
               <Link
-                to="/admin-panel/dashboard/coupons"
+                to="//coupons"
                 className="flex items-center space-x-3 text-gray-300 p-3 rounded-lg hover:bg-red-900 hover:text-red-200 transition-colors font-mono"
               >
                 <span className="text-yellow-400">◆</span>
                 <span>Kupon & Kampanya</span>
               </Link>
               <Link
-                to="/admin-panel/dashboard/pwa"
+                to="//pwa"
                 className="flex items-center space-x-3 text-gray-300 p-3 rounded-lg hover:bg-red-900 hover:text-red-200 transition-colors font-mono"
               >
                 <span className="text-blue-400">◈</span>
                 <span>PWA Yonetimi</span>
               </Link>
               <Link
-                to="/admin-panel/dashboard/support"
+                to="//support"
                 className="flex items-center space-x-3 text-gray-300 p-3 rounded-lg hover:bg-red-900 hover:text-red-200 transition-colors font-mono"
               >
                 <span className="text-cyan-400">◇</span>
                 <span>Destek & FAQ</span>
               </Link>
               <Link
-                to="/admin-panel/dashboard/backgrounds"
+                to="//backgrounds"
                 className="flex items-center space-x-3 text-gray-300 p-3 rounded-lg hover:bg-red-900 hover:text-red-200 transition-colors font-mono"
               >
                 <span className="text-purple-400">◈</span>
                 <span>Arka Plan & Medya</span>
               </Link>
               <Link
-                to="/admin-panel/dashboard/settings"
+                to="//settings"
                 className="flex items-center space-x-3 text-gray-300 p-3 rounded-lg hover:bg-red-900 hover:text-red-200 transition-colors font-mono"
               >
                 <span className="text-purple-400">◎</span>

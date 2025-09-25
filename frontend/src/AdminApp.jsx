@@ -41,7 +41,7 @@ const ProtectedRoute = ({ children }) => {
 const AdminApp = () => {
   return (
     <AdminAuthProvider>
-      <Router basename="/admin">
+      <Router>
         <div className="min-h-screen bg-gray-900">
           <Routes>
             <Route path="/login" element={<AdminLogin />} />
