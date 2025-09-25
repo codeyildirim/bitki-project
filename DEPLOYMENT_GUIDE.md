@@ -43,7 +43,7 @@ git push -u origin main
    NODE_ENV=production
    JWT_SECRET=[RENDER OTOMATIK OLUŞTURACAK]
    ADMIN_ACCESS_CODE=BITKI_ADMIN_2024
-   BASE_URL=https://bitki-backend.onrender.com
+   BASE_URL=https://bitki-project.onrender.com
    ```
 
 5. **Persistent Disk** ayarla:
@@ -54,9 +54,9 @@ git push -u origin main
 6. **Deploy** butonuna tıkla
 
 ### Adım 3: Doğrulama
-Backend URL'niz: `https://bitki-backend.onrender.com`
+Backend URL'niz: `https://bitki-project.onrender.com`
 
-Test: `https://bitki-backend.onrender.com/api/health`
+Test: `https://bitki-project.onrender.com/api/health`
 
 ---
 
@@ -66,7 +66,7 @@ Test: `https://bitki-backend.onrender.com/api/health`
 
 Dosya: `frontend/.env.production`
 ```env
-VITE_API_BASE_URL=https://bitki-backend.onrender.com
+VITE_API_BASE_URL=https://bitki-project.onrender.com
 VITE_NODE_ENV=production
 VITE_PUBLIC_DOMAIN=https://bitki.vercel.app
 VITE_ADMIN_DOMAIN=https://bitki-admin.vercel.app
@@ -86,7 +86,7 @@ VITE_ADMIN_DOMAIN=https://bitki-admin.vercel.app
 
 4. **Environment Variables:**
    ```
-   VITE_API_BASE_URL=https://bitki-backend.onrender.com
+   VITE_API_BASE_URL=https://bitki-project.onrender.com
    VITE_NODE_ENV=production
    VITE_ADMIN=false
    ```
@@ -105,7 +105,7 @@ VITE_ADMIN_DOMAIN=https://bitki-admin.vercel.app
 
 4. **Environment Variables:**
    ```
-   VITE_API_BASE_URL=https://bitki-backend.onrender.com
+   VITE_API_BASE_URL=https://bitki-project.onrender.com
    VITE_NODE_ENV=production
    VITE_ADMIN=true
    ```
@@ -118,7 +118,7 @@ VITE_ADMIN_DOMAIN=https://bitki-admin.vercel.app
 
 | Servis | URL | Açıklama |
 |--------|-----|----------|
-| **Backend API** | `https://bitki-backend.onrender.com` | Render - Ücretsiz |
+| **Backend API** | `https://bitki-project.onrender.com` | Render - Ücretsiz |
 | **Public Site** | `https://bitki.vercel.app` | Vercel - Müşteri sitesi |
 | **Admin Panel** | `https://bitki-admin.vercel.app` | Vercel - Admin paneli |
 
@@ -139,7 +139,7 @@ node create-admin.js
 ### Test İşlemleri
 1. ✅ Public site açılıyor: `https://bitki.vercel.app`
 2. ✅ Admin panel açılıyor: `https://bitki-admin.vercel.app`
-3. ✅ API çalışıyor: `https://bitki-backend.onrender.com/api/health`
+3. ✅ API çalışıyor: `https://bitki-project.onrender.com/api/health`
 4. ✅ Admin giriş yapabiliyor
 5. ✅ Ürün ekleme/düzenleme çalışıyor
 6. ✅ Dosya upload çalışıyor (persistent disk)
@@ -210,4 +210,4 @@ vercel --prod
 
 🌐 **Public Site:** https://bitki.vercel.app
 🔐 **Admin Panel:** https://bitki-admin.vercel.app
-🔧 **API Backend:** https://bitki-backend.onrender.com
+🔧 **API Backend:** https://bitki-project.onrender.com

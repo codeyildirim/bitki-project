@@ -220,10 +220,10 @@ Eğer script çalışmazsa, doğrudan API'yi çağırabilirsiniz:
 
 ```bash
 # Önce mevcut admin kontrolü
-curl https://bitki-backend.onrender.com/api/setup/check
+curl https://bitki-project.onrender.com/api/setup/check
 
 # Admin hesabı oluştur
-curl -X POST https://bitki-backend.onrender.com/api/setup/create-admin \
+curl -X POST https://bitki-project.onrender.com/api/setup/create-admin \
   -H "Content-Type: application/json"
 ```
 
@@ -231,8 +231,8 @@ curl -X POST https://bitki-backend.onrender.com/api/setup/create-admin \
 
 Tarayıcınızda şu URL'leri açın:
 
-1. Kontrol için: `https://bitki-backend.onrender.com/api/setup/check`
-2. Admin oluştur için: `https://bitki-backend.onrender.com/api/setup/create-admin` (POST request)
+1. Kontrol için: `https://bitki-project.onrender.com/api/setup/check`
+2. Admin oluştur için: `https://bitki-project.onrender.com/api/setup/create-admin` (POST request)
 
 ## Admin Panel Giriş
 

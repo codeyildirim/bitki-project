@@ -1,7 +1,7 @@
 // Production Admin Account Creator
 // Bu script ile Render.com'da admin hesabı oluşturabilirsiniz
 
-const API_URL = 'https://bitki-backend.onrender.com'; // Render.com backend URL'niz
+const API_URL = 'https://bitki-project.onrender.com'; // Render.com backend URL'niz
 
 async function createAdminAccount() {
   try {

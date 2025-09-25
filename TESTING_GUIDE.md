@@ -68,7 +68,7 @@ npm run dev:admin
 ### 1. Production Backend Testi
 ```bash
 # Backend URL'ini test et
-curl https://bitki-backend.onrender.com/api/health
+curl https://bitki-project.onrender.com/api/health
 ```
 
 ### 2. Production Frontend Testleri
@@ -143,7 +143,7 @@ npm run preview
 ### 1. API Response Time
 ```bash
 # Backend response time test
-time curl https://bitki-backend.onrender.com/api/health
+time curl https://bitki-project.onrender.com/api/health
 ```
 
 ### 2. Frontend Load Time
@@ -165,7 +165,7 @@ time curl https://bitki-backend.onrender.com/api/health
 ### 2. Rate Limiting Testi
 ```bash
 # Rate limit testleri
-for i in {1..10}; do curl https://bitki-backend.onrender.com/api/health; done
+for i in {1..10}; do curl https://bitki-project.onrender.com/api/health; done
 ```
 
 ### 3. Authentication Testi
@@ -214,4 +214,4 @@ for i in {1..10}; do curl https://bitki-backend.onrender.com/api/health; done
 
 📱 **Public Site:** https://bitki.vercel.app
 🔐 **Admin Panel:** https://bitki-admin.vercel.app
-🔧 **API Backend:** https://bitki-backend.onrender.com
+🔧 **API Backend:** https://bitki-project.onrender.com
