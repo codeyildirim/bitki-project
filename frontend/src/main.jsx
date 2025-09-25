@@ -4,15 +4,12 @@ import { BrowserRouter } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { Toaster } from 'react-hot-toast'
 import App from './App.jsx'
-import AdminApp from './AdminApp.jsx'
 import { AuthProvider } from './context/AuthContext.jsx'
 import { CartProvider } from './context/CartContext.jsx'
 import { ThemeProvider } from './context/ThemeContext.jsx'
 import { initializePWATracking } from './utils/pwaTracking.js'
 import './index.css'
 
-// Check if we're in admin mode
-const isAdmin = import.meta.env.VITE_ADMIN === 'true' || window.location.port === '5174';
 
 // Register service worker for PWA
 if ('serviceWorker' in navigator) {
@@ -27,10 +24,8 @@ if ('serviceWorker' in navigator) {
   });
 }
 
-// Initialize PWA tracking for public app
-if (!isAdmin) {
-  initializePWATracking();
-}
+// Initialize PWA tracking
+initializePWATracking();
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -45,43 +40,39 @@ const queryClient = new QueryClient({
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
-      {isAdmin ? (
-        <AdminApp />
-      ) : (
-        <BrowserRouter>
-          <ThemeProvider>
-            <AuthProvider>
-              <CartProvider>
-                <App />
-                <Toaster
-                position="top-right"
-                toastOptions={{
+      <BrowserRouter>
+        <ThemeProvider>
+          <AuthProvider>
+            <CartProvider>
+              <App />
+              <Toaster
+              position="top-right"
+              toastOptions={{
+                duration: 4000,
+                style: {
+                  background: '#363636',
+                  color: '#fff',
+                },
+                success: {
+                  duration: 3000,
+                  iconTheme: {
+                    primary: '#22c55e',
+                    secondary: '#fff',
+                  },
+                },
+                error: {
                   duration: 4000,
-                  style: {
-                    background: '#363636',
-                    color: '#fff',
+                  iconTheme: {
+                    primary: '#ef4444',
+                    secondary: '#fff',
                   },
-                  success: {
-                    duration: 3000,
-                    iconTheme: {
-                      primary: '#22c55e',
-                      secondary: '#fff',
-                    },
-                  },
-                  error: {
-                    duration: 4000,
-                    iconTheme: {
-                      primary: '#ef4444',
-                      secondary: '#fff',
-                    },
-                  },
-                }}
-                />
-              </CartProvider>
-            </AuthProvider>
-          </ThemeProvider>
-        </BrowserRouter>
-      )}
+                },
+              }}
+              />
+            </CartProvider>
+          </AuthProvider>
+        </ThemeProvider>
+      </BrowserRouter>
     </QueryClientProvider>
   </React.StrictMode>,
 )

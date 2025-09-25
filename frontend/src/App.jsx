@@ -5,7 +5,6 @@ import { ThemeProvider } from './context/ThemeContext';
 
 // Layout Components
 import Layout from './components/common/Layout';
-import DarkAdminLayout from './components/admin/DarkAdminLayout';
 
 // Public Pages
 import Home from './pages/SimpleHome';
@@ -24,28 +23,14 @@ import Login from './pages/auth/SimpleLogin';
 import Register from './pages/auth/SimpleRegister';
 import RecoverPassword from './pages/auth/RecoverPassword';
 
-// Admin Pages
-import AdminLogin from './pages/Admin/AdminLogin';
-import AdminDashboard from './pages/Admin/DarkDashboard';
-import AdminProducts from './pages/Admin/Products';
-import AdminOrders from './pages/Admin/Orders';
-import AdminUsers from './pages/Admin/Users';
-import AdminSecurity from './pages/Admin/Security';
-import AdminCategories from './pages/Admin/Categories';
-import AdminBlog from './pages/Admin/Blog';
-import AdminSettings from './pages/Admin/Settings';
-import AdminCoupons from './pages/Admin/Coupons';
-import PWAManagement from './pages/Admin/PWAManagement';
-import AdminSupport from './pages/Admin/Support';
-import BackgroundSettings from './pages/Admin/BackgroundSettings';
 
 // Loading Component
 import LoadingSpinner from './components/common/LoadingSpinner';
 import PWAInstallBanner from './components/common/PWAInstallBanner';
 
-// Protected Route Component - Only for normal users
+// Protected Route Component
 const ProtectedRoute = ({ children }) => {
-  const { isAuthenticated, isAdmin, loading } = useAuth();
+  const { isAuthenticated, loading } = useAuth();
 
   if (loading) {
     return <LoadingSpinner />;
@@ -55,48 +40,9 @@ const ProtectedRoute = ({ children }) => {
     return <Navigate to="/auth/login" replace />;
   }
 
-  // Admin kullanıcıları normal sayfalara erişemez
-  if (isAdmin) {
-    return <Navigate to="/admin-panel/dashboard" replace />;
-  }
-
   return children;
 };
 
-// Admin Only Route Component
-const AdminOnlyRoute = ({ children }) => {
-  const { isAuthenticated, isAdmin, loading } = useAuth();
-
-  if (loading) {
-    return <LoadingSpinner />;
-  }
-
-  if (!isAuthenticated) {
-    return <Navigate to="/admin-panel" replace />;
-  }
-
-  if (!isAdmin) {
-    return <Navigate to="/" replace />;
-  }
-
-  return children;
-};
-
-// Public Route Component - Allow non-admin users or unauthenticated
-const PublicRoute = ({ children }) => {
-  const { isAdmin, loading } = useAuth();
-
-  if (loading) {
-    return <LoadingSpinner />;
-  }
-
-  // Admin kullanıcıları admin panele yönlendir
-  if (isAdmin) {
-    return <Navigate to="/admin-panel/dashboard" replace />;
-  }
-
-  return children;
-};
 
 function App() {
   const { loading } = useAuth();
@@ -120,21 +66,9 @@ function App() {
         </Route>
 
         {/* Auth Routes */}
-        <Route path="/auth/login" element={
-          <PublicRoute>
-            <Login />
-          </PublicRoute>
-        } />
-        <Route path="/auth/register" element={
-          <PublicRoute>
-            <Register />
-          </PublicRoute>
-        } />
-        <Route path="/auth/recover" element={
-          <PublicRoute>
-            <RecoverPassword />
-          </PublicRoute>
-        } />
+        <Route path="/auth/login" element={<Login />} />
+        <Route path="/auth/register" element={<Register />} />
+        <Route path="/auth/recover" element={<RecoverPassword />} />
 
         {/* Protected User Routes */}
         <Route path="/" element={<Layout />}>
@@ -160,32 +94,6 @@ function App() {
           } />
         </Route>
 
-        {/* Admin Login Route - No PublicRoute wrapper */}
-        <Route path="/admin-panel" element={<AdminLogin />} />
-
-        {/* Dark Admin Panel - Admin Only Routes */}
-        <Route path="/admin-panel/dashboard" element={
-          <AdminOnlyRoute>
-            <DarkAdminLayout />
-          </AdminOnlyRoute>
-        }>
-          <Route index element={<AdminDashboard />} />
-          <Route path="products" element={<AdminProducts />} />
-          <Route path="orders" element={<AdminOrders />} />
-          <Route path="users" element={<AdminUsers />} />
-          <Route path="categories" element={<AdminCategories />} />
-          <Route path="security" element={<AdminSecurity />} />
-          <Route path="blog" element={<AdminBlog />} />
-          <Route path="coupons" element={<AdminCoupons />} />
-          <Route path="pwa" element={<PWAManagement />} />
-          <Route path="support" element={<AdminSupport />} />
-          <Route path="backgrounds" element={<BackgroundSettings />} />
-          <Route path="settings" element={<AdminSettings />} />
-        </Route>
-
-        {/* Old Admin Routes - Redirect to new panel */}
-        <Route path="/admin" element={<Navigate to="/admin-panel" replace />} />
-        <Route path="/admin/*" element={<Navigate to="/admin-panel" replace />} />
 
         {/* 404 Route */}
         <Route path="*" element={

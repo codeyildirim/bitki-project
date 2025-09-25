@@ -81,7 +81,7 @@ export default defineConfig({
     })
   ],
   server: {
-    port: process.env.VITE_ADMIN === 'true' ? 5174 : 5173,
+    port: 5173,
     proxy: {
       '/api': {
         target: process.env.VITE_API_BASE_URL || 'https://bitki-project.onrender.com',
@@ -95,8 +95,7 @@ export default defineConfig({
     sourcemap: false,
     rollupOptions: {
       input: {
-        main: resolve(__dirname, 'index.html'),
-        admin: resolve(__dirname, 'admin.html')
+        main: resolve(__dirname, 'index.html')
       }
     }
   }
