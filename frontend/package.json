@@ -7,7 +7,7 @@
     "dev": "vite",
     "dev:admin": "VITE_ADMIN=true vite",
     "build": "vite build",
-    "build:admin": "VITE_ADMIN=true vite build",
+    "build:admin": "vite build --config vite.config.admin.js",
     "preview": "vite preview",
     "preview:admin": "VITE_ADMIN=true vite preview"
   },
