@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { useTheme } from '../context/ThemeContext';
-import CryptoPayment from '../components/payment/CryptoPayment';
+import { ShoppingBag, MapPin, CreditCard, CheckCircle, ArrowLeft, ArrowRight } from 'lucide-react';
 
 const EnhancedCheckout = () => {
-  const { user } = useAuth();
-  const { isDark } = useTheme();
+  const { } = useAuth();
   const navigate = useNavigate();
 
   const [currentStep, setCurrentStep] = useState(1);
@@ -184,104 +182,132 @@ const EnhancedCheckout = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
+      <div className="min-h-screen relative z-0">
+        <div className="relative z-0 min-h-screen backdrop-blur-sm flex items-center justify-center">
+          <div className="text-center">
+            <div className="text-6xl mb-4 animate-float">🛒</div>
+            <p className="text-xl font-sans text-white">Ödeme sayfası yükleniyor...</p>
+          </div>
+        </div>
       </div>
     );
   }
 
   if (cartItems.length === 0) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-            Sepetiniz Boş
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400 mb-8">
-            Sipariş verebilmek için sepetinizde ürün olması gerekiyor.
-          </p>
-          <button
-            onClick={() => navigate('/products')}
-            className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors"
-          >
-            Alışverişe Başla
-          </button>
+      <div className="min-h-screen relative z-0">
+        <div className="relative z-0 min-h-screen backdrop-blur-sm py-8">
+          <div className="container mx-auto px-4 text-center">
+            <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm p-6 sm:p-8 lg:p-12 rounded-none border-b-4 border-rick-green max-w-md mx-auto">
+              <div className="text-6xl sm:text-7xl lg:text-8xl mb-4 sm:mb-6 text-rick-green animate-bounce-slow">🛒</div>
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-heading font-bold text-gray-900 dark:text-white mb-3 sm:mb-4">
+                Sepetiniz Boş
+              </h1>
+              <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 font-sans mb-4 sm:mb-6">
+                Sipariş verebilmek için sepetinizde ürün olması gerekiyor.
+              </p>
+              <button
+                onClick={() => navigate('/products')}
+                className="w-full sm:w-auto bg-rick-green text-white px-6 sm:px-8 py-3 sm:py-4 rounded-none hover:scale-105 hover:animate-slime-drip transition-all duration-300 font-heading font-semibold text-base sm:text-lg"
+              >
+                Alışverişe Başla
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
-      <div className="max-w-6xl mx-auto px-4">
+    <div className="min-h-screen relative z-0">
+      <div className="relative z-0 min-h-screen backdrop-blur-sm py-4 sm:py-6 lg:py-8">
+        <div className="container mx-auto px-4">
+        {/* Başlık */}
+        <div className="text-center mb-6 sm:mb-8 px-4">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-heading font-bold text-white drop-shadow-2xl mb-3 sm:mb-4 animate-float">
+            Ödeme İşlemi
+          </h1>
+          <p className="text-base sm:text-lg font-sans text-gray-100 drop-shadow-lg">
+            Siparişinizi güvenli bir şekilde tamamlayın
+          </p>
+        </div>
+
         {/* Progress Steps */}
-        <div className="mb-8">
+        <div className="mb-6 sm:mb-8 px-4">
           <div className="flex items-center justify-center">
-            {[1, 2, 3].map((step) => (
-              <React.Fragment key={step}>
-                <div className={`flex items-center justify-center w-10 h-10 rounded-full ${
-                  currentStep >= step
-                    ? 'bg-green-600 text-white'
-                    : 'bg-gray-300 dark:bg-gray-600 text-gray-600 dark:text-gray-400'
-                }`}>
-                  {step}
+            {[
+              { num: 1, icon: MapPin, label: 'Adres' },
+              { num: 2, icon: CreditCard, label: 'Ödeme' },
+              { num: 3, icon: CheckCircle, label: 'Onay' }
+            ].map((step, index) => (
+              <React.Fragment key={step.num}>
+                <div className={`flex flex-col items-center space-y-2`}>
+                  <div className={`flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 rounded-none border-2 ${
+                    currentStep >= step.num
+                      ? 'bg-rick-green border-rick-green text-white'
+                      : 'bg-white/90 border-gray-300 text-gray-600'
+                  } transition-all duration-300`}>
+                    <step.icon className="w-5 h-5 sm:w-6 sm:h-6" />
+                  </div>
+                  <span className={`text-xs sm:text-sm font-heading font-medium ${
+                    currentStep >= step.num ? 'text-rick-green' : 'text-white'
+                  }`}>
+                    {step.label}
+                  </span>
                 </div>
-                {step < 3 && (
-                  <div className={`w-20 h-1 ${
-                    currentStep > step ? 'bg-green-600' : 'bg-gray-300 dark:bg-gray-600'
-                  }`}></div>
+                {index < 2 && (
+                  <div className={`w-12 sm:w-20 h-1 mx-2 sm:mx-4 mb-6 ${
+                    currentStep > step.num ? 'bg-rick-green' : 'bg-gray-300'
+                  } transition-all duration-300`}></div>
                 )}
               </React.Fragment>
             ))}
           </div>
-          <div className="flex justify-center mt-2 space-x-16">
-            <span className="text-sm text-gray-600 dark:text-gray-400">Adres</span>
-            <span className="text-sm text-gray-600 dark:text-gray-400">Ödeme</span>
-            <span className="text-sm text-gray-600 dark:text-gray-400">Onay</span>
-          </div>
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 px-4">
           {/* Main Content */}
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2 order-2 lg:order-1">
             {/* Step 1: Address */}
             {currentStep === 1 && (
-              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-                <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">
-                  📍 Teslimat Adresi
+              <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-none border-b-4 border-rick-green p-4 sm:p-6">
+                <h2 className="text-lg sm:text-xl lg:text-2xl font-heading font-bold text-gray-900 dark:text-white mb-4 sm:mb-6 flex items-center space-x-2">
+                  <MapPin className="w-5 h-5 sm:w-6 sm:h-6 text-rick-green" />
+                  <span>Teslimat Adresi</span>
                 </h2>
 
                 {/* Saved Addresses */}
                 {addresses.length > 0 && (
-                  <div className="mb-6">
-                    <h3 className="font-semibold text-gray-900 dark:text-white mb-4">
+                  <div className="mb-4 sm:mb-6">
+                    <h3 className="font-heading font-semibold text-gray-900 dark:text-white mb-3 sm:mb-4 text-sm sm:text-base">
                       Kayıtlı Adreslerim
                     </h3>
-                    <div className="space-y-3">
+                    <div className="space-y-2 sm:space-y-3">
                       {addresses.map((address) => (
                         <div
                           key={address.id}
-                          className={`border-2 rounded-lg p-4 cursor-pointer transition-colors ${
+                          className={`border-2 rounded-none p-3 sm:p-4 cursor-pointer transition-all duration-300 hover:scale-105 ${
                             selectedAddress === address.id
-                              ? 'border-green-500 bg-green-50 dark:bg-green-900'
-                              : 'border-gray-300 dark:border-gray-600 hover:border-green-300'
+                              ? 'border-rick-green bg-rick-green/10 dark:bg-rick-green/20'
+                              : 'border-gray-300 dark:border-gray-600 hover:border-rick-green/50'
                           }`}
                           onClick={() => setSelectedAddress(address.id)}
                         >
-                          <div className="flex justify-between items-start">
-                            <div>
-                              <h4 className="font-semibold text-gray-900 dark:text-white">
+                          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2">
+                            <div className="flex-1">
+                              <h4 className="font-heading font-semibold text-gray-900 dark:text-white text-sm sm:text-base">
                                 {address.title}
                               </h4>
-                              <p className="text-gray-600 dark:text-gray-400">
+                              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 font-sans">
                                 {address.full_name} - {address.phone}
                               </p>
-                              <p className="text-gray-600 dark:text-gray-400">
+                              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 font-sans">
                                 {address.address}, {address.district}, {address.city}
                               </p>
                             </div>
                             {address.is_default && (
-                              <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">
+                              <span className="bg-rick-purple text-white px-2 py-1 rounded-none text-xs font-heading font-semibold w-fit">
                                 Varsayılan
                               </span>
                             )}
@@ -294,35 +320,35 @@ const EnhancedCheckout = () => {
 
                 {/* New Address Form */}
                 <div>
-                  <h3 className="font-semibold text-gray-900 dark:text-white mb-4">
+                  <h3 className="font-heading font-semibold text-gray-900 dark:text-white mb-3 sm:mb-4 text-sm sm:text-base">
                     Yeni Adres Ekle
                   </h3>
-                  <div className="grid md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                     <input
                       type="text"
                       placeholder="Adres başlığı (Ev, İş vb.)"
                       value={newAddress.title}
                       onChange={(e) => setNewAddress(prev => ({ ...prev, title: e.target.value }))}
-                      className="p-3 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700"
+                      className="p-2 sm:p-3 border-2 border-gray-300 dark:border-gray-600 rounded-none dark:bg-gray-700 text-sm sm:text-base font-sans focus:border-rick-green transition-colors"
                     />
                     <input
                       type="text"
                       placeholder="Ad Soyad"
                       value={newAddress.full_name}
                       onChange={(e) => setNewAddress(prev => ({ ...prev, full_name: e.target.value }))}
-                      className="p-3 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700"
+                      className="p-2 sm:p-3 border-2 border-gray-300 dark:border-gray-600 rounded-none dark:bg-gray-700 text-sm sm:text-base font-sans focus:border-rick-green transition-colors"
                     />
                     <input
                       type="tel"
                       placeholder="Telefon"
                       value={newAddress.phone}
                       onChange={(e) => setNewAddress(prev => ({ ...prev, phone: e.target.value }))}
-                      className="p-3 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700"
+                      className="p-2 sm:p-3 border-2 border-gray-300 dark:border-gray-600 rounded-none dark:bg-gray-700 text-sm sm:text-base font-sans focus:border-rick-green transition-colors"
                     />
                     <select
                       value={newAddress.city}
                       onChange={(e) => handleCityChange(e.target.value)}
-                      className="p-3 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700"
+                      className="p-2 sm:p-3 border-2 border-gray-300 dark:border-gray-600 rounded-none dark:bg-gray-700 text-sm sm:text-base font-sans focus:border-rick-green transition-colors"
                     >
                       <option value="">Şehir Seçin</option>
                       {cities.map(city => (
@@ -332,7 +358,7 @@ const EnhancedCheckout = () => {
                     <select
                       value={newAddress.district}
                       onChange={(e) => setNewAddress(prev => ({ ...prev, district: e.target.value }))}
-                      className="p-3 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700"
+                      className="p-2 sm:p-3 border-2 border-gray-300 dark:border-gray-600 rounded-none dark:bg-gray-700 text-sm sm:text-base font-sans focus:border-rick-green transition-colors"
                       disabled={!newAddress.city}
                     >
                       <option value="">İlçe Seçin</option>
@@ -345,30 +371,32 @@ const EnhancedCheckout = () => {
                       placeholder="Posta Kodu"
                       value={newAddress.postal_code}
                       onChange={(e) => setNewAddress(prev => ({ ...prev, postal_code: e.target.value }))}
-                      className="p-3 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700"
+                      className="p-2 sm:p-3 border-2 border-gray-300 dark:border-gray-600 rounded-none dark:bg-gray-700 text-sm sm:text-base font-sans focus:border-rick-green transition-colors"
                     />
                     <textarea
                       placeholder="Detaylı adres"
                       value={newAddress.address}
                       onChange={(e) => setNewAddress(prev => ({ ...prev, address: e.target.value }))}
-                      className="md:col-span-2 p-3 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 rows-3"
+                      className="sm:col-span-2 p-2 sm:p-3 border-2 border-gray-300 dark:border-gray-600 rounded-none dark:bg-gray-700 text-sm sm:text-base font-sans focus:border-rick-green transition-colors"
+                      rows="3"
                     />
                   </div>
                   <button
                     onClick={saveNewAddress}
-                    className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                    className="mt-3 sm:mt-4 bg-rick-purple text-white px-4 sm:px-6 py-2 sm:py-3 rounded-none hover:bg-purple-600 hover:scale-105 transition-all duration-300 font-heading font-semibold text-sm sm:text-base"
                   >
                     Adresi Kaydet
                   </button>
                 </div>
 
-                <div className="flex justify-end mt-6">
+                <div className="flex justify-end mt-4 sm:mt-6">
                   <button
                     onClick={() => setCurrentStep(2)}
                     disabled={!selectedAddress}
-                    className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50"
+                    className="bg-rick-green text-white px-4 sm:px-6 py-2 sm:py-3 rounded-none hover:bg-green-600 hover:scale-105 hover:animate-slime-drip transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed font-heading font-semibold text-sm sm:text-base flex items-center space-x-2"
                   >
-                    Devam Et →
+                    <span>Devam Et</span>
+                    <ArrowRight className="w-4 h-4" />
                   </button>
                 </div>
               </div>
@@ -376,26 +404,27 @@ const EnhancedCheckout = () => {
 
             {/* Step 2: Payment */}
             {currentStep === 2 && (
-              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-                <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">
-                  💳 Ödeme Yöntemi
+              <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-none border-b-4 border-rick-purple p-4 sm:p-6">
+                <h2 className="text-lg sm:text-xl lg:text-2xl font-heading font-bold text-gray-900 dark:text-white mb-4 sm:mb-6 flex items-center space-x-2">
+                  <CreditCard className="w-5 h-5 sm:w-6 sm:h-6 text-rick-purple" />
+                  <span>Ödeme Yöntemi</span>
                 </h2>
 
-                <div className="grid md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   {paymentMethods.map((method) => (
                     <div
                       key={method.id}
-                      className={`border-2 rounded-lg p-4 cursor-pointer transition-colors ${
+                      className={`border-2 rounded-none p-3 sm:p-4 cursor-pointer transition-all duration-300 hover:scale-105 ${
                         selectedPayment?.id === method.id
-                          ? 'border-green-500 bg-green-50 dark:bg-green-900'
-                          : 'border-gray-300 dark:border-gray-600 hover:border-green-300'
+                          ? 'border-rick-purple bg-rick-purple/10 dark:bg-rick-purple/20'
+                          : 'border-gray-300 dark:border-gray-600 hover:border-rick-purple/50'
                       }`}
                       onClick={() => setSelectedPayment(method)}
                     >
-                      <h3 className="font-semibold text-gray-900 dark:text-white">
+                      <h3 className="font-heading font-semibold text-gray-900 dark:text-white text-sm sm:text-base">
                         {method.title}
                       </h3>
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                      <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1 font-sans">
                         {method.type === 'iban' && '🏦 Banka Havalesi/EFT'}
                         {method.type === 'btc' && '₿ Bitcoin'}
                         {method.type === 'eth' && '⟠ Ethereum'}
@@ -405,31 +434,34 @@ const EnhancedCheckout = () => {
                   ))}
                 </div>
 
-                <div className="mt-6">
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <div className="mt-4 sm:mt-6">
+                  <label className="block text-sm sm:text-base font-heading font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Sipariş Notu (Opsiyonel)
                   </label>
                   <textarea
                     value={orderNotes}
                     onChange={(e) => setOrderNotes(e.target.value)}
                     placeholder="Özel istekleriniz varsa buraya yazabilirsiniz..."
-                    className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 rows-3"
+                    className="w-full p-2 sm:p-3 border-2 border-gray-300 dark:border-gray-600 rounded-none dark:bg-gray-700 text-sm sm:text-base font-sans focus:border-rick-purple transition-colors"
+                    rows="3"
                   />
                 </div>
 
-                <div className="flex justify-between mt-6">
+                <div className="flex flex-col sm:flex-row justify-between gap-3 mt-4 sm:mt-6">
                   <button
                     onClick={() => setCurrentStep(1)}
-                    className="bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition-colors"
+                    className="bg-gray-600 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-none hover:bg-gray-700 hover:scale-105 transition-all duration-300 font-heading font-semibold text-sm sm:text-base flex items-center justify-center space-x-2"
                   >
-                    ← Geri
+                    <ArrowLeft className="w-4 h-4" />
+                    <span>Geri</span>
                   </button>
                   <button
                     onClick={() => setCurrentStep(3)}
                     disabled={!selectedPayment}
-                    className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50"
+                    className="bg-rick-green text-white px-4 sm:px-6 py-2 sm:py-3 rounded-none hover:bg-green-600 hover:scale-105 hover:animate-slime-drip transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed font-heading font-semibold text-sm sm:text-base flex items-center justify-center space-x-2"
                   >
-                    Devam Et →
+                    <span>Devam Et</span>
+                    <ArrowRight className="w-4 h-4" />
                   </button>
                 </div>
               </div>
@@ -437,25 +469,27 @@ const EnhancedCheckout = () => {
 
             {/* Step 3: Confirmation */}
             {currentStep === 3 && (
-              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-                <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">
-                  ✅ Sipariş Onayı
+              <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-none border-b-4 border-rick-pink p-4 sm:p-6">
+                <h2 className="text-lg sm:text-xl lg:text-2xl font-heading font-bold text-gray-900 dark:text-white mb-4 sm:mb-6 flex items-center space-x-2">
+                  <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6 text-rick-pink" />
+                  <span>Sipariş Onayı</span>
                 </h2>
 
                 {/* Address Summary */}
-                <div className="mb-6">
-                  <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
-                    📍 Teslimat Adresi
+                <div className="mb-4 sm:mb-6">
+                  <h3 className="font-heading font-semibold text-gray-900 dark:text-white mb-2 sm:mb-3 text-sm sm:text-base flex items-center space-x-2">
+                    <MapPin className="w-4 h-4 text-rick-green" />
+                    <span>Teslimat Adresi</span>
                   </h3>
                   {selectedAddress && (
-                    <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                    <div className="bg-gray-50 dark:bg-gray-700 p-3 sm:p-4 rounded-none border-l-4 border-rick-green">
                       {(() => {
                         const addr = addresses.find(a => a.id === selectedAddress);
                         return addr ? (
                           <>
-                            <p className="font-medium">{addr.title}</p>
-                            <p>{addr.full_name} - {addr.phone}</p>
-                            <p>{addr.address}, {addr.district}, {addr.city}</p>
+                            <p className="font-heading font-medium text-sm sm:text-base">{addr.title}</p>
+                            <p className="text-xs sm:text-sm font-sans text-gray-600 dark:text-gray-400">{addr.full_name} - {addr.phone}</p>
+                            <p className="text-xs sm:text-sm font-sans text-gray-600 dark:text-gray-400">{addr.address}, {addr.district}, {addr.city}</p>
                           </>
                         ) : null;
                       })()}
@@ -464,45 +498,51 @@ const EnhancedCheckout = () => {
                 </div>
 
                 {/* Payment Summary */}
-                <div className="mb-6">
-                  <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
-                    💳 Ödeme Yöntemi
+                <div className="mb-4 sm:mb-6">
+                  <h3 className="font-heading font-semibold text-gray-900 dark:text-white mb-2 sm:mb-3 text-sm sm:text-base flex items-center space-x-2">
+                    <CreditCard className="w-4 h-4 text-rick-purple" />
+                    <span>Ödeme Yöntemi</span>
                   </h3>
                   {selectedPayment && (
-                    <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
-                      <p className="font-medium">{selectedPayment.title}</p>
+                    <div className="bg-gray-50 dark:bg-gray-700 p-3 sm:p-4 rounded-none border-l-4 border-rick-purple">
+                      <p className="font-heading font-medium text-sm sm:text-base">{selectedPayment.title}</p>
                     </div>
                   )}
                 </div>
 
                 {/* Order Items */}
-                <div className="mb-6">
-                  <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
-                    🛒 Sipariş İçeriği
+                <div className="mb-4 sm:mb-6">
+                  <h3 className="font-heading font-semibold text-gray-900 dark:text-white mb-2 sm:mb-3 text-sm sm:text-base flex items-center space-x-2">
+                    <ShoppingBag className="w-4 h-4 text-rick-pink" />
+                    <span>Sipariş İçeriği</span>
                   </h3>
-                  <div className="space-y-2">
-                    {cartItems.map((item) => (
-                      <div key={item.id} className="flex justify-between py-2">
-                        <span>{item.name} x{item.quantity}</span>
-                        <span>{(item.price * item.quantity).toFixed(2)} ₺</span>
-                      </div>
-                    ))}
+                  <div className="bg-gray-50 dark:bg-gray-700 p-3 sm:p-4 rounded-none border-l-4 border-rick-pink">
+                    <div className="space-y-2">
+                      {cartItems.map((item) => (
+                        <div key={item.id} className="flex justify-between py-1 sm:py-2 text-xs sm:text-sm">
+                          <span className="font-sans text-gray-700 dark:text-gray-300">{item.name} x{item.quantity}</span>
+                          <span className="font-heading font-semibold text-rick-green">{(item.price * item.quantity).toFixed(2)} ₺</span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
 
-                <div className="flex justify-between mt-6">
+                <div className="flex flex-col sm:flex-row justify-between gap-3 mt-4 sm:mt-6">
                   <button
                     onClick={() => setCurrentStep(2)}
-                    className="bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition-colors"
+                    className="bg-gray-600 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-none hover:bg-gray-700 hover:scale-105 transition-all duration-300 font-heading font-semibold text-sm sm:text-base flex items-center justify-center space-x-2"
                   >
-                    ← Geri
+                    <ArrowLeft className="w-4 h-4" />
+                    <span>Geri</span>
                   </button>
                   <button
                     onClick={createOrder}
                     disabled={isSubmitting}
-                    className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50"
+                    className="bg-rick-green text-white px-4 sm:px-6 py-2 sm:py-3 rounded-none hover:bg-green-600 hover:scale-105 hover:animate-slime-drip transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed font-heading font-semibold text-sm sm:text-base flex items-center justify-center space-x-2"
                   >
-                    {isSubmitting ? 'Sipariş Oluşturuluyor...' : '🚀 Siparişi Onayla'}
+                    <ShoppingBag className="w-4 h-4" />
+                    <span>{isSubmitting ? 'Sipariş Oluşturuluyor...' : 'Siparişi Onayla'}</span>
                   </button>
                 </div>
               </div>
@@ -510,45 +550,47 @@ const EnhancedCheckout = () => {
           </div>
 
           {/* Order Summary Sidebar */}
-          <div className="lg:col-span-1">
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 sticky top-8">
-              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">
-                📋 Sipariş Özeti
+          <div className="lg:col-span-1 order-1 lg:order-2">
+            <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-none border-b-4 border-rick-green p-4 sm:p-6 lg:sticky lg:top-8">
+              <h3 className="text-base sm:text-lg lg:text-xl font-heading font-bold text-gray-900 dark:text-white mb-3 sm:mb-4 flex items-center space-x-2">
+                <ShoppingBag className="w-4 h-4 sm:w-5 sm:h-5 text-rick-green" />
+                <span>Sipariş Özeti</span>
               </h3>
 
-              <div className="space-y-2 mb-4">
+              <div className="space-y-1 sm:space-y-2 mb-3 sm:mb-4">
                 {cartItems.map((item) => (
-                  <div key={item.id} className="flex justify-between text-sm">
-                    <span className="text-gray-600 dark:text-gray-400">
+                  <div key={item.id} className="flex justify-between text-xs sm:text-sm">
+                    <span className="text-gray-600 dark:text-gray-400 font-sans">
                       {item.name} x{item.quantity}
                     </span>
-                    <span className="text-gray-900 dark:text-white">
+                    <span className="text-gray-900 dark:text-white font-heading font-semibold">
                       {(item.price * item.quantity).toFixed(2)} ₺
                     </span>
                   </div>
                 ))}
               </div>
 
-              <div className="border-t pt-4 space-y-2">
-                <div className="flex justify-between">
-                  <span className="text-gray-600 dark:text-gray-400">Ara Toplam:</span>
-                  <span className="text-gray-900 dark:text-white">{getSubtotal().toFixed(2)} ₺</span>
+              <div className="border-t-2 border-gray-200 dark:border-gray-700 pt-3 sm:pt-4 space-y-1 sm:space-y-2">
+                <div className="flex justify-between text-xs sm:text-sm">
+                  <span className="text-gray-600 dark:text-gray-400 font-sans">Ara Toplam:</span>
+                  <span className="text-gray-900 dark:text-white font-heading font-semibold">{getSubtotal().toFixed(2)} ₺</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600 dark:text-gray-400">Kargo:</span>
-                  <span className="text-gray-900 dark:text-white">
+                <div className="flex justify-between text-xs sm:text-sm">
+                  <span className="text-gray-600 dark:text-gray-400 font-sans">Kargo:</span>
+                  <span className="text-rick-green font-heading font-semibold">
                     {getShippingCost() === 0 ? 'Ücretsiz' : `${getShippingCost()} ₺`}
                   </span>
                 </div>
-                <div className="flex justify-between text-lg font-bold pt-2 border-t">
+                <div className="flex justify-between text-base sm:text-lg font-heading font-bold pt-2 border-t-2 border-rick-green">
                   <span className="text-gray-900 dark:text-white">Toplam:</span>
-                  <span className="text-green-600 dark:text-green-400">{getTotal().toFixed(2)} ₺</span>
+                  <span className="text-rick-green">{getTotal().toFixed(2)} ₺</span>
                 </div>
               </div>
 
-              <div className="mt-6 p-4 bg-green-50 dark:bg-green-900 rounded-lg">
-                <p className="text-sm text-green-700 dark:text-green-300">
-                  🔒 Güvenli ödeme sistemi ile korumalı alışveriş
+              <div className="mt-4 sm:mt-6 p-3 sm:p-4 bg-rick-green/10 dark:bg-rick-green/20 rounded-none border-l-4 border-rick-green">
+                <p className="text-xs sm:text-sm text-rick-green font-sans flex items-center space-x-2">
+                  <span>🔒</span>
+                  <span>Güvenli ödeme sistemi ile korumalı alışveriş</span>
                 </p>
               </div>
             </div>
