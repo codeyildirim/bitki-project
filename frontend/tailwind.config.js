@@ -42,20 +42,37 @@ export default {
           700: '#977669',
           800: '#846358',
           900: '#43302b'
+        },
+        rick: {
+          green: '#32CD32',
+          purple: '#8A2BE2',
+          pink: '#FF69B4'
         }
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
+        sans: ['Nunito', 'system-ui', 'sans-serif'],
+        heading: ['Poppins', 'system-ui', 'sans-serif'],
       },
       animation: {
         'float': 'float 6s ease-in-out infinite',
         'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
         'bounce-slow': 'bounce 3s infinite',
+        'slime-drip': 'slimeDrip 2s ease-out infinite',
+        'slime-wiggle': 'slimeWiggle 1s ease-in-out infinite alternate',
       },
       keyframes: {
         float: {
           '0%, 100%': { transform: 'translateY(0px)' },
           '50%': { transform: 'translateY(-20px)' },
+        },
+        slimeDrip: {
+          '0%': { transform: 'scaleY(1) translateY(0)' },
+          '50%': { transform: 'scaleY(1.1) translateY(2px)' },
+          '100%': { transform: 'scaleY(1) translateY(0)' },
+        },
+        slimeWiggle: {
+          '0%': { transform: 'skewX(0deg)' },
+          '100%': { transform: 'skewX(2deg)' },
         }
       }
     },

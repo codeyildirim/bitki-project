@@ -8,11 +8,11 @@ import Layout from './components/common/Layout';
 
 // Public Pages
 import Home from './pages/SimpleHome';
-import Products from './pages/EnhancedProducts';
+import Products from './pages/RickProducts';
 import ProductDetail from './pages/ProductDetail';
-import Cart from './pages/EnhancedCart';
-import Checkout from './pages/EnhancedCheckout';
-import Blog from './pages/EnhancedBlog';
+import Cart from './pages/RickCart';
+import Checkout from './pages/RickCheckout';
+import Blog from './pages/RickBlog';
 import BlogPost from './pages/EnhancedBlogPost';
 import Profile from './pages/Profile';
 import Orders from './pages/Orders';
