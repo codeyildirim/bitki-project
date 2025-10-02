@@ -73,15 +73,26 @@ export const AdminAuthProvider = ({ children }) => {
   const login = async (credentials) => {
     try {
       const response = await adminApi.post('/api/admin/login', credentials);
+      console.log('🔐 Login response:', response.data);
 
       if (response.data.success) {
-        const { token, user } = response.data.data;
+        // Token doğrudan response.data.token'da olabilir
+        const token = response.data.token || response.data.data?.token;
+        const user = response.data.user || response.data.data?.user || { nickname: credentials.nickname };
 
+        if (!token) {
+          console.error('❌ No token in response!');
+          throw new Error('Token alınamadı');
+        }
+
+        // Token'ı localStorage'a kaydet
+        localStorage.setItem('adminToken', token);
         storage.setAdminAuth(token, user);
 
         setUser(user);
         setIsAuthenticated(true);
 
+        console.log('✅ Admin login successful, token saved');
         toast.success('Admin girişi başarılı!');
         return { success: true };
       } else {
@@ -89,6 +100,7 @@ export const AdminAuthProvider = ({ children }) => {
       }
     } catch (error) {
       const message = error.response?.data?.message || 'Giriş hatası oluştu';
+      console.error('❌ Login error:', error);
       toast.error(message);
       return { success: false, message };
     }
