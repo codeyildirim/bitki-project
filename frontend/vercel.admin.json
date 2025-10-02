@@ -5,7 +5,7 @@
   "rewrites": [
     {
       "source": "/(.*)",
-      "destination": "/admin.html"
+      "destination": "/index.html"
     }
   ]
 }

@@ -19,7 +19,9 @@ export default defineConfig({
   build: {
     outDir: 'dist-admin',
     rollupOptions: {
-      input: resolve(__dirname, 'admin.html')
+      input: {
+        index: resolve(__dirname, 'admin.html')
+      }
     }
   }
 });
