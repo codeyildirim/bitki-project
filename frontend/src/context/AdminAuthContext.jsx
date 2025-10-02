@@ -76,14 +76,16 @@ export const AdminAuthProvider = ({ children }) => {
       console.log('🔐 Login response:', response.data);
 
       if (response.data.success) {
-        // Token doğrudan response.data.token'da olabilir
-        const token = response.data.token || response.data.data?.token;
-        const user = response.data.user || response.data.data?.user || { nickname: credentials.nickname };
+        // Backend now returns token at root level
+        const token = response.data.token;
+        const user = response.data.admin || response.data.user || response.data.data?.user || { nickname: credentials.nickname };
 
         if (!token) {
-          console.error('❌ No token in response!');
+          console.error('❌ No token in response!', response.data);
           throw new Error('Token alınamadı');
         }
+
+        console.log('🎯 Token found:', token.substring(0, 20) + '...');
 
         // Token'ı localStorage'a kaydet
         localStorage.setItem('adminToken', token);
@@ -92,14 +94,14 @@ export const AdminAuthProvider = ({ children }) => {
         setUser(user);
         setIsAuthenticated(true);
 
-        console.log('✅ Admin login successful, token saved');
+        console.log('✅ Admin login successful, token saved to localStorage');
         toast.success('Admin girişi başarılı!');
         return { success: true };
       } else {
         throw new Error(response.data.message || 'Giriş başarısız');
       }
     } catch (error) {
-      const message = error.response?.data?.message || 'Giriş hatası oluştu';
+      const message = error.response?.data?.message || error.message || 'Giriş hatası oluştu';
       console.error('❌ Login error:', error);
       toast.error(message);
       return { success: false, message };

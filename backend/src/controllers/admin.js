@@ -42,15 +42,27 @@ export const adminLogin = async (req, res) => {
     // Log admin login
     await logAdminAction(db, user.id, 'ADMIN_LOGIN', 'Admin sisteme giriş yaptı', req);
 
-    res.json(responseSuccess({
+    // Return token at root level for easier access
+    res.json({
+      success: true,
+      message: 'Admin girişi başarılı',
       token,
-      user: {
+      admin: {
         id: user.id,
         nickname: user.nickname,
         city: user.city,
         isAdmin: true
+      },
+      data: {
+        token,
+        user: {
+          id: user.id,
+          nickname: user.nickname,
+          city: user.city,
+          isAdmin: true
+        }
       }
-    }, 'Admin girişi başarılı'));
+    });
 
   } catch (error) {
     console.error('Admin giriş hatası:', error);
