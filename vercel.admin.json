@@ -1,0 +1,7 @@
+{
+  "buildCommand": "cd frontend && npm run build:admin",
+  "outputDirectory": "frontend/dist-admin",
+  "framework": "vite",
+  "cleanUrls": true,
+  "trailingSlash": false
+}

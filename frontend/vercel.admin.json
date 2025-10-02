@@ -1,10 +1,11 @@
 {
+  "buildCommand": "npm run build:admin",
+  "outputDirectory": "dist-admin",
+  "framework": "vite",
   "cleanUrls": true,
   "trailingSlash": false,
   "env": {
     "VITE_API_BASE_URL": "https://bitki-project.onrender.com",
-    "VITE_PUBLIC_DOMAIN": "https://bitki-project.vercel.app",
-    "VITE_ADMIN_DOMAIN": "https://bitki-admin.vercel.app",
     "VITE_ADMIN": "true"
   },
   "rewrites": [
@@ -12,7 +13,5 @@
       "source": "/(.*)",
       "destination": "/index.html"
     }
-  ],
-  "buildCommand": "npm run build:admin",
-  "outputDirectory": "dist-admin"
+  ]
 }
