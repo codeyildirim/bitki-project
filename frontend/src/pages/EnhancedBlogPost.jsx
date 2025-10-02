@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
+import { createApiUrl } from '../config/api.js';
 
 const EnhancedBlogPost = () => {
   const { slug } = useParams();
@@ -87,7 +88,7 @@ const EnhancedBlogPost = () => {
 
   const fetchRelatedPosts = async () => {
     try {
-      const response = await fetch('/api/blog?limit=3');
+      const response = await fetch(createApiUrl('/api/blog?limit=3'))
       const data = await response.json();
 
       if (data.success) {

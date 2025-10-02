@@ -14,7 +14,7 @@ const Orders = () => {
 
   const fetchOrders = async () => {
     try {
-      const response = await fetch('/api/orders', {
+      const response = await fetch(createApiUrl('/api/orders'), {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }

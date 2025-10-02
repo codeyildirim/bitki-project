@@ -18,7 +18,7 @@ const BackgroundSettings = () => {
   const fetchBackgrounds = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('/api/admin/background/list', {
+      const response = await fetch(createApiUrl('/api/admin/background/list'), {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -90,7 +90,7 @@ const BackgroundSettings = () => {
 
       const token = localStorage.getItem('token');
 
-      const response = await fetch('/api/admin/background/upload', {
+      const response = await fetch(createApiUrl('/api/admin/background/upload'), {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -131,7 +131,7 @@ const BackgroundSettings = () => {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('/api/admin/background/delete', {
+      const response = await fetch(createApiUrl('/api/admin/background/delete'), {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { createApiUrl } from '../config/api.js';
 
 const Checkout = () => {
   const navigate = useNavigate();
@@ -27,7 +28,7 @@ const Checkout = () => {
 
   const fetchCities = async () => {
     try {
-      const response = await fetch('/api/cities');
+      const response = await fetch(createApiUrl('/api/cities'))
       const data = await response.json();
       if (data.success) {
         setCities(data.data);

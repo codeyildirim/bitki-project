@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { ShoppingBag, MapPin, CreditCard, CheckCircle, ArrowLeft, ArrowRight } from 'lucide-react';
+import { createApiUrl } from '../config/api.js';
 
 const EnhancedCheckout = () => {
   const { } = useAuth();
@@ -40,7 +41,7 @@ const EnhancedCheckout = () => {
   const fetchInitialData = async () => {
     try {
       // Sepet verilerini al
-      const cartResponse = await fetch('/api/cart', {
+      const cartResponse = await fetch(createApiUrl('/api/cart'), {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
@@ -48,7 +49,7 @@ const EnhancedCheckout = () => {
       const cartData = await cartResponse.json();
 
       // Adresler
-      const addressResponse = await fetch('/api/addresses', {
+      const addressResponse = await fetch(createApiUrl('/api/addresses'), {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
@@ -56,7 +57,7 @@ const EnhancedCheckout = () => {
       const addressData = await addressResponse.json();
 
       // Ödeme yöntemleri
-      const paymentResponse = await fetch('/api/payment/methods');
+      const paymentResponse = await fetch(createApiUrl('/api/payment/methods'))
       const paymentData = await paymentResponse.json();
 
       if (cartData.success) setCartItems(cartData.data || []);
@@ -98,7 +99,7 @@ const EnhancedCheckout = () => {
 
   const saveNewAddress = async () => {
     try {
-      const response = await fetch('/api/addresses', {
+      const response = await fetch(createApiUrl('/api/addresses'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -141,7 +142,7 @@ const EnhancedCheckout = () => {
         notes: orderNotes
       };
 
-      const response = await fetch('/api/orders', {
+      const response = await fetch(createApiUrl('/api/orders'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

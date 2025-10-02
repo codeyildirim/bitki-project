@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { User, MapPin, ShoppingBag, Heart, Settings, LogOut, Plus, Trash2, Edit3, Check, X } from 'lucide-react';
+import { createApiUrl } from '../config/api.js';
 
 const EnhancedProfile = () => {
   const { user, updateProfile, logout } = useAuth();
@@ -58,14 +59,14 @@ const EnhancedProfile = () => {
     setLoading(true);
     try {
       // Fetch cities
-      const citiesResponse = await fetch('/api/cities');
+      const citiesResponse = await fetch(createApiUrl('/api/cities'))
       const citiesData = await citiesResponse.json();
       if (citiesData.success) {
         setCities(citiesData.data);
       }
 
       // Fetch addresses
-      const addressResponse = await fetch('/api/addresses', {
+      const addressResponse = await fetch(createApiUrl('/api/addresses'), {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
@@ -76,7 +77,7 @@ const EnhancedProfile = () => {
       }
 
       // Fetch orders
-      const ordersResponse = await fetch('/api/orders', {
+      const ordersResponse = await fetch(createApiUrl('/api/orders'), {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
@@ -112,7 +113,7 @@ const EnhancedProfile = () => {
         updateData.newPassword = profileData.newPassword;
       }
 
-      const response = await fetch('/api/auth/profile', {
+      const response = await fetch(createApiUrl('/api/auth/profile'), {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -158,7 +159,7 @@ const EnhancedProfile = () => {
     }
 
     try {
-      const response = await fetch('/api/addresses', {
+      const response = await fetch(createApiUrl('/api/addresses'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -216,7 +217,7 @@ const EnhancedProfile = () => {
         setAddresses(prev => prev.map(addr => ({
           ...addr,
           is_default: addr.id === addressId ? 1 : 0
-        })));
+        }));
         setMessage('Varsayılan adres güncellendi');
       }
     } catch (error) {

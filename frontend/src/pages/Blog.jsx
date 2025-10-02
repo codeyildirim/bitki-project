@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { createApiUrl } from '../config/api.js';
 
 const Blog = () => {
   const [posts, setPosts] = useState([]);
@@ -11,7 +12,7 @@ const Blog = () => {
 
   const fetchPosts = async () => {
     try {
-      const response = await fetch('/api/blog');
+      const response = await fetch(createApiUrl('/api/blog'))
       const data = await response.json();
       if (data.success) {
         setPosts(data.data);

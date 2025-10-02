@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
+import { createApiUrl } from '../config/api.js';
 
 const Profile = () => {
   const { user, updateProfile } = useAuth();
@@ -30,7 +31,7 @@ const Profile = () => {
 
   const fetchCities = async () => {
     try {
-      const response = await fetch('/api/cities');
+      const response = await fetch(createApiUrl('/api/cities'))
       const data = await response.json();
       if (data.success) {
         setCities(data.data);
@@ -60,7 +61,7 @@ const Profile = () => {
         updateData.newPassword = profileData.newPassword;
       }
 
-      const response = await fetch('/api/auth/profile', {
+      const response = await fetch(createApiUrl('/api/auth/profile'), {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

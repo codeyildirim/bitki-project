@@ -233,9 +233,30 @@ export const createProduct = async (req, res) => {
 
     const { name, description, price, stock, category_id } = req.body;
 
-    if (!name || !price || stock < 0) {
-      console.log('❌ Validation failed:', { name, price, stock });
-      return res.status(400).json(responseError('Ürün adı, fiyat ve stok gereklidir'));
+    // Validate required fields
+    if (!name || name.trim() === '') {
+      console.log('❌ Validation failed: name required');
+      return res.status(400).json(responseError('Ürün adı gereklidir'));
+    }
+
+    if (!description || description.trim() === '') {
+      console.log('❌ Validation failed: description required');
+      return res.status(400).json(responseError('Ürün açıklaması gereklidir'));
+    }
+
+    if (!price || isNaN(parseFloat(price)) || parseFloat(price) <= 0) {
+      console.log('❌ Validation failed: invalid price');
+      return res.status(400).json(responseError('Geçerli bir fiyat gereklidir'));
+    }
+
+    if (!stock || isNaN(parseInt(stock)) || parseInt(stock) < 0) {
+      console.log('❌ Validation failed: invalid stock');
+      return res.status(400).json(responseError('Geçerli bir stok miktarı gereklidir'));
+    }
+
+    if (!category_id || isNaN(parseInt(category_id))) {
+      console.log('❌ Validation failed: invalid category_id');
+      return res.status(400).json(responseError('Geçerli bir kategori seçilmelidir'));
     }
 
     const baseURL = process.env.BASE_URL || 'https://seninrenderlink.onrender.com';

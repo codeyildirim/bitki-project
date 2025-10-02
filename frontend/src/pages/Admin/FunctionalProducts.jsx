@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { API_CONFIG, createApiUrl } from '../../config/api.js';
 
 const FunctionalProducts = () => {
   const [products, setProducts] = useState([]);
@@ -24,7 +25,7 @@ const FunctionalProducts = () => {
 
   const fetchProducts = async () => {
     try {
-      const response = await fetch('/api/products', {
+      const response = await fetch(createApiUrl('/api/products'), {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
@@ -54,7 +55,7 @@ const FunctionalProducts = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch('/api/categories');
+      const response = await fetch(createApiUrl('/api/categories'));
       const data = await response.json();
       if (data.success) {
         setCategories(data.data || []);

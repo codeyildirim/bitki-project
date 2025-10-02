@@ -16,7 +16,7 @@ const MediaManagement = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('/api/media/background-video', {
+      const response = await fetch(createApiUrl('/api/media/background-video'), {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -64,7 +64,7 @@ const MediaManagement = () => {
       formData.append('video', file);
 
       const token = localStorage.getItem('token');
-      const response = await fetch('/api/media/background-video', {
+      const response = await fetch(createApiUrl('/api/media/background-video'), {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`

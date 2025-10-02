@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronRight, Star, Heart, ShoppingCart, ArrowRight } from 'lucide-react';
 import BackgroundVideo from '../BackgroundVideo';
+import { createApiUrl } from '../../config/api.js';
 
 const ModernHome = () => {
   const [categories, setCategories] = useState([]);
@@ -14,7 +15,7 @@ const ModernHome = () => {
       try {
         // Kategorileri getir
         try {
-          const categoriesRes = await fetch('/api/products/categories');
+          const categoriesRes = await fetch(createApiUrl('/api/products/categories'))
           if (categoriesRes.ok) {
             const categoriesData = await categoriesRes.json();
             setCategories(categoriesData.data || []);
@@ -25,7 +26,7 @@ const ModernHome = () => {
 
         // Öne çıkan ürünleri getir
         try {
-          const featuredRes = await fetch('/api/products/featured');
+          const featuredRes = await fetch(createApiUrl('/api/products/featured'))
           if (featuredRes.ok) {
             const featuredData = await featuredRes.json();
             setFeaturedProducts(featuredData.data || []);
@@ -36,7 +37,7 @@ const ModernHome = () => {
 
         // Son blog yazılarını getir
         try {
-          const blogsRes = await fetch('/api/blog?limit=3');
+          const blogsRes = await fetch(createApiUrl('/api/blog?limit=3'))
           if (blogsRes.ok) {
             const blogsData = await blogsRes.json();
             setRecentBlogs(blogsData.data || []);

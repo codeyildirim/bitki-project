@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createApiUrl } from '../../config/api.js';
 
 const FunctionalUsers = () => {
   const [users, setUsers] = useState([]);
@@ -14,7 +15,7 @@ const FunctionalUsers = () => {
 
   const fetchUsers = async () => {
     try {
-      const response = await fetch('/api/admin/users', {
+      const response = await fetch(createApiUrl('/api/admin/users'), {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
@@ -74,7 +75,7 @@ const FunctionalUsers = () => {
 
   const fetchIPBans = async () => {
     try {
-      const response = await fetch('/api/admin/ip-bans', {
+      const response = await fetch(createApiUrl('/api/admin/ip-bans'), {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
@@ -148,7 +149,7 @@ const FunctionalUsers = () => {
     if (!newBanIP.trim()) return;
 
     try {
-      const response = await fetch('/api/admin/ip-bans', {
+      const response = await fetch(createApiUrl('/api/admin/ip-bans'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

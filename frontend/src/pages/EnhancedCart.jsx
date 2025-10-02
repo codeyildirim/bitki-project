@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Trash2, Plus, Minus, ShoppingBag, ArrowLeft } from 'lucide-react';
+import { createApiUrl } from '../config/api.js';
 
 const EnhancedCart = () => {
   const { isAuthenticated } = useAuth();
@@ -16,7 +17,7 @@ const EnhancedCart = () => {
   const fetchCart = async () => {
     try {
       if (isAuthenticated) {
-        const response = await fetch('/api/cart', {
+        const response = await fetch(createApiUrl('/api/cart'), {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }

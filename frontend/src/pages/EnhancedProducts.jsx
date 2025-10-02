@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Star, ShoppingCart, Eye, Heart } from 'lucide-react';
+import { createApiUrl } from '../config/api.js';
 
 const EnhancedProducts = () => {
   const [products, setProducts] = useState([]);
@@ -9,7 +10,7 @@ const EnhancedProducts = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await fetch('/api/products');
+        const response = await fetch(createApiUrl('/api/products'));
         const data = await response.json();
         if (data.success) {
           setProducts(data.data);

@@ -70,7 +70,7 @@ const BackgroundManagement = () => {
       formData.append('fileType', isVideo ? 'video' : 'image');
 
       const token = localStorage.getItem('token');
-      const response = await fetch('/api/backgrounds/upload', {
+      const response = await fetch(createApiUrl('/api/backgrounds/upload'), {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -101,7 +101,7 @@ const BackgroundManagement = () => {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('/api/backgrounds/delete', {
+      const response = await fetch(createApiUrl('/api/backgrounds/delete'), {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,

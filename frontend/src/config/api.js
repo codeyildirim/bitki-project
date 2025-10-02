@@ -2,9 +2,9 @@ import storage from '../utils/storage.js';
 
 // API Configuration
 export const API_CONFIG = {
-  // Base API URL - ALWAYS use production URL, no localhost!
-  BASE_URL: 'https://bitki-project.onrender.com',
-  baseURL: 'https://bitki-project.onrender.com',
+  // Base API URL - Use environment variable with fallback to production
+  BASE_URL: import.meta.env.VITE_API_BASE_URL || 'https://bitki-project.onrender.com',
+  baseURL: import.meta.env.VITE_API_BASE_URL || 'https://bitki-project.onrender.com',
 
   // API Endpoints
   ENDPOINTS: {
