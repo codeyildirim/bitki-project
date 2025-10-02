@@ -94,9 +94,7 @@ export default defineConfig({
     assetsDir: 'assets',
     sourcemap: false,
     rollupOptions: {
-      input: {
-        main: resolve(__dirname, 'index-public.html')
-      }
+      input: resolve(__dirname, 'index-public.html')
     }
   }
 });
