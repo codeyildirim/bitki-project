@@ -3,7 +3,6 @@ import { resolve } from 'path'
 import react from '@vitejs/plugin-react'
 
 export default defineConfig({
-  base: '/',
   plugins: [react()],
   define: {
     'process.env.VITE_ADMIN': JSON.stringify('true')
@@ -19,12 +18,8 @@ export default defineConfig({
   },
   build: {
     outDir: 'dist-admin',
-    assetsDir: 'assets',
-    sourcemap: false,
     rollupOptions: {
-      input: {
-        index: resolve(__dirname, 'admin.html')
-      }
+      input: resolve(__dirname, 'admin.html')
     }
   }
 });
