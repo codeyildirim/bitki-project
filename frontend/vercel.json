@@ -1,4 +1,7 @@
 {
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "framework": "vite",
   "cleanUrls": true,
   "trailingSlash": false,
   "env": {
@@ -6,10 +9,11 @@
     "VITE_PUBLIC_DOMAIN": "https://bitki-project.vercel.app",
     "VITE_ADMIN_DOMAIN": "https://bitki-admin.vercel.app"
   },
-  "rewrites": [
+  "routes": [
     {
-      "source": "/(.*)",
-      "destination": "/index.html"
+      "src": "/[^.]+",
+      "dest": "/",
+      "status": 200
     }
   ]
 }

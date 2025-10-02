@@ -2,10 +2,13 @@
   "buildCommand": "npm run build:admin",
   "outputDirectory": "dist-admin",
   "framework": "vite",
-  "rewrites": [
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "routes": [
     {
-      "source": "/(.*)",
-      "destination": "/index.html"
+      "src": "/[^.]+",
+      "dest": "/",
+      "status": 200
     }
   ]
 }
