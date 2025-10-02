@@ -3,17 +3,13 @@ import {
   Smartphone, Download, Users, Bell, Send, Calendar,
   TrendingUp, Activity, Monitor, Tablet, Clock, CheckCircle
 } from 'lucide-react';
-import axios from 'axios';
 import toast from 'react-hot-toast';
-import { API_CONFIG } from '../../config/api.js';
+import { useAdminAuth } from '../../context/AdminAuthContext.jsx';
 
-// Her zaman canlı domain kullan
-const getApiUrl = (endpoint) => {
-  return `${API_CONFIG.BASE_URL}${endpoint}`;
-};
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 
 const PWAManagement = () => {
+  const { adminApi } = useAdminAuth();
   const [stats, setStats] = useState({
     totalInstalls: 0,
     activeUsers: 0,
@@ -42,15 +38,9 @@ const PWAManagement = () => {
 
   const fetchPWAStats = async () => {
     try {
-      const apiUrl = getApiUrl('/api/pwa/stats');
-      console.log('🔍 PWA Stats API URL:', apiUrl);
+      console.log('🔍 PWA Stats API URL: /api/pwa/stats');
 
-      const token = localStorage.getItem('token');
-      console.log('🔑 Token exists:', !!token);
-
-      const response = await axios.get(apiUrl, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const response = await adminApi.get('/api/pwa/stats');
 
       console.log('✅ PWA Stats Response:', response.data);
 
@@ -66,7 +56,7 @@ const PWAManagement = () => {
         message: error.message,
         response: error.response?.data,
         status: error.response?.status,
-        url: getApiUrl('/api/pwa/stats')
+        url: '/api/pwa/stats'
       });
       toast.error(`İstatistikler yüklenemedi: ${error.response?.data?.message || error.message}`);
     } finally {
@@ -76,13 +66,9 @@ const PWAManagement = () => {
 
   const fetchNotifications = async () => {
     try {
-      const apiUrl = getApiUrl('/api/pwa/notifications');
-      console.log('🔍 PWA Notifications API URL:', apiUrl);
+      console.log('🔍 PWA Notifications API URL: /api/pwa/notifications');
 
-      const token = localStorage.getItem('token');
-      const response = await axios.get(apiUrl, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const response = await adminApi.get('/api/pwa/notifications');
 
       console.log('✅ PWA Notifications Response:', response.data);
 
@@ -97,7 +83,7 @@ const PWAManagement = () => {
         message: error.message,
         response: error.response?.data,
         status: error.response?.status,
-        url: getApiUrl('/api/pwa/notifications')
+        url: '/api/pwa/notifications'
       });
       toast.error(`Bildirimler yüklenemedi: ${error.response?.data?.message || error.message}`);
     }
@@ -108,10 +94,7 @@ const PWAManagement = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post(getApiUrl('/api/pwa/notifications/send'),
-        notificationForm,
-        { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }}
-      );
+      const response = await adminApi.post('/api/pwa/notifications/send', notificationForm);
 
       if (response.data.success) {
         toast.success('Bildirim gönderildi');
@@ -130,9 +113,7 @@ const PWAManagement = () => {
     if (!window.confirm('Bu bildirimi silmek istediğinizden emin misiniz?')) return;
 
     try {
-      const response = await axios.delete(getApiUrl(`/api/pwa/notifications/${id}`), {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-      });
+      const response = await adminApi.delete(`/api/pwa/notifications/${id}`);
 
       if (response.data.success) {
         toast.success('Bildirim silindi');
