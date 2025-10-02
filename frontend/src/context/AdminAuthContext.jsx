@@ -76,8 +76,8 @@ export const AdminAuthProvider = ({ children }) => {
       console.log('🔐 Login response:', response.data);
 
       if (response.data.success) {
-        // Backend now returns token at root level
-        const token = response.data.token;
+        // Token'ı farklı formatlardan kontrol et
+        const token = response.data.token || response.data.data?.token;
         const user = response.data.admin || response.data.user || response.data.data?.user || { nickname: credentials.nickname };
 
         if (!token) {
