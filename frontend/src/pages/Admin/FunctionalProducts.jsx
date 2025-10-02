@@ -13,7 +13,8 @@ const FunctionalProducts = () => {
     price: '',
     stock: '',
     category_id: '',
-    image: null
+    images: [],
+    videos: []
   });
 
   useEffect(() => {
@@ -78,19 +79,51 @@ const FunctionalProducts = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Validation
+    if (!formData.name.trim()) {
+      alert('Ürün adı gereklidir');
+      return;
+    }
+    if (!formData.description.trim()) {
+      alert('Ürün açıklaması gereklidir');
+      return;
+    }
+    if (!formData.price || isNaN(parseFloat(formData.price)) || parseFloat(formData.price) <= 0) {
+      alert('Geçerli bir fiyat gereklidir');
+      return;
+    }
+    if (!formData.stock || isNaN(parseInt(formData.stock)) || parseInt(formData.stock) < 0) {
+      alert('Geçerli bir stok miktarı gereklidir');
+      return;
+    }
+    if (!formData.category_id) {
+      alert('Kategori seçilmelidir');
+      return;
+    }
+
     try {
       const method = editingProduct ? 'PUT' : 'POST';
       const url = editingProduct ? `/api/admin/products/${editingProduct.id}` : '/api/admin/products';
 
       const formDataToSend = new FormData();
-      formDataToSend.append('name', formData.name);
-      formDataToSend.append('description', formData.description);
+      formDataToSend.append('name', formData.name.trim());
+      formDataToSend.append('description', formData.description.trim());
       formDataToSend.append('price', parseFloat(formData.price));
       formDataToSend.append('stock', parseInt(formData.stock));
       formDataToSend.append('category_id', formData.category_id);
 
-      if (formData.image) {
-        formDataToSend.append('image', formData.image);
+      // Handle multiple images
+      if (formData.images && formData.images.length > 0) {
+        formData.images.forEach(image => {
+          formDataToSend.append('images', image);
+        });
+      }
+
+      // Handle multiple videos
+      if (formData.videos && formData.videos.length > 0) {
+        formData.videos.forEach(video => {
+          formDataToSend.append('videos', video);
+        });
       }
 
       const response = await fetch(url, {
@@ -123,7 +156,8 @@ const FunctionalProducts = () => {
       price: product.price.toString(),
       stock: product.stock.toString(),
       category_id: product.category_id || '',
-      image: null
+      images: [],
+      videos: []
     });
     setShowAddForm(true);
   };
@@ -159,7 +193,8 @@ const FunctionalProducts = () => {
       price: '',
       stock: '',
       category_id: '',
-      image: null
+      images: [],
+      videos: []
     });
     setEditingProduct(null);
     setShowAddForm(false);
@@ -274,15 +309,29 @@ const FunctionalProducts = () => {
             </div>
             <div className="md:col-span-2">
               <label className="block text-sm font-medium text-gray-300 mb-1 font-mono">
-                Urun Gorseli
+                Urun Gorselleri (Maksimum 10 adet)
               </label>
               <input
                 type="file"
                 accept="image/*"
-                onChange={(e) => setFormData({...formData, image: e.target.files[0]})}
+                multiple
+                onChange={(e) => setFormData({...formData, images: Array.from(e.target.files)})}
                 className="w-full p-3 bg-gray-800 border border-red-700 rounded-lg text-white focus:ring-2 focus:ring-red-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-red-900 file:text-red-200 hover:file:bg-red-800 font-mono"
               />
-              <p className="text-xs text-gray-400 mt-1 font-mono">JPG, PNG veya WebP formatinda urun fotografi yukleyin (Maksimum 5MB)</p>
+              <p className="text-xs text-gray-400 mt-1 font-mono">JPG, PNG veya WebP formatinda urun fotograflari yukleyin (Her biri maksimum 5MB)</p>
+            </div>
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-gray-300 mb-1 font-mono">
+                Urun Videolari (Opsiyonel, Maksimum 3 adet)
+              </label>
+              <input
+                type="file"
+                accept="video/*"
+                multiple
+                onChange={(e) => setFormData({...formData, videos: Array.from(e.target.files)})}
+                className="w-full p-3 bg-gray-800 border border-red-700 rounded-lg text-white focus:ring-2 focus:ring-red-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-red-900 file:text-red-200 hover:file:bg-red-800 font-mono"
+              />
+              <p className="text-xs text-gray-400 mt-1 font-mono">MP4 veya WebM formatinda urun videolari yukleyin (Her biri maksimum 50MB)</p>
             </div>
             <div className="md:col-span-2 flex space-x-4">
               <button
