@@ -12,8 +12,10 @@ const EnhancedProducts = () => {
       try {
         const response = await fetch(createApiUrl('/api/products'));
         const data = await response.json();
-        if (data.success) {
-          setProducts(data.data);
+        if (data.success && data.data) {
+          // API returns data.data.products for the products array
+          const productsArray = data.data.products || data.data || [];
+          setProducts(Array.isArray(productsArray) ? productsArray : []);
         }
       } catch (error) {
         console.error('Ürünler yüklenirken hata:', error);
