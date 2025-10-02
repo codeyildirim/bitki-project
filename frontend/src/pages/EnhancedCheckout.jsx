@@ -596,6 +596,7 @@ const EnhancedCheckout = () => {
             </div>
           </div>
         </div>
+        </div>
       </div>
     </div>
   );
