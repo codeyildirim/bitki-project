@@ -161,28 +161,28 @@ const AdminDashboard = () => {
       {/* Quick Actions */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <Link
-          to="/admin/products"
+          to="/products"
           className="bg-green-600 text-white p-4 rounded-lg hover:bg-green-700 transition-colors text-center"
         >
           <div className="text-2xl mb-2">[PROD]</div>
           <div className="font-semibold">Ürün Yönetimi</div>
         </Link>
         <Link
-          to="/admin/orders"
+          to="/orders"
           className="bg-blue-600 text-white p-4 rounded-lg hover:bg-blue-700 transition-colors text-center"
         >
           <div className="text-2xl mb-2">[ORD]</div>
           <div className="font-semibold">Sipariş Yönetimi</div>
         </Link>
         <Link
-          to="/admin/users"
+          to="/users"
           className="bg-purple-600 text-white p-4 rounded-lg hover:bg-purple-700 transition-colors text-center"
         >
           <div className="text-2xl mb-2">[USER]</div>
           <div className="font-semibold">Kullanıcı Yönetimi</div>
         </Link>
         <Link
-          to="/admin/blog"
+          to="/blog"
           className="bg-orange-600 text-white p-4 rounded-lg hover:bg-orange-700 transition-colors text-center"
         >
           <div className="text-2xl mb-2">[BLOG]</div>
@@ -219,7 +219,7 @@ const AdminDashboard = () => {
           )}
           <div className="mt-4">
             <Link
-              to="/admin/orders"
+              to="/orders"
               className="text-green-600 hover:text-green-700 font-medium"
             >
               Tüm siparişleri görüntüle →
@@ -246,7 +246,7 @@ const AdminDashboard = () => {
                 </div>
                 <div className="mt-3">
                   <Link
-                    to="/admin/orders?status=pending"
+                    to="/orders?status=pending"
                     className="text-red-700 hover:text-red-800 font-medium"
                   >
                     Siparişleri incele →
@@ -259,19 +259,19 @@ const AdminDashboard = () => {
               <h3 className="font-semibold mb-2">Hızlı Eylemler</h3>
               <div className="space-y-2">
                 <Link
-                  to="/admin/products/new"
+                  to="/products/new"
                   className="block text-green-600 hover:text-green-700 text-sm"
                 >
                   • Yeni ürün ekle
                 </Link>
                 <Link
-                  to="/admin/blog/new"
+                  to="/blog/new"
                   className="block text-green-600 hover:text-green-700 text-sm"
                 >
                   • Yeni blog yazısı ekle
                 </Link>
                 <Link
-                  to="/admin/settings"
+                  to="/settings"
                   className="block text-green-600 hover:text-green-700 text-sm"
                 >
                   • Site ayarlarını düzenle

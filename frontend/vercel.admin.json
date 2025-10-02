@@ -10,9 +10,9 @@
   "rewrites": [
     {
       "source": "/(.*)",
-      "destination": "/admin.html"
+      "destination": "/index.html"
     }
   ],
   "buildCommand": "npm run build:admin",
-  "outputDirectory": "dist"
+  "outputDirectory": "dist-admin"
 }
