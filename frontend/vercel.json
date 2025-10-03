@@ -9,11 +9,10 @@
     "VITE_PUBLIC_DOMAIN": "https://bitki-project.vercel.app",
     "VITE_ADMIN_DOMAIN": "https://bitki-admin.vercel.app"
   },
-  "routes": [
+  "rewrites": [
     {
-      "src": "/[^.]+",
-      "dest": "/",
-      "status": 200
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ]
 }

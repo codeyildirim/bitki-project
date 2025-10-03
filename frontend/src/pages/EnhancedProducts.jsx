@@ -6,19 +6,31 @@ import { createApiUrl } from '../config/api.js';
 const EnhancedProducts = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
+        console.log('Fetching products from:', createApiUrl('/api/products'));
         const response = await fetch(createApiUrl('/api/products'));
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
         const data = await response.json();
+        console.log('Products API response:', data);
+
         if (data.success && data.data) {
           // API returns data.data.products for the products array
           const productsArray = data.data.products || data.data || [];
           setProducts(Array.isArray(productsArray) ? productsArray : []);
+        } else {
+          setError(data.message || 'Ürünler yüklenemedi');
         }
       } catch (error) {
         console.error('Ürünler yüklenirken hata:', error);
+        setError(error.message || 'Bir hata oluştu');
       } finally {
         setLoading(false);
       }
@@ -235,8 +247,29 @@ const EnhancedProducts = () => {
             )}
           </div>
 
+          {/* Hata durumu */}
+          {!loading && error && (
+            <div className="text-center py-16 px-4">
+              <div className="bg-red-50/90 dark:bg-red-900/20 backdrop-blur-sm p-6 sm:p-8 lg:p-12 rounded-none border-b-4 border-red-500 max-w-md mx-auto">
+                <div className="text-6xl sm:text-7xl lg:text-8xl mb-4 sm:mb-6 text-red-500">⚠️</div>
+                <h3 className="text-xl sm:text-2xl lg:text-3xl font-heading font-bold text-red-700 dark:text-red-400 mb-3 sm:mb-4">
+                  Bir hata oluştu
+                </h3>
+                <p className="text-sm sm:text-base text-red-600 dark:text-red-300 font-sans mb-4">
+                  {error}
+                </p>
+                <button
+                  onClick={() => window.location.reload()}
+                  className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+                >
+                  Tekrar Dene
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* Eğer ürün yoksa */}
-          {!loading && products.length === 0 && (
+          {!loading && !error && products.length === 0 && (
             <div className="text-center py-16 px-4">
               <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm p-6 sm:p-8 lg:p-12 rounded-none border-b-4 border-rick-green max-w-md mx-auto">
                 <div className="text-6xl sm:text-7xl lg:text-8xl mb-4 sm:mb-6 text-rick-green animate-bounce-slow">🌿</div>
