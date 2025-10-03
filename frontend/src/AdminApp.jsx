@@ -45,7 +45,9 @@ const AdminApp = () => {
         <div className="min-h-screen bg-gray-900">
           <Routes>
             <Route path="/login" element={<AdminLogin />} />
-            <Route path="/" element={
+            {/* Ana sayfa direkt dashboard'a değil, login'e yönlendir */}
+            <Route path="/" element={<Navigate to="/login" replace />} />
+            <Route path="/dashboard" element={
               <ProtectedRoute>
                 <AdminLayout>
                   <DarkDashboard />
@@ -146,7 +148,8 @@ const AdminApp = () => {
               </ProtectedRoute>
             } />
 
-            <Route path="*" element={<Navigate to="/" replace />} />
+            {/* Bilinmeyen route'lar login'e yönlensin */}
+            <Route path="*" element={<Navigate to="/login" replace />} />
           </Routes>
           <Toaster
             position="top-right"

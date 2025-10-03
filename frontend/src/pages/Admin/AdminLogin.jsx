@@ -17,7 +17,7 @@ const AdminLogin = () => {
 
   // Redirect if already authenticated
   if (isAuthenticated) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/dashboard" replace />;
   }
 
   // Show loading spinner while checking auth status
