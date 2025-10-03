@@ -25,7 +25,7 @@ const AdminProducts = () => {
   const loadProducts = async () => {
     setLoading(true);
     try {
-      const response = await adminApi.get('/products');
+      const response = await adminApi.get('/api/products');
       if (response.data.success) {
         setProducts(response.data.data.products || response.data.data || []);
       }
@@ -68,11 +68,11 @@ const AdminProducts = () => {
 
       let response;
       if (editingProduct) {
-        response = await adminApi.put(`/products/${editingProduct.id}`, formDataObj, {
+        response = await adminApi.put(`/api/products/${editingProduct.id}`, formDataObj, {
           headers: { 'Content-Type': 'multipart/form-data' }
         });
       } else {
-        response = await adminApi.post('/products', formDataObj, {
+        response = await adminApi.post('/api/products', formDataObj, {
           headers: { 'Content-Type': 'multipart/form-data' }
         });
       }
@@ -117,7 +117,7 @@ const AdminProducts = () => {
     if (!confirm('Bu ürünü silmek istediğinizden emin misiniz?')) return;
 
     try {
-      const response = await adminApi.delete(`/products/${productId}`);
+      const response = await adminApi.delete(`/api/products/${productId}`);
       if (response.data.success) {
         loadProducts();
       } else {
@@ -131,7 +131,7 @@ const AdminProducts = () => {
 
   const toggleFeatured = async (productId) => {
     try {
-      const response = await adminApi.patch(`/products/${productId}/featured`);
+      const response = await adminApi.patch(`/api/products/${productId}/featured`);
       if (response.data.success) {
         loadProducts();
         alert(response.data.data.message);

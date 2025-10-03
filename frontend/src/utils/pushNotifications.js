@@ -1,5 +1,3 @@
-import { API_CONFIG } from '../config/api.js';
-
 // VAPID public key - should match backend
 const VAPID_PUBLIC_KEY = 'BIb3RmkvdoXbCi9vRJZJqMq6Tn0HoLGwVWXBt8hNbN1mKs8Dd3DLnxlkdDTpU1EqTbgOHCfS_DfTZl6KEHpcvHo';
 
@@ -83,9 +81,10 @@ export const subscribeToPushNotifications = async () => {
     });
 
     console.log('📨 Push subscription created:', subscription);
+    console.log('📨 Subscription object:', JSON.stringify(subscription.toJSON(), null, 2));
 
     // Send subscription to backend
-    const response = await fetch(`${API_CONFIG.BASE_URL}/api/pwa/subscribe`, {
+    const response = await fetch('https://bitki-project.onrender.com/api/pwa/subscribe', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -130,7 +129,7 @@ export const unsubscribeFromPushNotifications = async () => {
     console.log('📤 Push subscription cancelled locally');
 
     // Notify backend
-    const response = await fetch(`${API_CONFIG.BASE_URL}/api/pwa/unsubscribe`, {
+    const response = await fetch('https://bitki-project.onrender.com/api/pwa/unsubscribe', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
