@@ -233,6 +233,15 @@ export const createProduct = async (req, res) => {
 
     const { name, description, price, stock, category_id } = req.body;
 
+    // Check if at least one image is provided
+    if (!req.files || !req.files.images || req.files.images.length === 0) {
+      console.log('❌ Validation failed: no images provided');
+      return res.status(400).json({
+        success: false,
+        message: 'En az bir ürün görseli gereklidir'
+      });
+    }
+
     // Validate required fields
     if (!name || name.trim() === '') {
       console.log('❌ Validation failed: name required');

@@ -102,9 +102,17 @@ const FunctionalProducts = () => {
       return;
     }
 
+    // Yeni ürün eklerken görsel zorunlu
+    if (!editingProduct && (!formData.images || formData.images.length === 0)) {
+      alert('En az bir ürün görseli eklemelisiniz');
+      return;
+    }
+
     try {
       const method = editingProduct ? 'PUT' : 'POST';
-      const url = editingProduct ? `/api/admin/products/${editingProduct.id}` : '/api/admin/products';
+      const url = editingProduct ?
+        createApiUrl(`/api/admin/products/${editingProduct.id}`) :
+        createApiUrl('/api/admin/products');
 
       const formDataToSend = new FormData();
       formDataToSend.append('name', formData.name.trim());
