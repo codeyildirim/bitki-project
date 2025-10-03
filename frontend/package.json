@@ -6,8 +6,9 @@
   "scripts": {
     "dev": "vite",
     "dev:admin": "VITE_ADMIN=true vite",
-    "build": "vite build && cp dist/index-public.html dist/index.html",
+    "build:public": "vite build --config vite.config.js",
     "build:admin": "vite build --config vite.config.admin.js",
+    "build": "echo 'Please use build:public or build:admin explicitly'",
     "preview": "vite preview",
     "preview:admin": "VITE_ADMIN=true vite preview"
   },
