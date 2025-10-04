@@ -38,9 +38,9 @@ const PWAManagement = () => {
 
   const fetchPWAStats = async () => {
     try {
-      console.log('🔍 PWA Stats API URL: /api/pwa/stats');
+      console.log('🔍 PWA Stats API URL: /pwa/stats');
 
-      const response = await adminApi.get('/api/pwa/stats');
+      const response = await adminApi.get('/pwa/stats');
 
       console.log('✅ PWA Stats Response:', response.data);
 
@@ -66,9 +66,9 @@ const PWAManagement = () => {
 
   const fetchNotifications = async () => {
     try {
-      console.log('🔍 PWA Notifications API URL: /api/pwa/notifications');
+      console.log('🔍 PWA Notifications API URL: /pwa/notifications');
 
-      const response = await adminApi.get('/api/pwa/notifications');
+      const response = await adminApi.get('/pwa/notifications');
 
       console.log('✅ PWA Notifications Response:', response.data);
 
@@ -94,7 +94,7 @@ const PWAManagement = () => {
     setLoading(true);
 
     try {
-      const response = await adminApi.post('/api/pwa/notifications/send', notificationForm);
+      const response = await adminApi.post('/pwa/notifications/send', notificationForm);
 
       if (response.data.success) {
         toast.success('Bildirim gönderildi');
@@ -113,7 +113,7 @@ const PWAManagement = () => {
     if (!window.confirm('Bu bildirimi silmek istediğinizden emin misiniz?')) return;
 
     try {
-      const response = await adminApi.delete(`/api/pwa/notifications/${id}`);
+      const response = await adminApi.delete(`/pwa/notifications/${id}`);
 
       if (response.data.success) {
         toast.success('Bildirim silindi');
