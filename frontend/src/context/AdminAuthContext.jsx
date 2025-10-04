@@ -8,7 +8,7 @@ const AdminAuthContext = createContext();
 
 // Admin-specific axios instance
 const adminApi = axios.create({
-  baseURL: API_CONFIG.BASE_URL,
+  baseURL: `${API_CONFIG.BASE_URL}/api`,
   withCredentials: true
 });
 
@@ -72,7 +72,7 @@ export const AdminAuthProvider = ({ children }) => {
 
   const login = async (credentials) => {
     try {
-      const response = await adminApi.post('/api/admin/login', credentials);
+      const response = await adminApi.post('/admin/login', credentials);
       console.log('🔐 Login response:', response.data);
 
       if (response.data.success) {
