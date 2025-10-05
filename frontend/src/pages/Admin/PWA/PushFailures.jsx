@@ -86,7 +86,7 @@ const PushFailures = () => {
         >
           <RefreshCw size={20} />
           Yenile
-        button>
+        </button>
       </div>
 
       {/* Empty State */}
