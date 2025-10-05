@@ -269,7 +269,7 @@ export const createProduct = async (req, res) => {
       return res.status(400).json(responseError('Geçerli bir kategori seçilmelidir'));
     }
 
-    const baseURL = process.env.BASE_URL || 'https://seninrenderlink.onrender.com';
+    const baseURL = process.env.BASE_URL || 'https://bitki-project.onrender.com';
     console.log('🌐 Base URL:', baseURL);
 
     // Handle images
@@ -337,7 +337,7 @@ export const updateProduct = async (req, res) => {
       return res.status(404).json(responseError('Ürün bulunamadı'));
     }
 
-    const baseURL = process.env.BASE_URL || 'https://seninrenderlink.onrender.com';
+    const baseURL = process.env.BASE_URL || 'https://bitki-project.onrender.com';
 
     // Handle existing images
     let images = product.images ? JSON.parse(product.images) : [];
