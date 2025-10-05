@@ -18,7 +18,8 @@ import {
   Image,
   Folder,
   Palette,
-  Grid3X3
+  Grid3X3,
+  AlertCircle
 } from 'lucide-react';
 
 const AdminLayout = ({ children }) => {
@@ -55,6 +56,7 @@ const AdminLayout = ({ children }) => {
     // Sistem ve Güvenlik
     { name: 'Güvenlik', href: '/security', icon: Shield },
     { name: 'PWA Yönetimi', href: '/pwa', icon: Smartphone },
+    { name: 'Bildirim Logları', href: '/pwa/failures', icon: AlertCircle },
     { name: 'Ayarlar', href: '/settings', icon: Settings },
   ];
 
@@ -96,6 +98,7 @@ const AdminLayout = ({ children }) => {
                 '',
                 '',
                 'Sistem ve Güvenlik',
+                '',
                 '',
                 ''
               ];
@@ -158,6 +161,7 @@ const AdminLayout = ({ children }) => {
                   '',
                   '',
                   'Sistem ve Güvenlik',
+                  '',
                   '',
                   ''
                 ];

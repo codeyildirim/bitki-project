@@ -18,6 +18,7 @@ import Security from './pages/Admin/Security.jsx';
 import BackgroundSettings from './pages/Admin/BackgroundSettings.jsx';
 import Coupons from './pages/Admin/Coupons.jsx';
 import PWAManagement from './pages/Admin/PWAManagement.jsx';
+import PushFailures from './pages/Admin/PWA/PushFailures.jsx';
 import MediaManagement from './components/admin/MediaManagement.jsx';
 import BackgroundManagement from './components/admin/BackgroundManagement.jsx';
 
@@ -130,6 +131,13 @@ const AdminApp = () => {
               <ProtectedRoute>
                 <AdminLayout>
                   <PWAManagement />
+                </AdminLayout>
+              </ProtectedRoute>
+            } />
+            <Route path="/pwa/failures" element={
+              <ProtectedRoute>
+                <AdminLayout>
+                  <PushFailures />
                 </AdminLayout>
               </ProtectedRoute>
             } />
