@@ -120,17 +120,23 @@ const ProductDetail = () => {
                     {product.tiered_pricing.map((tier, index) => {
                       const isSelected = selectedTier === index;
                       const unitPrice = (tier.price / tier.quantity).toFixed(2);
+                      const hasDiscount = tier.discount && tier.discount > 0;
                       return (
                         <button
                           key={index}
                           type="button"
                           onClick={() => setSelectedTier(index)}
-                          className={`p-4 border-2 rounded-lg transition-all duration-200 ${
+                          className={`relative p-4 border-2 rounded-lg transition-all duration-200 ${
                             isSelected
                               ? 'border-green-500 bg-green-50 dark:bg-green-900/30 ring-2 ring-green-500 scale-105'
-                              : 'border-gray-300 dark:border-gray-600 hover:border-green-400 hover:scale-102'
+                              : 'border-gray-300 dark:border-gray-600 hover:border-green-400 hover:scale-102 hover:scale-110'
                           }`}
                         >
+                          {hasDiscount && (
+                            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg animate-pulse">
+                              %{tier.discount} Tasarruf
+                            </span>
+                          )}
                           <div className="text-center">
                             <div className="text-lg font-heading font-bold text-gray-900 dark:text-white">
                               {tier.quantity} Paket

@@ -101,6 +101,26 @@ export const getProduct = async (req, res) => {
     `, [id]);
 
     const baseURL = process.env.BASE_URL || 'https://seninrenderlink.onrender.com';
+
+    // Calculate discount for tiered pricing if badges are enabled
+    let tieredPricingWithDiscount = null;
+    if (product.tiered_pricing) {
+      const tiers = JSON.parse(product.tiered_pricing);
+      if (product.discount_badges && tiers.length > 0) {
+        tieredPricingWithDiscount = tiers.map(tier => {
+          // Calculate discount: 100 - (tier.price / (base_price * quantity)) * 100
+          const expectedPrice = product.price * tier.quantity;
+          const discount = Math.round(100 - (tier.price / expectedPrice) * 100);
+          return {
+            ...tier,
+            discount: discount > 0 ? discount : 0
+          };
+        });
+      } else {
+        tieredPricingWithDiscount = tiers.map(tier => ({ ...tier, discount: 0 }));
+      }
+    }
+
     const formattedProduct = {
       ...product,
       images: product.images ? JSON.parse(product.images).map(img => {
@@ -109,7 +129,7 @@ export const getProduct = async (req, res) => {
       videos: product.videos ? JSON.parse(product.videos).map(video => {
         return video.startsWith('http') ? video : `${baseURL}${video}`;
       }) : [],
-      tiered_pricing: product.tiered_pricing ? JSON.parse(product.tiered_pricing) : null,
+      tiered_pricing: tieredPricingWithDiscount,
       reviews
     };
 

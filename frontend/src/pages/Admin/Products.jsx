@@ -15,7 +15,8 @@ const AdminProducts = () => {
     stock: '',
     category_id: '',
     images: [],
-    tiered_pricing: []
+    tiered_pricing: [],
+    discount_badges: false
   });
   const [isTieredPricing, setIsTieredPricing] = useState(false);
 
@@ -92,7 +93,8 @@ const AdminProducts = () => {
           stock: '',
           category_id: '',
           images: [],
-          tiered_pricing: []
+          tiered_pricing: [],
+          discount_badges: false
         });
         setIsTieredPricing(false);
       } else {
@@ -116,7 +118,8 @@ const AdminProducts = () => {
       stock: product.stock,
       category_id: product.category_id || '',
       images: [],
-      tiered_pricing: tieredPricing
+      tiered_pricing: tieredPricing,
+      discount_badges: product.discount_badges === 1 || product.discount_badges === true
     });
     setIsTieredPricing(tieredPricing.length > 0);
     setShowForm(true);
@@ -190,7 +193,8 @@ const AdminProducts = () => {
               stock: '',
               category_id: '',
               images: [],
-              tiered_pricing: []
+              tiered_pricing: [],
+              discount_badges: false
             });
             setIsTieredPricing(false);
           }}
@@ -398,6 +402,40 @@ const AdminProducts = () => {
                 </div>
               )}
             </div>
+
+            {/* Campaign Badges Toggle */}
+            {isTieredPricing && formData.tiered_pricing.length > 0 && (
+              <div className="border-t border-gray-700 pt-4">
+                <div className="bg-gray-900 p-4 rounded border border-purple-700">
+                  <div className="flex items-center justify-between mb-2">
+                    <div>
+                      <label className="block text-sm font-medium text-purple-300 font-mono mb-1">
+                        🏷️ Kampanya Etiketleri
+                      </label>
+                      <p className="text-xs text-gray-400 font-mono">
+                        Fiyat farkına göre otomatik % tasarruf etiketi gösterilir.
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setFormData({ ...formData, discount_badges: !formData.discount_badges })}
+                      className={`px-4 py-2 rounded font-mono text-sm transition-colors ${
+                        formData.discount_badges
+                          ? 'bg-purple-900 text-purple-200 border border-purple-700'
+                          : 'bg-gray-700 text-gray-300 border border-gray-600'
+                      }`}
+                    >
+                      {formData.discount_badges ? '[ON] Açık' : '[OFF] Kapalı'}
+                    </button>
+                  </div>
+                  {formData.discount_badges && (
+                    <div className="text-xs text-green-400 font-mono mt-2 p-2 bg-gray-800 rounded">
+                      ✅ Kullanıcılar paket kartlarında "%XX Tasarruf" etiketini görecek
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
 
             <div className="flex justify-end space-x-4 pt-4">
               <button
