@@ -195,6 +195,40 @@ export const sendPushNotification = async (req, res) => {
   }
 };
 
+// Retry helper with exponential backoff
+const retryWithBackoff = async (fn, maxRetries = 3) => {
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      return await fn();
+    } catch (error) {
+      const isRetryable = error.statusCode === 429 || error.statusCode === 503 || error.code === 'ECONNREFUSED';
+
+      if (!isRetryable || attempt === maxRetries) {
+        throw error;
+      }
+
+      const delay = Math.pow(2, attempt) * 1000; // 2s, 4s, 8s
+      console.warn(`[PWA RETRY] ${attempt}/${maxRetries} attempt failed, retrying in ${delay}ms...`, {
+        statusCode: error.statusCode,
+        message: error.message
+      });
+
+      await new Promise(resolve => setTimeout(resolve, delay));
+    }
+  }
+};
+
+// Log to file helper
+const logPushResult = (success, endpoint, error = null) => {
+  const timestamp = new Date().toISOString();
+  const logMessage = success
+    ? `[${timestamp}] OK: Push sent to ${endpoint.substring(0, 60)}...`
+    : `[${timestamp}] FAIL: ${error?.statusCode || 'ERROR'} ${error?.message || 'Unknown'} for ${endpoint.substring(0, 60)}...`;
+
+  console.log(logMessage);
+  // In production, write to file: fs.appendFileSync('logs/pwa-delivery.log', logMessage + '\n');
+};
+
 // Bildirim gönderme yardımcı fonksiyonu
 const sendNotificationToUsers = async (notificationId) => {
   try {
@@ -225,6 +259,8 @@ const sendNotificationToUsers = async (notificationId) => {
     });
 
     let sentCount = 0;
+    let failureCount = 0;
+
     for (const sub of subscriptions) {
       try {
         const subscription = {
@@ -232,12 +268,39 @@ const sendNotificationToUsers = async (notificationId) => {
           keys: JSON.parse(sub.keys)
         };
 
-        await webpush.sendNotification(subscription, payload);
+        // Send with retry mechanism
+        await retryWithBackoff(async () => {
+          return await webpush.sendNotification(subscription, payload);
+        });
+
         sentCount++;
+        logPushResult(true, sub.endpoint);
+
       } catch (error) {
-        // Başarısız aboneliği deaktive et
-        if (error.statusCode === 410) {
+        failureCount++;
+        logPushResult(false, sub.endpoint, error);
+
+        // Handle specific error codes
+        if (error.statusCode === 410 || error.statusCode === 404) {
+          // Subscription expired or not found - deactivate
+          console.warn(`[PWA] Deactivating expired subscription: ${error.statusCode}`);
           await db.run('UPDATE push_subscriptions SET is_active = 0 WHERE id = ?', [sub.id]);
+        }
+
+        // Log to push_failures table
+        try {
+          await db.run(`
+            INSERT INTO push_failures (endpoint, error_code, error_message, notification_id, retry_count)
+            VALUES (?, ?, ?, ?, ?)
+          `, [
+            sub.endpoint,
+            error.statusCode || null,
+            error.message || 'Unknown error',
+            notificationId,
+            error.retryCount || 0
+          ]);
+        } catch (dbError) {
+          console.error('[PWA] Failed to log push failure:', dbError);
         }
       }
     }
@@ -249,9 +312,12 @@ const sendNotificationToUsers = async (notificationId) => {
       WHERE id = ?
     `, [sentCount, notificationId]);
 
+    console.log(`[PWA] Push delivery complete: ${sentCount} sent, ${failureCount} failed`);
     return sentCount;
+
   } catch (error) {
     console.error('Bildirim gönderme hatası:', error);
+    throw error;
   }
 };
 
@@ -290,6 +356,29 @@ export const deleteNotification = async (req, res) => {
 
   } catch (error) {
     console.error('Bildirim silme hatası:', error);
+    res.status(500).json(responseError('Sunucu hatası'));
+  }
+};
+// Admin - Push başarısızlıklarını getir
+export const getPushFailures = async (req, res) => {
+  try {
+    const { limit = 100 } = req.query;
+
+    const failures = await db.all(`
+      SELECT
+        pf.*,
+        pn.title as notification_title,
+        pn.body as notification_body
+      FROM push_failures pf
+      LEFT JOIN push_notifications pn ON pf.notification_id = pn.id
+      ORDER BY pf.created_at DESC
+      LIMIT ?
+    `, [limit]);
+
+    res.json(responseSuccess(failures));
+
+  } catch (error) {
+    console.error('Push failures getirme hatası:', error);
     res.status(500).json(responseError('Sunucu hatası'));
   }
 };
