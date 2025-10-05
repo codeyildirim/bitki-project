@@ -337,51 +337,57 @@ const AdminProducts = () => {
 
               {isTieredPricing && (
                 <div className="space-y-3 bg-gray-900 p-4 rounded border border-yellow-700">
-                  {formData.tiered_pricing.map((tier, index) => (
-                    <div key={index} className="flex gap-3 items-center">
-                      <div className="flex-1">
-                        <label className="text-xs text-gray-400 font-mono">Paket Sayısı</label>
-                        <input
-                          type="number"
-                          value={tier.quantity}
-                          onChange={(e) => {
-                            const newTiers = [...formData.tiered_pricing];
-                            newTiers[index].quantity = parseInt(e.target.value);
+                  {formData.tiered_pricing.sort((a, b) => a.quantity - b.quantity).map((tier, index) => {
+                    const unitPrice = tier.quantity > 0 && tier.price > 0 ? (tier.price / tier.quantity).toFixed(2) : '0.00';
+                    return (
+                      <div key={index} className="flex gap-3 items-start">
+                        <div className="flex-1">
+                          <label className="text-xs text-gray-400 font-mono">Paket Sayısı</label>
+                          <input
+                            type="number"
+                            value={tier.quantity}
+                            onChange={(e) => {
+                              const newTiers = [...formData.tiered_pricing];
+                              newTiers[index].quantity = parseInt(e.target.value);
+                              setFormData({ ...formData, tiered_pricing: newTiers });
+                            }}
+                            min="1"
+                            className="w-full p-2 bg-gray-800 border border-gray-700 rounded text-white text-sm"
+                            placeholder="1"
+                          />
+                        </div>
+                        <div className="flex-1">
+                          <label className="text-xs text-gray-400 font-mono">Fiyat (TL)</label>
+                          <input
+                            type="number"
+                            value={tier.price}
+                            onChange={(e) => {
+                              const newTiers = [...formData.tiered_pricing];
+                              newTiers[index].price = parseFloat(e.target.value);
+                              setFormData({ ...formData, tiered_pricing: newTiers });
+                            }}
+                            min="0"
+                            step="0.01"
+                            className="w-full p-2 bg-gray-800 border border-gray-700 rounded text-white text-sm"
+                            placeholder="200.00"
+                          />
+                          <div className="text-xs text-green-400 font-mono mt-1">
+                            ≈ {unitPrice} ₺/paket
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const newTiers = formData.tiered_pricing.filter((_, i) => i !== index);
                             setFormData({ ...formData, tiered_pricing: newTiers });
                           }}
-                          min="1"
-                          className="w-full p-2 bg-gray-800 border border-gray-700 rounded text-white text-sm"
-                          placeholder="1"
-                        />
+                          className="mt-5 px-3 py-2 bg-red-900 text-red-200 rounded hover:bg-red-800 font-mono text-sm"
+                        >
+                          🗑️
+                        </button>
                       </div>
-                      <div className="flex-1">
-                        <label className="text-xs text-gray-400 font-mono">Fiyat (TL)</label>
-                        <input
-                          type="number"
-                          value={tier.price}
-                          onChange={(e) => {
-                            const newTiers = [...formData.tiered_pricing];
-                            newTiers[index].price = parseFloat(e.target.value);
-                            setFormData({ ...formData, tiered_pricing: newTiers });
-                          }}
-                          min="0"
-                          step="0.01"
-                          className="w-full p-2 bg-gray-800 border border-gray-700 rounded text-white text-sm"
-                          placeholder="200.00"
-                        />
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const newTiers = formData.tiered_pricing.filter((_, i) => i !== index);
-                          setFormData({ ...formData, tiered_pricing: newTiers });
-                        }}
-                        className="mt-5 px-3 py-2 bg-red-900 text-red-200 rounded hover:bg-red-800 font-mono text-sm"
-                      >
-                        🗑️
-                      </button>
-                    </div>
-                  ))}
+                    );
+                  })}
 
                   <button
                     type="button"

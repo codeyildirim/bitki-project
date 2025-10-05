@@ -1,6 +1,7 @@
 import { responseSuccess, responseError, logAdminAction } from '../utils/helpers.js';
 import { hashPassword as bcryptHash, comparePassword, generateJWT } from '../utils/crypto.js';
 import db from '../models/database.js';
+import { validateTieredPricing } from '../middleware/validateTieredPricing.js';
 
 // Admin Authentication
 export const adminLogin = async (req, res) => {
@@ -289,7 +290,18 @@ export const createProduct = async (req, res) => {
     });
 
     // Handle tiered_pricing if provided
-    const tieredPricing = req.body.tiered_pricing ? JSON.stringify(req.body.tiered_pricing) : null;
+    const tieredPricingData = req.body.tiered_pricing;
+
+    // Validate tiered pricing structure
+    if (tieredPricingData) {
+      const validation = validateTieredPricing(tieredPricingData);
+      if (!validation.ok) {
+        console.log('❌ Tiered pricing validation failed:', validation.message);
+        return res.status(400).json(responseError(validation.message));
+      }
+    }
+
+    const tieredPricing = tieredPricingData ? JSON.stringify(tieredPricingData) : null;
     const discountBadges = req.body.discount_badges ? 1 : 0;
 
     const result = await db.run(`
@@ -332,6 +344,13 @@ export const updateProduct = async (req, res) => {
     }
 
     // Handle tiered_pricing update
+    if (tiered_pricing) {
+      const validation = validateTieredPricing(tiered_pricing);
+      if (!validation.ok) {
+        return res.status(400).json(responseError(validation.message));
+      }
+    }
+
     const tieredPricingValue = tiered_pricing ? JSON.stringify(tiered_pricing) : null;
     const discountBadgesValue = discount_badges ? 1 : 0;
 
