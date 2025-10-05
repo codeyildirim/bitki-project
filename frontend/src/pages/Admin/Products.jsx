@@ -71,6 +71,16 @@ const AdminProducts = () => {
         }
       });
 
+      // Debug: Log FormData contents
+      console.log('📦 FormData Contents:');
+      for (let [key, value] of formDataObj.entries()) {
+        if (value instanceof File) {
+          console.log(`  ${key}:`, `File(${value.name}, ${value.size} bytes)`);
+        } else {
+          console.log(`  ${key}:`, value);
+        }
+      }
+
       let response;
       if (editingProduct) {
         response = await adminApi.put(`/api/admin/products/${editingProduct.id}`, formDataObj);
