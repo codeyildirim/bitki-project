@@ -45,6 +45,7 @@ export const trackPWAEvent = async (req, res) => {
 
 // Admin - PWA istatistiklerini getir
 export const getPWAStats = async (req, res) => {
+  console.log('📊 [PWA STATS] Request from admin:', req.user?.nickname);
   try {
     // Toplam indirme sayısı
     const installStats = await db.get(`
@@ -82,15 +83,23 @@ export const getPWAStats = async (req, res) => {
         AND ip_address IS NOT NULL
     `);
 
-    res.json(responseSuccess({
+    const result = {
       totalInstalls: installStats.total,
       activeUsers: activeUsers.count,
       last30Days,
       deviceStats
-    }));
+    };
+
+    console.log('✅ [PWA STATS] Sending response:', {
+      totalInstalls: result.totalInstalls,
+      activeUsers: result.activeUsers,
+      daysCount: result.last30Days.length
+    });
+
+    res.json(responseSuccess(result));
 
   } catch (error) {
-    console.error('PWA istatistikleri getirme hatası:', error);
+    console.error('❌ [PWA STATS] Error:', error);
     res.status(500).json(responseError('Sunucu hatası'));
   }
 };
@@ -323,6 +332,7 @@ const sendNotificationToUsers = async (notificationId) => {
 
 // Admin - Bildirim listesi
 export const getNotifications = async (req, res) => {
+  console.log('📬 [PWA NOTIFICATIONS] Request from admin:', req.user?.nickname);
   try {
     const notifications = await db.all(`
       SELECT * FROM push_notifications
@@ -361,6 +371,7 @@ export const deleteNotification = async (req, res) => {
 };
 // Admin - Push başarısızlıklarını getir
 export const getPushFailures = async (req, res) => {
+  console.log('🚨 [PWA FAILURES] Request from admin:', req.user?.nickname);
   try {
     const { limit = 100 } = req.query;
 
@@ -385,6 +396,7 @@ export const getPushFailures = async (req, res) => {
 
 // Admin - PWA Analytics (saat bazlı ve cihaz türü analizi)
 export const getPWAAnalytics = async (req, res) => {
+  console.log('📈 [PWA ANALYTICS] Request from admin:', req.user?.nickname);
   try {
     // Saat bazlı kullanım (son 7 gün)
     const hourlyActivity = await db.all(`

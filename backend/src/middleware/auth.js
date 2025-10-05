@@ -6,29 +6,46 @@ export const authenticateToken = async (req, res, next) => {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
 
+  console.log('🔐 [AUTH] Request to:', req.method, req.path);
+  console.log('🔐 [AUTH] Authorization header:', authHeader ? `Bearer ${token?.substring(0, 20)}...` : 'Missing');
+
   if (!token) {
+    console.log('❌ [AUTH] No token provided');
     return res.status(401).json(responseError('Giriş yapmanız gerekiyor', 401));
   }
 
   try {
     const decoded = verifyJWT(token);
+    console.log('✅ [AUTH] Token decoded:', { userId: decoded.userId, role: decoded.role });
+
     const user = await db.get('SELECT * FROM users WHERE id = ?', [decoded.userId]);
 
     if (!user) {
+      console.log('❌ [AUTH] User not found in database:', decoded.userId);
       return res.status(401).json(responseError('Geçersiz token', 401));
     }
 
+    console.log('✅ [AUTH] User authenticated:', { id: user.id, nickname: user.nickname, isAdmin: user.is_admin });
     req.user = user;
     next();
   } catch (err) {
+    console.log('❌ [AUTH] Token verification failed:', err.message);
     return res.status(403).json(responseError('Geçersiz token', 403));
   }
 };
 
 export const requireAdmin = (req, res, next) => {
+  console.log('👮 [ADMIN] Checking admin access for user:', {
+    userId: req.user?.id,
+    isAdmin: req.user?.is_admin
+  });
+
   if (!req.user || !req.user.is_admin) {
+    console.log('❌ [ADMIN] Access denied: Not an admin');
     return res.status(403).json(responseError('Admin yetkisi gerekiyor', 403));
   }
+
+  console.log('✅ [ADMIN] Admin access granted');
   next();
 };
 
