@@ -59,6 +59,13 @@ const AdminProducts = () => {
     setLoading(true);
 
     try {
+      // Frontend validation: Require at least one image for new products
+      if (!editingProduct && (!formData.images || formData.images.length === 0)) {
+        alert('⚠️ En az bir ürün görseli yüklemelisiniz');
+        setLoading(false);
+        return;
+      }
+
       const formDataObj = new FormData();
 
       Object.keys(formData).forEach(key => {
@@ -107,8 +114,11 @@ const AdminProducts = () => {
         alert('Hata: ' + response.data.message);
       }
     } catch (error) {
-      console.error('Product save error:', error);
-      alert('Ürün kaydedilirken hata oluştu');
+      console.error('❌ Product save error:', error);
+      console.error('❌ Error response:', error.response?.data);
+      console.error('❌ Error status:', error.response?.status);
+      const errorMsg = error.response?.data?.message || error.message || 'Bilinmeyen hata';
+      alert('Ürün kaydedilirken hata oluştu: ' + errorMsg);
     } finally {
       setLoading(false);
     }
@@ -307,7 +317,7 @@ const AdminProducts = () => {
 
             <div>
               <label className="block text-sm font-medium text-red-300 mb-2 font-mono">
-                Ürün Resimleri
+                Ürün Resimleri {!editingProduct && <span className="text-red-500">*</span>}
               </label>
               <input
                 type="file"
@@ -315,10 +325,11 @@ const AdminProducts = () => {
                 onChange={handleInputChange}
                 multiple
                 accept="image/*"
+                required={!editingProduct}
                 className="w-full p-3 bg-gray-800 border border-gray-700 rounded text-white focus:ring-2 focus:ring-red-500"
               />
               <p className="text-gray-400 text-sm mt-1 font-mono">
-                Maksimum 10 resim seçebilirsiniz
+                {!editingProduct ? '⚠️ En az 1 resim gereklidir' : 'Maksimum 10 resim seçebilirsiniz'}
               </p>
             </div>
 
