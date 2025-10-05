@@ -57,24 +57,51 @@ const executeMigration = async (filename) => {
   try {
     const migrationSQL = fs.readFileSync(migrationPath, 'utf8');
 
-    // Split SQL statements by semicolon and execute each one
-    const statements = migrationSQL
-      .split(';')
-      .map(stmt => stmt.trim())
-      .filter(stmt => stmt.length > 0 && !stmt.startsWith('--'));
+    // Check if migration uses TRANSACTION - if so, run all statements in order
+    if (migrationSQL.includes('BEGIN TRANSACTION')) {
+      // Remove comments and split by semicolon
+      const statements = migrationSQL
+        .split('\n')
+        .filter(line => !line.trim().startsWith('--'))
+        .join('\n')
+        .split(';')
+        .map(stmt => stmt.trim())
+        .filter(stmt => stmt.length > 0);
 
-    for (const statement of statements) {
-      if (statement.trim()) {
-        try {
+      try {
+        // Execute all statements in transaction
+        for (const statement of statements) {
           await db.run(statement);
-        } catch (stmtError) {
-          // If statement fails due to "already exists" error, skip it
-          if (stmtError.message.includes('already exists') ||
-              stmtError.message.includes('duplicate column')) {
-            console.warn(`⚠️ Migration statement skipped (already exists): ${filename}`);
-            continue;
+        }
+      } catch (execError) {
+        if (execError.message.includes('already exists') ||
+            execError.message.includes('duplicate column')) {
+          console.warn(`⚠️ Migration skipped (table/column already exists): ${filename}`);
+          await markMigrationExecuted(filename);
+          return;
+        }
+        throw execError;
+      }
+    } else {
+      // Split SQL statements by semicolon and execute each one
+      const statements = migrationSQL
+        .split(';')
+        .map(stmt => stmt.trim())
+        .filter(stmt => stmt.length > 0 && !stmt.startsWith('--'));
+
+      for (const statement of statements) {
+        if (statement.trim()) {
+          try {
+            await db.run(statement);
+          } catch (stmtError) {
+            // If statement fails due to "already exists" error, skip it
+            if (stmtError.message.includes('already exists') ||
+                stmtError.message.includes('duplicate column')) {
+              console.warn(`⚠️ Migration statement skipped (already exists): ${filename}`);
+              continue;
+            }
+            throw stmtError;
           }
-          throw stmtError;
         }
       }
     }
