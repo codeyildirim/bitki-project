@@ -8,75 +8,17 @@ import { AuthProvider } from './context/AuthContext.jsx'
 import { CartProvider } from './context/CartContext.jsx'
 import { ThemeProvider } from './context/ThemeContext.jsx'
 import { initializePWATracking } from './utils/pwaTracking.js'
+import NotificationPermissionModal from './components/NotificationPermissionModal.jsx'
 import './index.css'
 
-
-// Helper function for VAPID key conversion
-function urlBase64ToUint8Array(base64String) {
-  const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
-  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
-  const rawData = window.atob(base64);
-  const outputArray = new Uint8Array(rawData.length);
-  for (let i = 0; i < rawData.length; ++i) {
-    outputArray[i] = rawData.charCodeAt(i);
-  }
-  return outputArray;
-}
-
-// Register service worker and setup push notifications for PUBLIC site
-if ('serviceWorker' in navigator && 'PushManager' in window) {
+// Register service worker for PUBLIC site (permission modal will handle push subscription)
+if ('serviceWorker' in navigator) {
   window.addEventListener('load', async () => {
     try {
-      // Register service worker
       const registration = await navigator.serviceWorker.register('/sw.js');
       console.log('✅ SW registered:', registration);
-
-      // Request notification permission
-      const permission = await Notification.requestPermission();
-      console.log('🔔 Notification permission:', permission);
-
-      if (permission === 'granted') {
-        const vapidKey = import.meta.env.VITE_VAPID_PUBLIC_KEY;
-
-        if (!vapidKey) {
-          console.warn('⚠️ VITE_VAPID_PUBLIC_KEY environment variable is missing');
-          return;
-        }
-
-        // Subscribe to push notifications
-        const subscription = await registration.pushManager.subscribe({
-          userVisibleOnly: true,
-          applicationServerKey: urlBase64ToUint8Array(vapidKey)
-        });
-
-        console.log('📨 Push subscription created:', subscription);
-
-        // Send subscription to backend
-        const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'https://bitki-project.onrender.com';
-        const response = await fetch(`${apiBaseUrl}/api/pwa/subscribe`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          credentials: 'include',
-          body: JSON.stringify({
-            subscription: subscription.toJSON(),
-            deviceInfo: {
-              userAgent: navigator.userAgent,
-              platform: navigator.platform,
-              language: navigator.language
-            }
-          })
-        });
-
-        if (response.ok) {
-          console.log('✅ Push subscription registered on backend');
-        } else {
-          console.error('❌ Failed to register subscription on backend:', await response.text());
-        }
-      }
     } catch (error) {
-      console.error('❌ PWA setup error:', error);
+      console.error('❌ Service worker registration failed:', error);
     }
   });
 }
@@ -102,6 +44,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
           <AuthProvider>
             <CartProvider>
               <App />
+              <NotificationPermissionModal />
               <Toaster
               position="top-right"
               toastOptions={{

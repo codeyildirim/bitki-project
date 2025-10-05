@@ -83,9 +83,17 @@ export const getPWAStats = async (req, res) => {
         AND ip_address IS NOT NULL
     `);
 
+    // Aktif push bildirimleri abonelikleri
+    const activeSubscriptions = await db.get(`
+      SELECT COUNT(*) as count
+      FROM push_subscriptions
+      WHERE is_active = 1
+    `);
+
     const result = {
       totalInstalls: installStats.total,
       activeUsers: activeUsers.count,
+      activeSubscriptions: activeSubscriptions?.count || 0,
       last30Days,
       deviceStats
     };
@@ -93,6 +101,7 @@ export const getPWAStats = async (req, res) => {
     console.log('✅ [PWA STATS] Sending response:', {
       totalInstalls: result.totalInstalls,
       activeUsers: result.activeUsers,
+      activeSubscriptions: result.activeSubscriptions,
       daysCount: result.last30Days.length
     });
 

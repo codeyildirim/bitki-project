@@ -13,6 +13,7 @@ const PWAManagement = () => {
   const [stats, setStats] = useState({
     totalInstalls: 0,
     activeUsers: 0,
+    activeSubscriptions: 0,
     last30Days: [],
     deviceStats: []
   });
@@ -302,30 +303,28 @@ const PWAManagement = () => {
             <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Günlük Ortalama</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Aktif Abonelikler</p>
                   <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                    {chartData.length > 0
-                      ? Math.round(chartData.reduce((acc, d) => acc + d.launch, 0) / chartData.length)
-                      : 0}
+                    {stats.activeSubscriptions || 0}
                   </p>
-                  <p className="text-xs text-gray-500">Açılış</p>
+                  <p className="text-xs text-gray-500">Push bildirimleri</p>
                 </div>
-                <TrendingUp className="text-purple-600" size={32} />
+                <Bell className="text-purple-600" size={32} />
               </div>
             </div>
 
             <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Dönüşüm Oranı</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Bildirim Oranı</p>
                   <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                    {stats.totalInstalls > 0
-                      ? `${Math.round((stats.activeUsers / stats.totalInstalls) * 100)}%`
+                    {stats.activeUsers > 0
+                      ? `${Math.round((stats.activeSubscriptions / stats.activeUsers) * 100)}%`
                       : '0%'}
                   </p>
-                  <p className="text-xs text-gray-500">İndirme → Aktif</p>
+                  <p className="text-xs text-gray-500">Aktif → Abone</p>
                 </div>
-                <Activity className="text-orange-600" size={32} />
+                <CheckCircle className="text-orange-600" size={32} />
               </div>
             </div>
           </div>
