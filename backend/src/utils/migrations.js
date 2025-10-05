@@ -65,7 +65,17 @@ const executeMigration = async (filename) => {
 
     for (const statement of statements) {
       if (statement.trim()) {
-        await db.run(statement);
+        try {
+          await db.run(statement);
+        } catch (stmtError) {
+          // If statement fails due to "already exists" error, skip it
+          if (stmtError.message.includes('already exists') ||
+              stmtError.message.includes('duplicate column')) {
+            console.warn(`⚠️ Migration statement skipped (already exists): ${filename}`);
+            continue;
+          }
+          throw stmtError;
+        }
       }
     }
 
@@ -73,7 +83,23 @@ const executeMigration = async (filename) => {
     console.log(`✅ Migration executed successfully: ${filename}`);
 
   } catch (error) {
-    console.error(`❌ Error executing migration ${filename}:`, error);
+    console.error(`❌ Error executing migration ${filename}:`, error.message);
+    // Don't throw error if it's an "already exists" error
+    if (error.message.includes('already exists') ||
+        error.message.includes('duplicate column') ||
+        error.message.includes('UNIQUE constraint failed')) {
+      console.warn(`⚠️ Migration skipped (already applied): ${filename}`);
+      // Mark as executed even if it was already applied
+      try {
+        await markMigrationExecuted(filename);
+      } catch (markError) {
+        // Ignore if already marked
+        if (!markError.message.includes('UNIQUE constraint failed')) {
+          throw markError;
+        }
+      }
+      return;
+    }
     throw error;
   }
 };

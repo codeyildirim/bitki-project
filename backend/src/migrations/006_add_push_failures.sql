@@ -8,6 +8,8 @@ CREATE TABLE IF NOT EXISTS push_failures (
   error_code INTEGER,
   error_message TEXT,
   notification_id INTEGER,
+  notification_title TEXT,
+  notification_body TEXT,
   retry_count INTEGER DEFAULT 0,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (notification_id) REFERENCES push_notifications(id)

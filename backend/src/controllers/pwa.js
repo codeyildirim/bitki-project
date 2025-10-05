@@ -308,13 +308,15 @@ const sendNotificationToUsers = async (notificationId) => {
         // Log to push_failures table
         try {
           await db.run(`
-            INSERT INTO push_failures (endpoint, error_code, error_message, notification_id, retry_count)
-            VALUES (?, ?, ?, ?, ?)
+            INSERT INTO push_failures (endpoint, error_code, error_message, notification_id, notification_title, notification_body, retry_count)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
           `, [
             sub.endpoint,
             error.statusCode || null,
             error.message || 'Unknown error',
             notificationId,
+            notification.title || null,
+            notification.body || null,
             error.retryCount || 0
           ]);
         } catch (dbError) {
