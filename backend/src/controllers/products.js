@@ -58,6 +58,7 @@ export const getProducts = async (req, res) => {
       ...product,
       images: product.images ? JSON.parse(product.images).map(img => publicUrl(img)) : [],
       videos: product.videos ? JSON.parse(product.videos).map(video => publicUrl(video)) : [],
+      tiered_pricing: product.tiered_pricing ? JSON.parse(product.tiered_pricing) : null,
       avg_rating: product.avg_rating ? parseFloat(product.avg_rating).toFixed(1) : 0,
       review_count: product.review_count || 0
     }));
@@ -108,6 +109,7 @@ export const getProduct = async (req, res) => {
       videos: product.videos ? JSON.parse(product.videos).map(video => {
         return video.startsWith('http') ? video : `${baseURL}${video}`;
       }) : [],
+      tiered_pricing: product.tiered_pricing ? JSON.parse(product.tiered_pricing) : null,
       reviews
     };
 
@@ -175,6 +177,7 @@ export const getFeaturedProducts = async (req, res) => {
       images: product.images ? JSON.parse(product.images).map(img => {
         return img.startsWith('http') ? img : `${baseURL}${img}`;
       }) : [],
+      tiered_pricing: product.tiered_pricing ? JSON.parse(product.tiered_pricing) : null,
       avg_rating: product.avg_rating ? parseFloat(product.avg_rating).toFixed(1) : 0
     }));
 

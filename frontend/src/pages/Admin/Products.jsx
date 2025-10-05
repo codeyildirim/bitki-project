@@ -14,8 +14,10 @@ const AdminProducts = () => {
     price: '',
     stock: '',
     category_id: '',
-    images: []
+    images: [],
+    tiered_pricing: []
   });
+  const [isTieredPricing, setIsTieredPricing] = useState(false);
 
   useEffect(() => {
     loadProducts();
@@ -61,7 +63,9 @@ const AdminProducts = () => {
       Object.keys(formData).forEach(key => {
         if (key === 'images' && formData[key].length > 0) {
           formData[key].forEach(file => formDataObj.append('images', file));
-        } else if (key !== 'images') {
+        } else if (key === 'tiered_pricing' && formData[key].length > 0) {
+          formDataObj.append(key, JSON.stringify(formData[key]));
+        } else if (key !== 'images' && key !== 'tiered_pricing') {
           formDataObj.append(key, formData[key]);
         }
       });
@@ -87,8 +91,10 @@ const AdminProducts = () => {
           price: '',
           stock: '',
           category_id: '',
-          images: []
+          images: [],
+          tiered_pricing: []
         });
+        setIsTieredPricing(false);
       } else {
         alert('Hata: ' + response.data.message);
       }
@@ -102,14 +108,17 @@ const AdminProducts = () => {
 
   const handleEdit = (product) => {
     setEditingProduct(product);
+    const tieredPricing = product.tiered_pricing ? (typeof product.tiered_pricing === 'string' ? JSON.parse(product.tiered_pricing) : product.tiered_pricing) : [];
     setFormData({
       name: product.name,
       description: product.description,
       price: product.price,
       stock: product.stock,
       category_id: product.category_id || '',
-      images: []
+      images: [],
+      tiered_pricing: tieredPricing
     });
+    setIsTieredPricing(tieredPricing.length > 0);
     setShowForm(true);
   };
 
@@ -180,8 +189,10 @@ const AdminProducts = () => {
               price: '',
               stock: '',
               category_id: '',
-              images: []
+              images: [],
+              tiered_pricing: []
             });
+            setIsTieredPricing(false);
           }}
           className="bg-green-900 text-green-200 px-4 py-2 rounded hover:bg-green-800 transition-colors font-mono border border-green-700"
         >
@@ -299,6 +310,93 @@ const AdminProducts = () => {
               <p className="text-gray-400 text-sm mt-1 font-mono">
                 Maksimum 10 resim seçebilirsiniz
               </p>
+            </div>
+
+            {/* Tiered Pricing Section */}
+            <div className="border-t border-gray-700 pt-4">
+              <div className="flex items-center justify-between mb-4">
+                <label className="block text-sm font-medium text-yellow-300 font-mono">
+                  💰 Çoklu Paket Fiyatlandırma
+                </label>
+                <button
+                  type="button"
+                  onClick={() => setIsTieredPricing(!isTieredPricing)}
+                  className={`px-4 py-2 rounded font-mono text-sm transition-colors ${
+                    isTieredPricing
+                      ? 'bg-green-900 text-green-200 border border-green-700'
+                      : 'bg-gray-700 text-gray-300 border border-gray-600'
+                  }`}
+                >
+                  {isTieredPricing ? '[ACTIVE] Aktif' : '[INACTIVE] Kapalı'}
+                </button>
+              </div>
+
+              {isTieredPricing && (
+                <div className="space-y-3 bg-gray-900 p-4 rounded border border-yellow-700">
+                  {formData.tiered_pricing.map((tier, index) => (
+                    <div key={index} className="flex gap-3 items-center">
+                      <div className="flex-1">
+                        <label className="text-xs text-gray-400 font-mono">Paket Sayısı</label>
+                        <input
+                          type="number"
+                          value={tier.quantity}
+                          onChange={(e) => {
+                            const newTiers = [...formData.tiered_pricing];
+                            newTiers[index].quantity = parseInt(e.target.value);
+                            setFormData({ ...formData, tiered_pricing: newTiers });
+                          }}
+                          min="1"
+                          className="w-full p-2 bg-gray-800 border border-gray-700 rounded text-white text-sm"
+                          placeholder="1"
+                        />
+                      </div>
+                      <div className="flex-1">
+                        <label className="text-xs text-gray-400 font-mono">Fiyat (TL)</label>
+                        <input
+                          type="number"
+                          value={tier.price}
+                          onChange={(e) => {
+                            const newTiers = [...formData.tiered_pricing];
+                            newTiers[index].price = parseFloat(e.target.value);
+                            setFormData({ ...formData, tiered_pricing: newTiers });
+                          }}
+                          min="0"
+                          step="0.01"
+                          className="w-full p-2 bg-gray-800 border border-gray-700 rounded text-white text-sm"
+                          placeholder="200.00"
+                        />
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const newTiers = formData.tiered_pricing.filter((_, i) => i !== index);
+                          setFormData({ ...formData, tiered_pricing: newTiers });
+                        }}
+                        className="mt-5 px-3 py-2 bg-red-900 text-red-200 rounded hover:bg-red-800 font-mono text-sm"
+                      >
+                        🗑️
+                      </button>
+                    </div>
+                  ))}
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setFormData({
+                        ...formData,
+                        tiered_pricing: [...formData.tiered_pricing, { quantity: 1, price: 0 }]
+                      });
+                    }}
+                    className="w-full px-4 py-2 bg-yellow-900 text-yellow-200 rounded hover:bg-yellow-800 font-mono text-sm border border-yellow-700"
+                  >
+                    [+] Yeni Paket Ekle
+                  </button>
+
+                  <div className="text-xs text-gray-400 font-mono mt-2 p-2 bg-gray-800 rounded">
+                    💡 Örnek: 1 paket = 200 TL, 3 paket = 500 TL, 6 paket = 900 TL
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className="flex justify-end space-x-4 pt-4">

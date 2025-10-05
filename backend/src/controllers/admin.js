@@ -288,12 +288,15 @@ export const createProduct = async (req, res) => {
       videos: videos.slice(0, 2)
     });
 
-    const result = await db.run(`
-      INSERT INTO products (name, description, price, stock, category_id, images, videos)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
-    `, [name, description, price, stock, category_id || null, JSON.stringify(images), JSON.stringify(videos)]);
+    // Handle tiered_pricing if provided
+    const tieredPricing = req.body.tiered_pricing ? JSON.stringify(req.body.tiered_pricing) : null;
 
-    console.log('✅ Product created successfully:', { id: result.id, name });
+    const result = await db.run(`
+      INSERT INTO products (name, description, price, stock, category_id, images, videos, tiered_pricing)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `, [name, description, price, stock, category_id || null, JSON.stringify(images), JSON.stringify(videos), tieredPricing]);
+
+    console.log('✅ Product created successfully:', { id: result.id, name, hasTieredPricing: !!tieredPricing });
     res.json(responseSuccess({ id: result.id }, 'Ürün oluşturuldu'));
   } catch (error) {
     console.error('❌ Ürün oluşturma hatası:', error);
@@ -304,7 +307,7 @@ export const createProduct = async (req, res) => {
 export const updateProduct = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, description, price, stock, category_id, is_active } = req.body;
+    const { name, description, price, stock, category_id, is_active, tiered_pricing } = req.body;
 
     const product = await db.get('SELECT * FROM products WHERE id = ?', [id]);
     if (!product) {
@@ -327,11 +330,14 @@ export const updateProduct = async (req, res) => {
       videos = [...videos, ...newVideos];
     }
 
+    // Handle tiered_pricing update
+    const tieredPricingValue = tiered_pricing ? JSON.stringify(tiered_pricing) : null;
+
     await db.run(`
       UPDATE products
-      SET name = ?, description = ?, price = ?, stock = ?, category_id = ?, images = ?, videos = ?, is_active = ?
+      SET name = ?, description = ?, price = ?, stock = ?, category_id = ?, images = ?, videos = ?, is_active = ?, tiered_pricing = ?
       WHERE id = ?
-    `, [name, description, price, stock, category_id || null, JSON.stringify(images), JSON.stringify(videos), is_active !== undefined ? is_active : product.is_active, id]);
+    `, [name, description, price, stock, category_id || null, JSON.stringify(images), JSON.stringify(videos), is_active !== undefined ? is_active : product.is_active, tieredPricingValue, id]);
 
     res.json(responseSuccess(null, 'Ürün güncellendi'));
   } catch (error) {

@@ -9,6 +9,7 @@ const ProductDetail = () => {
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
   const [reviews, setReviews] = useState([]);
+  const [selectedTier, setSelectedTier] = useState(null);
 
   useEffect(() => {
     fetchProduct();
@@ -109,8 +110,49 @@ const ProductDetail = () => {
                 </div>
               </div>
 
+              {/* Tiered Pricing Selector */}
+              {product.tiered_pricing && product.tiered_pricing.length > 0 && (
+                <div className="space-y-3">
+                  <h3 className="font-heading font-semibold text-gray-900 dark:text-white text-base sm:text-lg">
+                    📦 Paket Seçin
+                  </h3>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    {product.tiered_pricing.map((tier, index) => {
+                      const isSelected = selectedTier === index;
+                      const unitPrice = (tier.price / tier.quantity).toFixed(2);
+                      return (
+                        <button
+                          key={index}
+                          type="button"
+                          onClick={() => setSelectedTier(index)}
+                          className={`p-4 border-2 rounded-lg transition-all duration-200 ${
+                            isSelected
+                              ? 'border-green-500 bg-green-50 dark:bg-green-900/30 ring-2 ring-green-500 scale-105'
+                              : 'border-gray-300 dark:border-gray-600 hover:border-green-400 hover:scale-102'
+                          }`}
+                        >
+                          <div className="text-center">
+                            <div className="text-lg font-heading font-bold text-gray-900 dark:text-white">
+                              {tier.quantity} Paket
+                            </div>
+                            <div className="text-2xl font-heading font-bold text-rick-green mt-1">
+                              {tier.price.toLocaleString('tr-TR')} ₺
+                            </div>
+                            <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                              ~{unitPrice} ₺ / paket
+                            </div>
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
               <div className="text-2xl sm:text-3xl lg:text-4xl font-heading font-bold text-rick-green">
-                {product.price.toLocaleString('tr-TR')} ₺
+                {selectedTier !== null && product.tiered_pricing
+                  ? product.tiered_pricing[selectedTier].price.toLocaleString('tr-TR')
+                  : product.price.toLocaleString('tr-TR')} ₺
               </div>
 
               <div>
