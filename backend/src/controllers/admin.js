@@ -290,7 +290,17 @@ export const createProduct = async (req, res) => {
     });
 
     // Handle tiered_pricing if provided
-    const tieredPricingData = req.body.tiered_pricing;
+    let tieredPricingData = req.body.tiered_pricing;
+
+    // Parse if it's a string
+    if (tieredPricingData && typeof tieredPricingData === 'string') {
+      try {
+        tieredPricingData = JSON.parse(tieredPricingData);
+      } catch (parseError) {
+        console.log('❌ Tiered pricing JSON parse failed:', parseError.message);
+        return res.status(400).json(responseError('Geçersiz tiered_pricing formatı'));
+      }
+    }
 
     // Validate tiered pricing structure
     if (tieredPricingData) {
@@ -344,14 +354,26 @@ export const updateProduct = async (req, res) => {
     }
 
     // Handle tiered_pricing update
-    if (tiered_pricing) {
-      const validation = validateTieredPricing(tiered_pricing);
+    let tieredPricingData = tiered_pricing;
+
+    // Parse if it's a string
+    if (tieredPricingData && typeof tieredPricingData === 'string') {
+      try {
+        tieredPricingData = JSON.parse(tieredPricingData);
+      } catch (parseError) {
+        console.log('❌ Tiered pricing JSON parse failed:', parseError.message);
+        return res.status(400).json(responseError('Geçersiz tiered_pricing formatı'));
+      }
+    }
+
+    if (tieredPricingData) {
+      const validation = validateTieredPricing(tieredPricingData);
       if (!validation.ok) {
         return res.status(400).json(responseError(validation.message));
       }
     }
 
-    const tieredPricingValue = tiered_pricing ? JSON.stringify(tiered_pricing) : null;
+    const tieredPricingValue = tieredPricingData ? JSON.stringify(tieredPricingData) : null;
     const discountBadgesValue = discount_badges ? 1 : 0;
 
     await db.run(`
