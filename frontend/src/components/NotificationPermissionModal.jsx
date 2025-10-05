@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Bell, X, CheckCircle } from 'lucide-react';
+import toast from 'react-hot-toast';
 import {
   isPushSupported,
-  getNotificationPermission,
-  subscribeToPushNotifications
+  getNotificationPermission
 } from '../utils/pushNotifications.js';
 
 const NotificationPermissionModal = () => {
@@ -68,38 +68,99 @@ const NotificationPermissionModal = () => {
     setLoading(true);
 
     try {
-      await subscribeToPushNotifications();
-      console.log('✅ Push subscription successful');
-      setShow(false);
+      // iOS Safari permission timeout protection
+      const requestPermissionWithTimeout = async () => {
+        const timeout = new Promise(resolve => setTimeout(() => resolve('timeout'), 3000));
+        const permissionPromise = Notification.requestPermission();
+        const result = await Promise.race([permissionPromise, timeout]);
 
-      // Show success toast
-      if (typeof window !== 'undefined' && window.toast) {
-        window.toast.success('🔔 Bildirimler aktif edildi!');
+        if (result === 'timeout') {
+          console.warn('⚠️ iOS Safari permission promise did not resolve');
+          setLoading(false);
+          setShow(false);
+          toast.error('⏱️ İzin isteği zaman aşımına uğradı. Lütfen tekrar deneyin.');
+          return null;
+        }
+
+        return result;
+      };
+
+      const permission = await requestPermissionWithTimeout();
+
+      if (permission === null) {
+        // Timeout occurred
+        return;
       }
+
+      if (permission === 'granted') {
+        // Permission granted - proceed with subscription
+        console.log('✅ Notification permission granted');
+
+        // Register push subscription
+        const registration = await navigator.serviceWorker.ready;
+        const subscription = await registration.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: urlBase64ToUint8Array('BIb3RmkvdoXbCi9vRJZJqMq6Tn0HoLGwVWXBt8hNbN1mKs8Dd3DLnxlkdDTpU1EqTbgOHCfS_DfTZl6KEHpcvHo')
+        });
+
+        // Send subscription to backend
+        await fetch('https://bitki-project.onrender.com/api/pwa/subscribe', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            subscription: subscription.toJSON(),
+            deviceInfo: {
+              userAgent: navigator.userAgent,
+              platform: navigator.platform,
+              language: navigator.language
+            }
+          })
+        });
+
+        setShow(false);
+        toast.success('🎉 Bildirimlere başarıyla izin verildi!');
+        console.log('✅ Push subscription successful');
+
+      } else if (permission === 'denied') {
+        // Permission denied
+        console.warn('❌ Notification permission denied');
+        localStorage.setItem('notificationDeniedAt', Date.now().toString());
+
+        toast.error(
+          isIOS
+            ? '📱 iOS Ayarlar > Safari > Bildirimler\'den izin verin'
+            : '⚠️ Bildirim izni reddedildi'
+        );
+
+        // Auto-close modal after 2 seconds
+        setTimeout(() => {
+          setShow(false);
+        }, 2000);
+      } else {
+        // Permission dismissed (default)
+        console.log('ℹ️ Notification permission dismissed');
+        setShow(false);
+      }
+
     } catch (error) {
       console.error('❌ Push subscription failed:', error);
-
-      // Check if user denied
-      const permission = getNotificationPermission();
-      if (permission === 'denied') {
-        localStorage.setItem('notificationDeniedAt', Date.now().toString());
-        setShow(false);
-
-        if (typeof window !== 'undefined' && window.toast) {
-          window.toast.error(
-            isIOS
-              ? '📱 iOS Ayarlar > Safari > Bildirimler\'den izin verin'
-              : '⚠️ Bildirimlere izin vermek için tarayıcı ayarlarınızı kontrol edin'
-          );
-        }
-      } else {
-        if (typeof window !== 'undefined' && window.toast) {
-          window.toast.error('❌ Bildirim aboneliği başarısız oldu');
-        }
-      }
+      toast.error('❌ Bildirim aboneliği başarısız oldu');
+      setShow(false);
     } finally {
       setLoading(false);
     }
+  };
+
+  // Helper function for VAPID key conversion
+  const urlBase64ToUint8Array = (base64String) => {
+    const padding = '='.repeat((4 - base64String.length % 4) % 4);
+    const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+    const rawData = window.atob(base64);
+    const outputArray = new Uint8Array(rawData.length);
+    for (let i = 0; i < rawData.length; ++i) {
+      outputArray[i] = rawData.charCodeAt(i);
+    }
+    return outputArray;
   };
 
   const handleDeny = () => {
