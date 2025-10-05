@@ -15,7 +15,7 @@ const AdminOrders = () => {
 
   const fetchOrders = async () => {
     try {
-      const response = await adminApi.get('/orders');
+      const response = await adminApi.get('/api/admin/orders');
       if (response.data.success) {
         setOrders(response.data.data || []);
       }
@@ -29,7 +29,7 @@ const AdminOrders = () => {
 
   const updateOrderStatus = async (orderId, status, tracking = '') => {
     try {
-      const response = await adminApi.put(`/orders/${orderId}/status`, {
+      const response = await adminApi.put(`/api/admin/orders/${orderId}/status`, {
         status,
         trackingNumber: tracking
       });
