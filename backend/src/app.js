@@ -224,8 +224,14 @@ app.use((err, req, res, next) => {
   res.status(500).json({ success: false, message: 'Sunucu hatası oluştu' });
 });
 
-// 404 handler
+// 404 handler with debug logging
 app.use('*', (req, res) => {
+  console.warn('⚠️ [404 DEBUG]', {
+    method: req.method,
+    path: req.originalUrl,
+    ip: req.ip,
+    userAgent: req.get('user-agent')
+  });
   res.status(404).json({ success: false, message: 'Endpoint bulunamadı' });
 });
 

@@ -15,7 +15,7 @@ const PushFailures = () => {
   const fetchFailures = async () => {
     setLoading(true);
     try {
-      const response = await adminApi.get('/pwa/failures');
+      const response = await adminApi.get('/api/pwa/failures');
 
       if (response.data.success) {
         setFailures(response.data.data || []);

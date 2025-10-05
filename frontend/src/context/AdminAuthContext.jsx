@@ -8,7 +8,7 @@ const AdminAuthContext = createContext();
 
 // Admin-specific axios instance
 const adminApi = axios.create({
-  baseURL: `${API_CONFIG.BASE_URL}/api`,
+  baseURL: API_CONFIG.BASE_URL,
   withCredentials: true
 });
 
