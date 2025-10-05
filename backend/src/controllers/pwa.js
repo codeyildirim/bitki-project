@@ -73,12 +73,13 @@ export const getPWAStats = async (req, res) => {
       GROUP BY device_info
     `);
 
-    // Aktif kullanıcılar (son 7 gün)
+    // Aktif kullanıcılar (son 7 gün) - IP bazlı sayım
     const activeUsers = await db.get(`
-      SELECT COUNT(DISTINCT user_id) as count
+      SELECT COUNT(DISTINCT ip_address) as count
       FROM pwa_stats
       WHERE event_type = 'launch'
         AND created_at >= datetime('now', '-7 days')
+        AND ip_address IS NOT NULL
     `);
 
     res.json(responseSuccess({
