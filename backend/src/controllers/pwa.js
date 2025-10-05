@@ -382,3 +382,101 @@ export const getPushFailures = async (req, res) => {
     res.status(500).json(responseError('Sunucu hatası'));
   }
 };
+
+// Admin - PWA Analytics (saat bazlı ve cihaz türü analizi)
+export const getPWAAnalytics = async (req, res) => {
+  try {
+    // Saat bazlı kullanım (son 7 gün)
+    const hourlyActivity = await db.all(`
+      SELECT
+        CAST(strftime('%H', created_at) AS INTEGER) as hour,
+        COUNT(*) as count
+      FROM pwa_stats
+      WHERE event_type = 'launch'
+        AND created_at >= datetime('now', '-7 days')
+      GROUP BY hour
+      ORDER BY hour ASC
+    `);
+
+    // Tüm 24 saati içeren array oluştur (olmayan saatler için 0 değeri)
+    const hourlyData = Array.from({ length: 24 }, (_, i) => {
+      const found = hourlyActivity.find(h => h.hour === i);
+      return { hour: i, count: found ? found.count : 0 };
+    });
+
+    // Cihaz tipi bazlı kullanım (son 7 gün)
+    const deviceTypes = await db.all(`
+      SELECT
+        device_info as device,
+        COUNT(*) as count
+      FROM pwa_stats
+      WHERE event_type = 'launch'
+        AND created_at >= datetime('now', '-7 days')
+        AND device_info IS NOT NULL
+      GROUP BY device_info
+      ORDER BY count DESC
+    `);
+
+    // Device info'dan platform bilgisini çıkar
+    const processedDeviceTypes = deviceTypes.map(d => {
+      let deviceName = 'Bilinmeyen';
+
+      try {
+        const info = JSON.parse(d.device);
+        const platform = info.platform?.toLowerCase() || '';
+        const userAgent = info.userAgent?.toLowerCase() || '';
+
+        if (platform.includes('iphone') || platform.includes('ipad') || userAgent.includes('iphone') || userAgent.includes('ipad')) {
+          deviceName = 'iOS';
+        } else if (platform.includes('android') || userAgent.includes('android')) {
+          deviceName = 'Android';
+        } else if (platform.includes('mac')) {
+          deviceName = 'macOS';
+        } else if (platform.includes('win')) {
+          deviceName = 'Windows';
+        } else if (platform.includes('linux')) {
+          deviceName = 'Linux';
+        }
+      } catch (e) {
+        // JSON parse hatası durumunda string olarak kontrol et
+        const deviceStr = String(d.device).toLowerCase();
+        if (deviceStr.includes('ios') || deviceStr.includes('iphone') || deviceStr.includes('ipad')) {
+          deviceName = 'iOS';
+        } else if (deviceStr.includes('android')) {
+          deviceName = 'Android';
+        } else if (deviceStr.includes('mac')) {
+          deviceName = 'macOS';
+        } else if (deviceStr.includes('win')) {
+          deviceName = 'Windows';
+        } else if (deviceStr.includes('linux')) {
+          deviceName = 'Linux';
+        }
+      }
+
+      return { device: deviceName, count: d.count };
+    });
+
+    // Aynı cihaz türlerini birleştir
+    const mergedDeviceTypes = processedDeviceTypes.reduce((acc, curr) => {
+      const existing = acc.find(item => item.device === curr.device);
+      if (existing) {
+        existing.count += curr.count;
+      } else {
+        acc.push({ device: curr.device, count: curr.count });
+      }
+      return acc;
+    }, []);
+
+    // Sırala (en çok kullanılandan en aza)
+    mergedDeviceTypes.sort((a, b) => b.count - a.count);
+
+    res.json(responseSuccess({
+      hourly_activity: hourlyData,
+      device_types: mergedDeviceTypes
+    }));
+
+  } catch (error) {
+    console.error('PWA analytics getirme hatası:', error);
+    res.status(500).json(responseError('Sunucu hatası'));
+  }
+};

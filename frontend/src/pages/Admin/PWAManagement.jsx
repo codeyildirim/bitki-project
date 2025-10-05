@@ -16,6 +16,10 @@ const PWAManagement = () => {
     last30Days: [],
     deviceStats: []
   });
+  const [analytics, setAnalytics] = useState({
+    hourly_activity: [],
+    device_types: []
+  });
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('stats');
@@ -34,7 +38,20 @@ const PWAManagement = () => {
   useEffect(() => {
     fetchPWAStats();
     fetchNotifications();
+    fetchPWAAnalytics();
   }, []);
+
+  const fetchPWAAnalytics = async () => {
+    try {
+      const response = await adminApi.get('/pwa/analytics');
+
+      if (response.data.success) {
+        setAnalytics(response.data.data);
+      }
+    } catch (error) {
+      console.error('❌ PWA analytics yüklenemedi:', error);
+    }
+  };
 
   const fetchPWAStats = async () => {
     try {
@@ -352,6 +369,76 @@ const PWAManagement = () => {
                     >
                       {stats.deviceStats.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                  </PieChart>
+                </ResponsiveContainer>
+              ) : (
+                <p className="text-center text-gray-500">Henüz veri yok</p>
+              )}
+            </div>
+          </div>
+
+          {/* Yeni Analytics Grafikleri */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* En Aktif Saatler */}
+            <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+              <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                <Clock className="text-green-600" size={20} />
+                📊 En Aktif Saatler (Son 7 Gün)
+              </h3>
+              {analytics.hourly_activity && analytics.hourly_activity.length > 0 ? (
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart data={analytics.hourly_activity}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis
+                      dataKey="hour"
+                      tickFormatter={(h) => `${h}:00`}
+                    />
+                    <YAxis />
+                    <Tooltip
+                      labelFormatter={(h) => `Saat: ${h}:00`}
+                      formatter={(value) => [`${value} açılış`, 'Kullanım']}
+                    />
+                    <Bar dataKey="count" fill="#16a34a" radius={[8, 8, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              ) : (
+                <p className="text-center text-gray-500">Henüz veri yok</p>
+              )}
+            </div>
+
+            {/* En Çok Kullanılan Cihaz Türleri */}
+            <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+              <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                <Smartphone className="text-blue-600" size={20} />
+                📱 En Çok Kullanılan Cihaz Türleri
+              </h3>
+              {analytics.device_types && analytics.device_types.length > 0 ? (
+                <ResponsiveContainer width="100%" height={300}>
+                  <PieChart>
+                    <Pie
+                      data={analytics.device_types}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={true}
+                      label={({ device, percent }) => `${device}: ${(percent * 100).toFixed(0)}%`}
+                      outerRadius={90}
+                      dataKey="count"
+                    >
+                      {analytics.device_types.map((entry, index) => (
+                        <Cell
+                          key={`cell-${index}`}
+                          fill={
+                            entry.device === 'iOS' ? '#60a5fa' :
+                            entry.device === 'Android' ? '#34d399' :
+                            entry.device === 'macOS' ? '#a78bfa' :
+                            entry.device === 'Windows' ? '#f59e0b' :
+                            entry.device === 'Linux' ? '#ef4444' :
+                            '#9ca3af'
+                          }
+                        />
                       ))}
                     </Pie>
                     <Tooltip />

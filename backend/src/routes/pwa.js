@@ -7,7 +7,8 @@ import {
   sendPushNotification,
   getNotifications,
   deleteNotification,
-  getPushFailures
+  getPushFailures,
+  getPWAAnalytics
 } from '../controllers/pwa.js';
 import { authenticateToken, requireAdmin } from '../middleware/auth.js';
 
@@ -20,6 +21,7 @@ router.post('/unsubscribe', unsubscribePush);
 
 // Admin routes
 router.get('/stats', authenticateToken, requireAdmin, getPWAStats);
+router.get('/analytics', authenticateToken, requireAdmin, getPWAAnalytics);
 router.get('/notifications', authenticateToken, requireAdmin, getNotifications);
 router.get('/failures', authenticateToken, requireAdmin, getPushFailures);
 router.post('/notifications/send', authenticateToken, requireAdmin, sendPushNotification);
