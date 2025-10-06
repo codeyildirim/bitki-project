@@ -129,6 +129,55 @@ app.use(checkIPBan);
 // Static files (uploads) - Render kalıcı disk için
 const UPLOAD_DIR = process.env.UPLOAD_DIR || (process.env.NODE_ENV === 'production' ? '/opt/render/project/uploads' : './uploads');
 
+// ========================================
+// DISK HEALTH CHECK (Startup)
+// ========================================
+console.log('🔍 Checking upload directory health...');
+console.log('  Upload dir:', UPLOAD_DIR);
+console.log('  Process user:', process.env.USER || 'unknown');
+console.log('  Process UID:', process.getuid ? process.getuid() : 'N/A');
+
+try {
+  // Test 1: Directory exists
+  if (!fs.existsSync(UPLOAD_DIR)) {
+    console.warn('⚠️  Upload directory does not exist, creating...');
+    fs.mkdirSync(UPLOAD_DIR, { recursive: true, mode: 0o755 });
+    console.log('✅ Upload directory created');
+  } else {
+    console.log('✅ Upload directory exists');
+  }
+
+  // Test 2: Write permission
+  fs.accessSync(UPLOAD_DIR, fs.constants.W_OK);
+  console.log('✅ Upload directory is writable');
+
+  // Test 3: Create test file
+  const testFile = join(UPLOAD_DIR, '.write-test');
+  fs.writeFileSync(testFile, 'test');
+  fs.unlinkSync(testFile);
+  console.log('✅ Upload directory write test passed');
+
+} catch (err) {
+  console.error('❌ CRITICAL: Upload directory health check FAILED!');
+  console.error('  Error code:', err.code);
+  console.error('  Error message:', err.message);
+  console.error('  Upload dir:', UPLOAD_DIR);
+
+  if (err.code === 'EACCES') {
+    console.error('🚨 PERMISSION DENIED! Render disk permissions issue.');
+    console.error('   Solution 1: Check Render Persistent Disk is mounted at /opt/render/project/');
+    console.error('   Solution 2: Verify UPLOAD_DIR env variable in Render Dashboard');
+    console.error('   Solution 3: Contact Render support for disk permissions');
+  } else if (err.code === 'ENOENT') {
+    console.error('🚨 PATH NOT FOUND! Directory cannot be created.');
+    console.error('   Solution: Verify /opt/render/project/ exists (Render persistent disk)');
+  }
+
+  // DON'T exit - let app start but log critical error
+  console.error('⚠️  Application will start but FILE UPLOADS WILL FAIL!');
+}
+console.log('========================================\n');
+
 if (!fs.existsSync(UPLOAD_DIR)) {
   fs.mkdirSync(UPLOAD_DIR, { recursive: true });
 }

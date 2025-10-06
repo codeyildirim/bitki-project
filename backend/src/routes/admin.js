@@ -40,9 +40,20 @@ const productStorage = multer.diskStorage({
     const isVideo = file.mimetype.startsWith('video/');
     const destination = isVideo ? getUploadPath('videos') : getUploadPath('products');
 
-    // Ensure directory exists
+    // Ensure directory exists with error handling
     if (!fs.existsSync(destination)) {
-      fs.mkdirSync(destination, { recursive: true });
+      try {
+        fs.mkdirSync(destination, { recursive: true, mode: 0o755 });
+        console.log('✅ Upload directory created:', destination);
+      } catch (err) {
+        console.error('❌ CRITICAL: Cannot create upload directory:', destination);
+        console.error('❌ Error details:', err.code, err.message);
+        console.error('❌ Current user:', process.env.USER || 'unknown');
+        console.error('❌ Process UID:', process.getuid ? process.getuid() : 'N/A');
+
+        // Multer'a hatayı ilet
+        return cb(new Error(`Upload klasörü oluşturulamadı: ${err.message} (${err.code})`));
+      }
     }
 
     cb(null, destination);
