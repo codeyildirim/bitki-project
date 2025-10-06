@@ -100,7 +100,7 @@ export const getProduct = async (req, res) => {
       ORDER BY created_at DESC
     `, [id]);
 
-    const baseURL = process.env.BASE_URL || 'https://seninrenderlink.onrender.com';
+    const baseURL = process.env.BASE_URL || 'https://bitki-project.onrender.com';
 
     // Calculate discount for tiered pricing if badges are enabled
     let tieredPricingWithDiscount = null;
@@ -191,7 +191,7 @@ export const getFeaturedProducts = async (req, res) => {
       LIMIT 8
     `);
 
-    const baseURL = process.env.BASE_URL || 'https://seninrenderlink.onrender.com';
+    const baseURL = process.env.BASE_URL || 'https://bitki-project.onrender.com';
     const formattedProducts = products.map(product => ({
       ...product,
       images: product.images ? JSON.parse(product.images).map(img => {

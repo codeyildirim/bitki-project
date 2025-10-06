@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { productsApi } from '../utils/api.js';
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -17,8 +18,8 @@ const ProductDetail = () => {
 
   const fetchProduct = async () => {
     try {
-      const response = await fetch(`/api/products/${id}`);
-      const data = await response.json();
+      const response = await productsApi.getById(id);
+      const data = response.data;
       if (data.success) {
         setProduct(data.data);
         setReviews(data.data.reviews || []);
