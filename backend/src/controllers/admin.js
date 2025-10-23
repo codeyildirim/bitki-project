@@ -269,17 +269,14 @@ export const createProduct = async (req, res) => {
       return res.status(400).json(responseError('Geçerli bir kategori seçilmelidir'));
     }
 
-    const baseURL = process.env.BASE_URL || 'https://bitki-project.onrender.com';
-    console.log('🌐 Base URL:', baseURL);
-
-    // Handle images
+    // Handle images - sadece relatif path kaydet, base URL API response'ta eklenir
     const images = req.files?.images
-      ? req.files.images.map(file => `${baseURL}/uploads/products/${file.filename}`)
+      ? req.files.images.map(file => `/uploads/products/${file.filename}`)
       : [];
 
-    // Handle videos
+    // Handle videos - sadece relatif path kaydet
     const videos = req.files?.videos
-      ? req.files.videos.map(file => `${baseURL}/uploads/videos/${file.filename}`)
+      ? req.files.videos.map(file => `/uploads/videos/${file.filename}`)
       : [];
 
     console.log('📁 File processing:', {
@@ -337,19 +334,17 @@ export const updateProduct = async (req, res) => {
       return res.status(404).json(responseError('Ürün bulunamadı'));
     }
 
-    const baseURL = process.env.BASE_URL || 'https://bitki-project.onrender.com';
-
-    // Handle existing images
+    // Handle existing images - sadece relatif path kullan
     let images = product.images ? JSON.parse(product.images) : [];
     if (req.files?.images && req.files.images.length > 0) {
-      const newImages = req.files.images.map(file => `${baseURL}/uploads/products/${file.filename}`);
+      const newImages = req.files.images.map(file => `/uploads/products/${file.filename}`);
       images = [...images, ...newImages];
     }
 
-    // Handle existing videos
+    // Handle existing videos - sadece relatif path kullan
     let videos = product.videos ? JSON.parse(product.videos) : [];
     if (req.files?.videos && req.files.videos.length > 0) {
-      const newVideos = req.files.videos.map(file => `${baseURL}/uploads/videos/${file.filename}`);
+      const newVideos = req.files.videos.map(file => `/uploads/videos/${file.filename}`);
       videos = [...videos, ...newVideos];
     }
 
